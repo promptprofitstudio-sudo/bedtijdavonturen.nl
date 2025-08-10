@@ -1,0 +1,11 @@
+
+[build]
+  publish = "."
+  command = ""
+
+[functions]
+  directory = "netlify/functions"
+
+[[scheduled]]
+  path = "/.netlify/functions/weekly-digest"
+  schedule = "0 19 * * 4" # Thursday 19:00 Europe/Amsterdam-ish (note: Netlify runs in UTC)

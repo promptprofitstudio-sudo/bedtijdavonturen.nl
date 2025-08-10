@@ -1,212 +1,94 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bedtijdavonturen – AI bedtijdverhalen op maat</title>
-  <meta name="description" content="Ontvang elke week persoonlijke bedtijdverhalen voor je kind. Rustgevend, liefdevol en afgestemd op naam en interesses. Probeer nu 4 weken voor €2." />
-  <!-- Styles -->
-  <link rel="stylesheet" href="assets/style.css" />
-  <!-- Icon sprite -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='%23facc15' /></svg>" />
-  <!-- MailerLite universal script placeholder. Replace ACCOUNT_ID with your account id. -->
-  <!--
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bedtijdavonturen – Persoonlijke bedtijdverhalen</title>
+  <meta name="description" content="Korte, rustgevende bedtijdverhalen op maat. Gratis starten, daarna wekelijks een persoonlijk verhaal.">
+  <style>
+    body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;margin:0;background:#fafafa;color:#0f172a}
+    .container{max-width:960px;margin:0 auto;padding:0 16px}
+    header{background:linear-gradient(180deg,#e0f2fe,#fafafa);padding:24px 0 32px}
+    h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:8px 0 6px}
+    p.lead{font-size:18px;color:#334155;max-width:720px}
+    .cta{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+    .btn{background:#0ea5e9;color:#fff;text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:600}
+    .btn.secondary{background:#eef2ff;color:#312e81}
+    section{padding:36px 0;background:#fff;border-top:1px solid #e5e7eb}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 4;background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:16px}
+    .small{font-size:12px;color:#64748b}
+    footer{padding:24px 0;background:#0b1220;color:#cbd5e1;margin-top:24px}
+    .notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:8px 12px;border-radius:10px;margin:10px 0}
+  </style>
+
+  <!-- GA4 placeholder -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>
   <script>
-    (function (m, a, i, l, e, r) {
-      m['MailerLiteObject'] = e;
-      function f() {
-        var c = { a: arguments, q: [] };
-        var r = this.push(c);
-        return 'function' != typeof r ? r : f.bind(c.q);
-      }
-      f.q = f.q || [];
-      m[e] = m[e] || f.bind(f.q);
-      var t = a.createElement(i);
-      var s = a.getElementsByTagName(i)[0];
-      t.async = 1;
-      t.src = l;
-      s.parentNode.insertBefore(t, s);
-    })(window, document, 'script', 'https://assets.mlcdn.com/ml.js', 'ml');
-    ml('account', 'ACCOUNT_ID');
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config','G-XXXX');
   </script>
-  -->
+  <script defer src="/assets/js/utm.js"></script>
 </head>
 <body>
-  <!-- Header with hero section and starfield -->
-  <header class="hero" id="top">
-    <div class="moon"></div>
-    <div class="stars"></div>
+  <header>
     <div class="container">
-      <span class="badge">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" fill="currentColor" opacity="0.1" />
-          <path d="M8 12l2.5 2.5L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        Nieuw!
-      </span>
-      <h1>Persoonlijke bedtijdverhalen</h1>
-      <p class="lead">Elke avond een uniek verhaaltje, afgestemd op de naam en interesses van jouw kind. Perfect voor een rustig slaapritueel.</p>
-      <div class="hero-cta">
-        <a href="#aanmelden" class="btn">Ontvang je eerste verhaal gratis</a>
-        <a href="#proef" class="btn alt">Ontdek ons proefaanbod</a>
+      <span class="small">Voor NL ouders met kids 3–6 jaar</span>
+      <h1>Rust in huis met <em>persoonlijke</em> bedtijdverhalen</h1>
+      <p class="lead">Korte, schermvrije verhaaltjes op maat – met naam en interesses van je kind. Gratis starten, daarna wekelijks een verhaal dat past bij jullie ritme.</p>
+      <div class="cta">
+        <a class="btn" href="#aanmelden">Start gratis</a>
+        <a class="btn secondary" href="#proef">Proefaanbod €2 (4 weken)</a>
       </div>
     </div>
   </header>
 
-  <!-- Features section -->
-  <section class="section">
+  <section id="hoe-werkt-het">
     <div class="container">
-      <span class="kicker">Waarom Bedtijdavonturen</span>
-      <h2>Rust, liefde en magie in elk verhaal</h2>
-      <div class="grid cols-3">
-        <div class="feature">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M12 4h9" /><path d="M12 12h9" /><path d="M4 6h.01" /><path d="M4 18h.01" /><circle cx="4" cy="12" r="1" /></svg>
-          <div>
-            <h3>Volledig persoonlijk</h3>
-            <p class="small">We verwerken de naam, interesses en leeftijd van je kind in elk verhaal voor een magische beleving.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9" /><path d="M3 10h18" /><path d="M7 20v2" /><path d="M10 20v2" /><path d="M13 20v2" /><path d="M16 20v2" /><path d="M19 20v2" /></svg>
-          <div>
-            <h3>Rustgevende structuur</h3>
-            <p class="small">Korte, kalme verhaaltjes helpen om het hoofdje tot rust te brengen en de slaap te vinden.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" /><path d="M8 2v4" /><path d="M16 2v4" /><path d="M4 10h16" /></svg>
-          <div>
-            <h3>Volledig automatisch</h3>
-            <p class="small">Een AI schrijft de verhaaltjes en bezorgt ze wekelijks in je inbox. Jij hoeft alleen voor te lezen.</p>
-          </div>
-        </div>
+      <h2>Hoe werkt het?</h2>
+      <div class="grid">
+        <div class="card"><h3>1) Meld je aan</h3><p>Ontvang een week lang tips én verhaaltjes om uit te proberen.</p></div>
+        <div class="card"><h3>2) Geef voorkeuren door</h3><p>Noem thema’s (dieren, ruimte, voertuigen) en leeftijd. Wij doen de rest.</p></div>
+        <div class="card"><h3>3) Elke week een verhaal</h3><p>Met één klik open je een persoonlijk verhaal op onze site.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- How it works section -->
-  <section class="section alt">
+  <section id="proef">
     <div class="container">
-      <span class="kicker">Hoe werkt het</span>
-      <h2>Slechts drie simpele stappen</h2>
-      <div class="grid cols-3">
-        <div class="feature">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12v-2a3 3 0 0 1 6 0v2" /><rect x="5" y="12" width="14" height="10" rx="2" /><path d="M12 20v2" /></svg>
-          <div>
-            <h3>Meld je aan</h3>
-            <p class="small">Gebruik het formulier hieronder om je in te schrijven en de interesses van je kind op te geven.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v4" /><path d="M6 8v6a4 4 0 0 0 8 0V8" /><path d="M10 14v6" /><path d="M18 8a2 2 0 0 1 2 2v2a6 6 0 1 1-12 0V10a2 2 0 0 1 2-2" /></svg>
-          <div>
-            <h3>Ontvang verhalen</h3>
-            <p class="small">Elke week komt er een gepersonaliseerd verhaaltje in je mailbox. Print of lees het vanaf je telefoon.</p>
-          </div>
-        </div>
-        <div class="feature">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h4" /><path d="M17 19h4" /><path d="M7 19a5 5 0 0 1 10 0" /><circle cx="12" cy="8" r="5" /></svg>
-          <div>
-            <h3>Creëer rust</h3>
-            <p class="small">Lees samen en bouw een vertrouwd, liefdevol ritueel op dat helpt bij het in slaap vallen.</p>
-          </div>
-        </div>
-      </div>
+      <h2>Proefaanbod</h2>
+      <p>4 weken wekelijks persoonlijk verhaal voor slechts €2. Daarna kun je stoppen of doorgaan.</p>
+      <a class="btn" href="#" id="paylink">Start proef (Stripe)</a>
+      <p class="small">Veilig betalen via Stripe. Je kunt elk moment opzeggen.</p>
     </div>
   </section>
 
-  <!-- Proefaanbod section -->
-  <section class="section" id="proef">
+  <section id="aanmelden">
     <div class="container">
-      <span class="kicker">Proefaanbod</span>
-      <h2>Probeer 4 weken voor slechts €2</h2>
-      <div class="card">
-        <p>Laat je verrassen door een maand vol avonturen. Na je proefperiode beslis je of je doorgaat, helemaal vrijblijvend.</p>
-        <ul style="list-style: none; padding-left: 0; margin-top: 12px; margin-bottom: 16px;">
-          <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-            <svg width="20" height="20" fill="none" stroke="var(--ok)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-            Persoonlijke verhalen met naam &amp; interesses
-          </li>
-          <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-            <svg width="20" height="20" fill="none" stroke="var(--ok)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-            Wekelijks automatisch in je inbox
-          </li>
-          <li style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-            <svg width="20" height="20" fill="none" stroke="var(--ok)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
-            Opzeggen kan met één klik
-          </li>
-        </ul>
-        <a href="#aanmelden" class="btn">Start mijn proefperiode</a>
-      </div>
+      <h2>Probeer gratis</h2>
+      <p>Ontvang direct je eerste verhaaltje en tips voor een rustig bedtijdritueel.</p>
+      <div class="notice">Tip: Als het formulier niet verschijnt, controleer of je adblocker MailerLite blokkeert.</div>
+      <!-- MailerLite embed: vervang account en form indien nodig -->
+      <div class="ml-embedded" data-form="m1IM6t"></div>
+      <script>
+      (function (m, a, i, l, e, r) {
+        m['MailerLiteObject'] = e;
+        function f() { var c = { a: arguments, q: [] }; var r = this.push(c); return 'function' != typeof r ? r : f.bind(c.q); }
+        f.q = f.q || [];
+        m[e] = m[e] || f.bind(f.q);
+        m[e].q = m[e].q || f.q;
+        r = a.createElement(i); var _ = a.getElementsByTagName(i)[0]; r.async=1; r.src=l+'?v'+(~~(new Date().getTime()/1000000)); _.parentNode.insertBefore(r,_);
+      })(window, document, 'script', 'https://assets.mailerlite.com/js/universal.js', 'ml');
+      ml('account', '1722170'); // <-- vervang indien je eigen ID anders is
+      </script>
     </div>
   </section>
 
-  <!-- Signup section with MailerLite embed placeholder -->
-  <section class="section alt" id="aanmelden">
-    <div class="container">
-      <span class="kicker">Aanmelden</span>
-      <h2>Schrijf je gratis in</h2>
-      <p class="lead">Vul hieronder je gegevens in. Je ontvangt je eerste verhaal meteen. Dit is een demo-formulier. Vervang het straks door de MailerLite embedcode.</p>
-      <div class="notice" id="ml-placeholder-msg">Let op: dit is een demo. Vul straks de daadwerkelijke MailerLite code in.</div>
-      <form id="ml-placeholder-form" class="form-wrap" style="margin-top:16px;">
-        <div>
-          <label for="name">Naam ouder</label>
-          <input type="text" id="name" class="input" placeholder="Jouw naam" required />
-        </div>
-        <div>
-          <label for="email">E‑mail</label>
-          <input type="email" id="email" class="input" placeholder="jij@example.com" required />
-        </div>
-        <div>
-          <button type="submit" class="btn">Schrijf mij in</button>
-        </div>
-      </form>
-      <!-- Real MailerLite embed goes here -->
-      <!--
-      <div class="ml-embedded" data-form="FORM_ID"></div>
-      -->
-    </div>
-  </section>
-
-  <!-- Stories preview section -->
-  <section class="section">
-    <div class="container">
-      <span class="kicker">Voorproefje</span>
-      <h2>Kijk alvast naar een paar verhalen</h2>
-      <p class="lead">We hebben drie korte verhaaltjes online gezet zodat je kunt zien hoe onze stijl klinkt. Elk verhaal is rustig, vriendelijk en vol fantasie.</p>
-      <div class="grid cols-3">
-        <div class="card">
-          <h3>De maan en het konijntje</h3>
-          <p class="small">Een zacht verhaal over een nieuwsgierig konijntje dat de maan volgt en ontdekt dat thuis de beste plek is.</p>
-          <a href="stories.html#verhaal1" class="btn alt">Lees verhaal</a>
-        </div>
-        <div class="card">
-          <h3>Het sterrenfeest</h3>
-          <p class="small">Verschillende sterren houden een stille fuif aan de hemel, tot ze merken dat een klein meisje toekijkt.</p>
-          <a href="stories.html#verhaal2" class="btn alt">Lees verhaal</a>
-        </div>
-        <div class="card">
-          <h3>De droomtrein</h3>
-          <p class="small">Spring op een trein vol dieren die zachtjes suizend de dromen van kinderen binnenrijdt.</p>
-          <a href="stories.html#verhaal3" class="btn alt">Lees verhaal</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
   <footer>
-    <div class="container footer-wrap">
-      <nav>
-        <a href="#top">Home</a>
-        <a href="stories.html">Verhalen</a>
-        <a href="blog/index.html">Blog</a>
-        <a href="privacy.html">Privacy</a>
-      </nav>
-      <span class="small">&copy; <script>document.write(new Date().getFullYear());</script> Bedtijdavonturen</span>
+    <div class="container">
+      <small>&copy; 2025 Bedtijdavonturen • <a href="/privacy.html" style="color:#93c5fd">Privacy</a></small>
     </div>
   </footer>
-
-  <script src="assets/main.js"></script>
 </body>
 </html>

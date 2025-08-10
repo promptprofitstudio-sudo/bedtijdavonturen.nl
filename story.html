@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jullie Verhaal – Bedtijdavonturen</title>
+  <style>
+    body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;margin:0}
+    .container{max-width:720px;margin:0 auto;padding:24px}
+    .meta{color:#64748b;font-size:14px}
+    .card{background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:16px;margin-top:16px;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Voor <span id="child"></span></h1>
+    <div class="meta" id="meta"></div>
+    <div class="card" id="story">Verhaal laden…</div>
+  </div>
+  <script>
+    const p = new URLSearchParams(location.search);
+    const name = p.get('name') || 'vriendje';
+    const interests = (p.get('interests')||'dieren').split(',').slice(0,3).join(', ');
+    document.getElementById('child').textContent = name;
+    document.getElementById('meta').textContent = `Thema’s: ${interests}`;
+
+    fetch('/.netlify/functions/generate-story?name='+encodeURIComponent(name)+'&interests='+encodeURIComponent(interests)+'&lang=nl')
+      .then(r=>r.json()).then(d=>{
+        document.getElementById('story').textContent = d.story || 'Geen verhaal ontvangen.';
+      }).catch(()=>{
+        document.getElementById('story').textContent = 'Er ging iets mis bij het laden van het verhaal.'
+      });
+  </script>
+</body>
+</html>
