@@ -1,0 +1,9 @@
+{
+  "name": "Bedtijdavonturen",
+  "short_name": "Bedtijd",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F7FF",
+  "theme_color": "#0B1020",
+  "icons": []
+}
