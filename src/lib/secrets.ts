@@ -1,6 +1,13 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 
-const client = new SecretManagerServiceClient()
+let client: SecretManagerServiceClient | null = null
+
+function getClient() {
+    if (!client) {
+        client = new SecretManagerServiceClient()
+    }
+    return client
+}
 
 // Caching secrets in memory to prevent excessive API calls in warm instances
 const secretCache: Record<string, string> = {}
@@ -13,7 +20,7 @@ export async function getSecret(name: string): Promise<string | undefined> {
     try {
         // Hardcoded project ID for scaffold simplicity
         const projectId = 'bedtijdavonturen-prod'
-        const [version] = await client.accessSecretVersion({
+        const [version] = await getClient().accessSecretVersion({
             name: `projects/${projectId}/secrets/${name}/versions/latest`,
         })
 
