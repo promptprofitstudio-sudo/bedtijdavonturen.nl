@@ -41,10 +41,19 @@ export default function PricingPage() {
     },
   ]
 
+  /* New State for Waiver Checkbox */
+  const [agreedToTerms, setAgreedToTerms] = React.useState(false)
+
   const handleSelect = (plan: Plan) => {
     if (!user) {
       setToast('Log eerst in om te abonneren.')
       setTimeout(() => router.push('/account'), 1500)
+      return
+    }
+
+    /* Checkbox Validation */
+    if (!agreedToTerms) {
+      setToast('Ga eerst akkoord met de voorwaarden.')
       return
     }
 
@@ -72,6 +81,20 @@ export default function PricingPage() {
       </header>
 
       <div className="space-y-3">
+        {/* Compliance Checkbox */}
+        <div className="bg-moon-50 p-3 rounded-xl border border-moon-100 flex gap-3 items-start">
+          <input
+            type="checkbox"
+            id="terms-waiver"
+            checked={agreedToTerms}
+            onChange={(e) => setAgreedToTerms(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-ink-300 text-navy-600 focus:ring-navy-600"
+          />
+          <label htmlFor="terms-waiver" className="text-xs text-ink-700 cursor-pointer">
+            Ik ga akkoord met de <a href="/terms" target="_blank" className="underline font-bold">voorwaarden</a> en verklaar dat ik afstand doe van mijn herroepingsrecht zodra de directe levering begint (direct na betaling).
+          </label>
+        </div>
+
         {plans.map((p) => (
           <PlanCard
             key={p.name}
