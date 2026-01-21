@@ -28,6 +28,7 @@ export const metadata: Metadata = {
   },
 }
 
+import { Footer } from '@/components/Footer'
 import { AuthProvider } from '@/context/AuthContext'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -35,8 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="nl" className={inter.variable}>
       <body className="min-h-dvh bg-moon-50 text-ink-950">
         <AuthProvider>
-          <div className="mx-auto min-h-dvh max-w-md pb-20">
+          <div className="mx-auto min-h-dvh max-w-md pb-24 relative">
             {children}
+            <Footer />
           </div>
           <BottomNav />
         </AuthProvider>

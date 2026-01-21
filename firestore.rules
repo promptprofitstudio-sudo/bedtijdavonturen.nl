@@ -13,7 +13,7 @@ service cloud.firestore {
     
     // Stories access limits
     match /stories/{storyId} {
-      // Allow create if the userId matches the auth uid
+      // Allow create ONLY if the data.userId matches the auth uid
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       
       // Allow read/update/delete if the existing doc belongs to the user

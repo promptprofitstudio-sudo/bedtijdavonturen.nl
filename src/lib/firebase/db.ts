@@ -117,3 +117,27 @@ export async function updateStoryAudio(storyId: string, audioUrl: string): Promi
         audioUrl
     })
 }
+
+export async function deleteUserData(userId: string): Promise<void> {
+    const db = await getDb()
+
+    // 1. Delete all profiles
+    const profiles = await getProfiles(userId)
+    for (const p of profiles) {
+        await deleteProfile(userId, p.id)
+    }
+
+    // 2. Delete all user stories
+    const stories = await getUserStories(userId)
+    for (const s of stories) {
+        await deleteDoc(doc(db, 'stories', s.id))
+        // NOTE: Storage audio is NOT automatically deleted here.
+        // In a real production app, we should use a Cloud Function (onDelete trigger)
+        // to recursively delete storage files. For MVP, this cleans the DB.
+    }
+
+    // 3. Delete user document
+    await deleteDoc(doc(db, 'users', userId))
+
+    // Note: Auth user deletion must happen on Client side (requires recent login).
+}

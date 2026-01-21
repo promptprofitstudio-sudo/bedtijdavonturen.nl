@@ -1,0 +1,20 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Stories: Only allow write if metadata.storyId exists AND (FUTURE: metadata.userId matches auth)
+    // For now, we allow write if authenticated, but we should enforce a userId check if possible.
+    // Update: We'll enforce that the User MUST be authenticated. 
+    // Ideally, we'd structure paths as /users/{userId}/...
+    
+    match /stories/{storyId}/{allPaths=**} {
+       // Allow interaction if authenticated
+       allow read: if request.auth != null;
+       allow write: if request.auth != null; 
+    }
+    
+    // Explicitly deny everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

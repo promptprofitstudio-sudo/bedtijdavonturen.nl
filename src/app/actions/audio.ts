@@ -55,7 +55,8 @@ export async function generateAudioAction(storyId: string) {
 
         // 4. Upload using Admin SDK (Secure Write)
         console.log('Uploading audio to Storage...')
-        const audioUrl = await uploadStoryAudio(storyId, buffer)
+        // Ensure story.userId exists. It should.
+        const audioUrl = await uploadStoryAudio(storyId, buffer, story.userId)
 
         // 5. Update Firestore using Admin SDK (Secure Update)
         console.log('Updating story with audio URL...')

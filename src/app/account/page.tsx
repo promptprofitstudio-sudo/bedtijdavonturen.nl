@@ -84,8 +84,41 @@ export default function AccountPage() {
         )}
       </Card>
 
-      <div className="text-center">
+      <div className="text-center space-y-4">
         <p className="text-xs text-ink-400">User ID: {user.uid}</p>
+        <div className="border-t border-moon-100 pt-4">
+          <Button
+            variant="ghost"
+            size="md"
+            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+            onClick={async () => {
+              const confirm = window.confirm('Weet u zeker dat u uw account wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')
+              if (confirm) {
+                try {
+                  const { deleteUserData } = await import('@/lib/firebase/db')
+
+                  // Dynamic import to get Auth instance
+                  const { getAuth, deleteUser } = await import('firebase/auth')
+                  const auth = getAuth()
+                  const currentUser = auth.currentUser
+
+                  if (!currentUser) throw new Error('Geen gebruiker ingelogd')
+
+                  await deleteUserData(currentUser.uid)
+                  await deleteUser(currentUser)
+
+                  // Redirect handled by AuthContext or refresh
+                  window.location.href = '/'
+                } catch (err: any) {
+                  console.error(err)
+                  alert('Kon account niet verwijderen. Log opnieuw in en probeer het nogmaals. (Error: ' + err.message + ')')
+                }
+              }
+            }}
+          >
+            Account Verwijderen
+          </Button>
+        </div>
       </div>
     </main>
   )

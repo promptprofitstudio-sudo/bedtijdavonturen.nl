@@ -9,7 +9,7 @@ async function getStorageInstance(): Promise<FirebaseStorage> {
     return services.storage
 }
 
-export async function uploadStoryAudio(storyId: string, audioBuffer: Buffer): Promise<string> {
+export async function uploadStoryAudio(storyId: string, audioBuffer: Buffer, userId: string): Promise<string> {
     const storage = await getStorageInstance()
     const storageRef = ref(storage, `stories/${storyId}/audio.mp3`)
 
@@ -18,7 +18,10 @@ export async function uploadStoryAudio(storyId: string, audioBuffer: Buffer): Pr
 
     await uploadBytes(storageRef, uint8Array, {
         contentType: 'audio/mpeg',
-        customMetadata: { storyId }
+        customMetadata: {
+            storyId,
+            userId
+        }
     })
 
     return await getDownloadURL(storageRef)
