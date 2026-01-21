@@ -198,15 +198,15 @@ export default function WizardPage() {
         ) : null}
       </div>
 
-      {/* Navigation Buttons */}
-      <div className="fixed bottom-24 left-0 right-0 px-6">
+      {/* Navigation Bar (Glassmorphism above BottomNav) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-moon-50/95 backdrop-blur-xl border-t border-moon-200/60 pb-[calc(88px+env(safe-area-inset-bottom,20px))] pt-4 px-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
           {step > 1 && !isGenerating ? (
-            <Button variant="ghost" onClick={prev} className="flex-1">Terug</Button>
+            <Button variant="ghost" onClick={prev} className="flex-1 border border-moon-200 bg-white shadow-sm hover:bg-moon-100">Terug</Button>
           ) : <div className="flex-1" />}
 
           {step < 4 ? (
-            <Button onClick={next} disabled={!canNext} variant="primary" className="flex-[2] shadow-soft">
+            <Button onClick={next} disabled={!canNext} variant="primary" className="flex-[2] shadow-teal-glow">
               Volgende
             </Button>
           ) : <div className="flex-[2]" />}
