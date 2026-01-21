@@ -50,3 +50,11 @@ Thumbs.db
 # Local Config
 .ai-config.md
 
+
+# Secrets
+temp_key.json
+test-key.cjs
+
+# Playwright
+test-results/
+playwright-report/

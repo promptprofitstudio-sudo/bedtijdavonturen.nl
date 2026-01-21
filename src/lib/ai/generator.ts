@@ -5,7 +5,7 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 // Duplicate getSecret here to avoid dependency cycle or complexity with client-config
 // In a real app, I'd extract this to src/lib/secrets.ts
 const client = new SecretManagerServiceClient()
-async function getSecret(name: string): Promise<string | undefined> {
+export async function getSecret(name: string): Promise<string | undefined> {
     try {
         // Hardcoded project ID for scaffold simplicity as per user context
         const projectId = 'pps-core-441'
@@ -35,10 +35,34 @@ export async function generateStoryWithAI(
     theme: string
 ): Promise<GeneratedStoryData> {
 
+    // --- TEST MODE MOCK ---
+    if (process.env.TEST_MODE === 'true') {
+        console.log('[Mock] Generating story in TEST_MODE')
+        return {
+            title: `Avontuur van ${name}`,
+            mood,
+            minutes: 5,
+            excerpt: `Een spannend testverhaal over ${theme}.`,
+            body: [
+                { type: 'p', text: `Er was eens een ${theme} die ${name} heette.` },
+                { type: 'p', text: 'Samen beleefden ze een bedtijdavontuur.' },
+                { type: 'pause', text: 'Even rusten...' },
+                { type: 'p', text: 'En toen gingen ze slapen. Welterusten.' }
+            ],
+            dialogicPrompts: [
+                { pausePoint: 1, question: 'Wat zie je?', context: 'Check perceptie' },
+                { pausePoint: 3, question: 'Hoe voelt hij zich?', context: 'Check emotie' },
+                { pausePoint: 4, question: 'Slaap lekker?', context: 'Afsluiting' }
+            ]
+        }
+    }
+
     const apiKey = await getSecret('OPENAI_API_KEY')
     if (!apiKey) throw new Error('OpenAI API Key not found in Secrets Manager')
 
     const openai = new OpenAI({ apiKey })
+
+    // ... rest of AI logic ...
 
     // SAFETY & DIALOGIC LOGIC
     const isToddler = ageGroup === '2-4'

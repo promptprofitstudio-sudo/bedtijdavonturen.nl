@@ -2,7 +2,7 @@
 
 import { z } from 'zod'
 import { generateStoryWithAI } from '@/lib/ai/generator'
-import { createStory } from '@/lib/firebase/db'
+// import { createStory } from '@/lib/firebase/db' // client sdk not used here anymore
 import { StoryMood, StoryMoodSchema, AgeGroupSchema } from '@/lib/types'
 import { redirect } from 'next/navigation'
 
@@ -39,21 +39,28 @@ export async function generateStoryAction(formData: FormData) {
         // 2. Generate Story (AI)
         const generatedStory = await generateStoryWithAI(childName, ageGroup, mood as StoryMood, theme)
 
-        // 3. Save to DB
-        const storyId = await createStory({
+        // 3. Save to DB using Admin SDK (Server-side)
+        const { getAdminDb } = await import('@/lib/firebase/admin')
+        const adminDb = await getAdminDb()
+
+        const newStory = {
             ...generatedStory,
             userId,
             profileId,
             childName,
-            ageGroup: ageGroup, // Explicitly cast if needed, though validated by Zod
-            // The generator returns title, mood, minutes, excerpt, body
-            // We explicitly map them to ensure type safety, though spread works if key names match
-        })
+            ageGroup: ageGroup,
+            createdAt: new Date() // Admin SDK uses native Date or Timestamp
+        }
+
+        console.log('[Action] Attempting to write story to Firestore...', { storyId: null, userId })
+        const docRef = await adminDb.collection('stories').add(newStory)
+        console.log('[Action] Successfully wrote story:', docRef.id)
 
         // 4. Return Success
-        return { success: true, storyId }
+        return { success: true, storyId: docRef.id }
     } catch (error) {
         console.error('Story generation failed:', error)
-        return { error: 'Er ging iets mis met het maken van het verhaal.' }
+        const message = error instanceof Error ? error.message : 'Onbekende fout'
+        return { error: `Er ging iets mis: ${message}` }
     }
 }

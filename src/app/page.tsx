@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Button, Card, Chip, SectionTitle } from '@/components/ui'
+import { Button, Card, Chip, SectionTitle, Pill } from '@/components/ui'
 import { StoryCard } from '@/components/StoryCard'
 import { sampleStories } from '@/lib/mockData'
 
@@ -8,63 +8,85 @@ const moods = ['Rustig', 'Grappig', 'Dapper', 'Troost'] as const
 export default function HomePage() {
   return (
     <main className="px-4 py-6 space-y-6">
-      <header className="space-y-4">
-        <div className="rounded-2xl bg-gradient-to-b from-ink-950 to-ink-800 text-moon-50 p-5 shadow-soft overflow-hidden border border-ink-700">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-moon-100/80">Vanavond</p>
-              <h1 className="text-2xl font-extrabold tracking-tight">Een rustig verhaal in 60 seconden</h1>
-              <p className="text-sm text-moon-100/80">Gepersonaliseerd voor jouw kind. Lees, luister of print — zonder gedoe.</p>
+      <header className="space-y-6 pt-2">
+        {/* Active Child Indicator (Mockup: Fabi • 1 kind) */}
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-navy-900 flex items-center justify-center text-white font-bold shadow-soft">
+              B
             </div>
-            <div className="text-3xl" aria-hidden>🌙</div>
+            <h1 className="text-xl font-extrabold text-navy-900">Bedtijd</h1>
+          </div>
+          <Pill variant="default">Mijn Kind • 1 kind</Pill>
+        </div>
+
+        {/* Hero Card: "Vanavond" */}
+        <div className="relative overflow-hidden rounded-3xl bg-navy-900 p-6 text-white shadow-soft">
+          <div className="relative z-10 space-y-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-teal-400 text-xs font-bold uppercase tracking-wider">
+                <span>●</span> <span>Vanavond</span>
+              </div>
+              <h2 className="text-2xl font-extrabold leading-tight">
+                Vanavond een verhaal in 60 sec.
+              </h2>
+              <p className="text-navy-200 text-sm font-medium">Rustig • Persoonlijk • Bedtijd-safe</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Chip variant="teal">Rustig</Chip>
+              <Chip variant="def">Grappig</Chip>
+              <Chip variant="def">Dapper</Chip>
+            </div>
+
+            <div className="bg-navy-800/50 rounded-2xl p-5 border border-white/10 mt-6 backdrop-blur-sm">
+              <h3 className="font-bold text-lg mb-1">Maak het verhaal</h3>
+              <p className="text-navy-200 text-sm mb-4">Naam, thema, gevoel, lengte - klaar.</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/wizard" className="contents">
+                  <Button variant="teal" size="lg" className="w-full text-sm">Start wizard</Button>
+                </Link>
+                <Link href="/library" className="contents">
+                  <Button variant="ghost" className="w-full text-white hover:bg-white/10 hover:text-white text-sm">Favorieten</Button>
+                </Link>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {moods.map((m) => (
-              <span key={m} className="inline-flex items-center rounded-full bg-white/10 px-3 py-2 text-sm font-semibold">
-                {m}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <Link href="/wizard"><Button size="lg" className="w-full">Maak het verhaal</Button></Link>
-            <Link href="/pricing"><Button size="lg" variant="secondary" className="w-full">Bekijk plan</Button></Link>
-          </div>
+          {/* Decorative Gradient Blob */}
+          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-teal-500/20 blur-3xl" />
         </div>
       </header>
 
-      <section className="space-y-3">
-        <SectionTitle title="Snel kiezen" subtitle="Kies de sfeer — wij doen de rest." />
-        <Card className="space-y-3">
-          <div className="flex flex-wrap gap-2">
-            {moods.map((m) => (
-              <Chip key={m}>{m}</Chip>
-            ))}
-          </div>
-          <p className="text-xs text-ink-800/70">
-            Tip: voor bedtijd werkt ‘Rustig’ het best. Je kunt later altijd variëren.
-          </p>
-        </Card>
-      </section>
-
-      <section className="space-y-3">
-        <SectionTitle title="Recent" subtitle="Voorbeeldverhalen (mock data)." />
-        <div className="space-y-3">
-          {sampleStories.map((s) => (
-            <StoryCard key={s.id} story={s} />
-          ))}
+      <section className="space-y-4">
+        <SectionTitle title="Drie manieren om te gebruiken" subtitle="Kies wat past bij vanavond." />
+        <div className="grid gap-3">
+          <Card className="flex items-center gap-4 p-4 hover:border-teal-400 cursor-pointer transition-colors group">
+            <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📖</div>
+            <div>
+              <h4 className="font-bold text-navy-900">Lees</h4>
+              <p className="text-xs text-navy-800/60">Dim-modus voor in het donker</p>
+            </div>
+          </Card>
+          <Card className="flex items-center gap-4 p-4 hover:border-teal-400 cursor-pointer transition-colors group">
+            <div className="h-12 w-12 rounded-full bg-teal-100 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎧</div>
+            <div>
+              <h4 className="font-bold text-navy-900">Luister</h4>
+              <p className="text-xs text-navy-800/60">Scherm uit, audio aan</p>
+            </div>
+          </Card>
         </div>
       </section>
 
-      <section className="space-y-3">
-        <Card className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-extrabold">Schermvriendelijk</p>
-            <p className="text-xs text-ink-800/70">Lees dim, luister met scherm uit, of print een PDF.</p>
+      <section className="space-y-4 pb-20">
+        <div className="bg-gradient-to-r from-teal-50 to-moon-100 rounded-3xl p-6 border border-teal-100">
+          <div className="space-y-2">
+            <Pill variant="teal">Nieuw: Serie-universum</Pill>
+            <h3 className="text-xl font-extrabold text-navy-900">Terugkerende vriendjes</h3>
+            <p className="text-sm text-navy-800/70">Wist je dat kinderen beter slapen bij herhaling? Maak een vervolg op gisteravond.</p>
+            <Button variant="primary" className="w-full mt-2">Start een serie</Button>
           </div>
-          <div className="text-2xl" aria-hidden>🛌</div>
-        </Card>
+        </div>
       </section>
     </main>
   )

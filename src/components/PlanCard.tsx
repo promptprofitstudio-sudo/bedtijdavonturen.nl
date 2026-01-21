@@ -7,9 +7,10 @@ export type Plan = {
   tagline: string
   features: string[]
   variant?: 'default' | 'family' | 'weekend'
+  priceId?: string
 }
 
-export function PlanCard({ plan, onSelect }: { plan: Plan; onSelect?: () => void }) {
+export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?: () => void; isLoading?: boolean }) {
   const isFamily = plan.variant === 'family'
   const isWeekend = plan.variant === 'weekend'
 
@@ -61,8 +62,9 @@ export function PlanCard({ plan, onSelect }: { plan: Plan; onSelect?: () => void
         variant={isFamily ? 'primary' : 'secondary'}
         className={cn("w-full", isWeekend && "bg-teal-600 hover:bg-teal-700 text-white border-transparent")}
         onClick={onSelect}
+        disabled={isLoading}
       >
-        Kies {plan.name}
+        {isLoading ? 'Even geduld...' : `Kies ${plan.name}`}
       </Button>
     </Card>
   )

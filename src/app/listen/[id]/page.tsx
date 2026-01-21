@@ -1,33 +1,42 @@
 import Link from 'next/link'
 import { Card, Pill } from '@/components/ui'
 import { AudioPlayer } from '@/components/AudioPlayer'
-import { getStoryById } from '@/lib/mockData'
+import { GenerateAudioButton } from '@/components/GenerateAudioButton'
+import { getStory } from '@/lib/firebase/admin-db'
 
 export default async function ListenPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const story = getStoryById(id)
+  const story = await getStory(id)
 
-  if (!story) return <div>Verhaal niet gevonden</div>
+  if (!story) return <div className="p-8 text-center font-bold text-navy-900">Verhaal niet gevonden</div>
 
   return (
-    <main className="px-4 py-6 space-y-6">
-      <header className="space-y-3">
+    <main className="px-5 py-6 space-y-6 min-h-screen bg-navy-50">
+      <header className="space-y-4">
         <div className="flex items-center justify-between">
-          <Link href={`/story/${story.id}`} className="text-sm font-semibold underline">← Terug</Link>
+          <Link href={`/story/${story.id}`} className="text-sm font-bold text-navy-600 hover:text-navy-900 transition-colors">← Terug naar lezen</Link>
           <Pill>{story.mood}</Pill>
         </div>
-        <h1 className="text-2xl font-extrabold tracking-tight">Luister</h1>
-        <p className="text-sm text-ink-800/80">Voor {story.childName} • {story.minutes} min</p>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-extrabold tracking-tight text-navy-900">Luister</h1>
+          <p className="text-sm font-medium text-navy-500">Voor {story.childName} • {story.minutes} min</p>
+        </div>
       </header>
 
-      <AudioPlayer title={story.title} src={undefined} />
+      {/* Dynamic Content: Player OR Generator */}
+      {story.audioUrl ? (
+        <AudioPlayer title={story.title} src={story.audioUrl} />
+      ) : (
+        <Card className="border-dashed border-2 bg-white/50">
+          <GenerateAudioButton storyId={story.id} />
+        </Card>
+      )}
 
-      <Card className="space-y-2">
-        <p className="text-sm font-extrabold">Audio (roadmap)</p>
-        <p className="text-xs text-ink-800/70">
-          Koppel hier straks TTS (rustige bedtijdstem) of professionele voice packs. UI is al ingericht voor screen-off.
-        </p>
-      </Card>
+      {/* Tip Card */}
+      <div className="rounded-xl bg-indigo-900 p-4 text-white shadow-soft">
+        <p className="text-xs font-bold text-indigo-200 uppercase tracking-widest mb-1">Tip</p>
+        <p className="text-sm font-medium">Zet dit aan en leg de telefoon weg. Het verhaal stopt vanzelf.</p>
+      </div>
     </main>
   )
 }

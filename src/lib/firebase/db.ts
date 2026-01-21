@@ -55,6 +55,16 @@ export async function getProfiles(userId: string): Promise<ChildProfile[]> {
     return snap.docs.map(d => ({ id: d.id, ...d.data() })) as ChildProfile[]
 }
 
+export async function deleteProfile(userId: string, profileId: string): Promise<void> {
+    const db = await getDb()
+    await deleteDoc(doc(db, 'users', userId, 'profiles', profileId))
+}
+
+export async function updateProfile(userId: string, profileId: string, data: Partial<Omit<ChildProfile, 'id' | 'createdAt'>>): Promise<void> {
+    const db = await getDb()
+    await updateDoc(doc(db, 'users', userId, 'profiles', profileId), data)
+}
+
 // --- STORIES ---
 
 export async function createStory(storyData: Omit<Story, 'id' | 'createdAt'>): Promise<string> {
@@ -99,4 +109,11 @@ export async function getUserStories(userId: string): Promise<Story[]> {
     )
     const snap = await getDocs(q)
     return snap.docs.map(d => ({ id: d.id, ...d.data() })) as Story[]
+}
+
+export async function updateStoryAudio(storyId: string, audioUrl: string): Promise<void> {
+    const db = await getDb()
+    await updateDoc(doc(db, 'stories', storyId), {
+        audioUrl
+    })
 }

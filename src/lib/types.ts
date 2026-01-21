@@ -6,9 +6,12 @@ import { Timestamp } from 'firebase/firestore'
 // User (Parent) Schema
 export const UserSchema = z.object({
     uid: z.string(),
-    email: z.string().email(),
+    email: z.string().email().nullable(), // Updated to allow null
     displayName: z.string().nullable(),
-    subscriptionStatus: z.enum(['free', 'premium', 'trial']),
+    photoURL: z.string().nullable().optional(), // Added photoURL
+    subscriptionStatus: z.enum(['free', 'premium', 'trialing', 'canceled', 'past_due']), // Updated enum values
+    stripeCustomerId: z.string().optional(), // Added Stripe customer ID
+    subscriptionId: z.string().optional(), // Added Stripe subscription ID
     createdAt: z.custom<Timestamp>(),
 })
 

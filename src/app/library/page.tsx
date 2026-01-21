@@ -37,12 +37,13 @@ export default function LibraryPage() {
 
   if (authLoading || loading) {
     return (
-      <main className="px-4 py-6 space-y-6">
-        <header className="flex items-start justify-between gap-4">
-          <SectionTitle title="Bibliotheek" subtitle="Laden..." />
+      <main className="px-5 py-8 space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Bibliotheek</h1>
+          <p className="text-navy-800/60 font-medium">Laden van jouw collectie...</p>
         </header>
         <div className="space-y-4">
-          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-ink-100/50 rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-40 bg-navy-50 rounded-3xl animate-pulse" />)}
         </div>
       </main>
     )
@@ -50,28 +51,41 @@ export default function LibraryPage() {
 
   if (!user) {
     return (
-      <main className="px-4 py-6 space-y-6 text-center">
-        <SectionTitle title="Bibliotheek" subtitle="Log in om je verhalen te zien." />
-        <Link href="/account"><Button>Inloggen</Button></Link>
+      <main className="px-5 py-8 space-y-8 text-center">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-extrabold text-navy-900">Bibliotheek</h1>
+          <p className="text-navy-800/60">Log in om je verhalen te bewaren en terug te lezen.</p>
+        </div>
+        <Link href="/account"><Button variant="primary" size="lg" className="w-full shadow-soft">Nu Inloggen</Button></Link>
       </main>
     )
   }
 
   return (
-    <main className="px-4 py-6 space-y-6">
-      <header className="flex items-start justify-between gap-4">
-        <SectionTitle title="Bibliotheek" subtitle="Jouw verhalen en series." />
-        <Link href="/wizard" className="text-sm font-semibold text-ink-950 underline">Nieuw</Link>
+    <main className="px-5 py-8 space-y-8 pb-32">
+      <header className="flex items-end justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold text-navy-900 tracking-tight">Jouw verhalen</h1>
+          <p className="text-navy-800/60 font-medium">Tik en ga door waar je gebleven was.</p>
+        </div>
+        <Link href="/wizard">
+          <Button variant="teal" className="rounded-full w-10 h-10 p-0 shadow-soft text-lg flex items-center justify-center">
+            +
+          </Button>
+        </Link>
       </header>
 
       {stories.length === 0 ? (
-        <Card className="text-center py-8 space-y-4">
-          <p className="text-lg font-bold text-ink-800">Nog geen verhalen</p>
-          <p className="text-sm text-ink-600">Maak je eerste bedtijdavontuur in 60 seconden.</p>
-          <Link href="/wizard"><Button variant="primary">Maak Verhaal</Button></Link>
-        </Card>
+        <div className="rounded-3xl bg-amber-100 p-8 text-center space-y-6 border border-amber-200 shadow-card">
+          <div className="mx-auto text-4xl bg-white w-16 h-16 rounded-full flex items-center justify-center shadow-sm">✨</div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-navy-900">Nog geen verhalen</h3>
+            <p className="text-navy-800/70 text-sm">Maak je eerste bedtijdavontuur in 60 seconden.</p>
+          </div>
+          <Link href="/wizard" className="block"><Button variant="primary" className="w-full shadow-soft">Start Wizard</Button></Link>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid gap-4">
           {stories.map((s) => (
             <StoryCard key={s.id} story={s} />
           ))}

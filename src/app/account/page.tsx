@@ -3,27 +3,16 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button, Card, SectionTitle, Pill } from '@/components/ui'
+import { EmailLoginForm } from '@/components/EmailLoginForm'
 import { useAuth } from '@/context/AuthContext'
-import { getProfiles } from '@/lib/profiles'
+// AddProfileForm removed
+import { getProfiles, deleteProfile } from '@/lib/firebase/db'
 import { ChildProfile } from '@/lib/types'
 
 export default function AccountPage() {
   const { user, loading, signInWithGoogle, signOut, db } = useAuth()
   const [profiles, setProfiles] = useState<ChildProfile[]>([])
-
-  useEffect(() => {
-    async function fetchProfiles() {
-      if (user && db) {
-        try {
-          const list = await getProfiles(db, user.uid)
-          setProfiles(list)
-        } catch (err) {
-          console.error('Failed to fetch profiles', err)
-        }
-      }
-    }
-    fetchProfiles()
-  }, [user, db])
+  /* handleDelete removed, moved to /profiles */
 
   if (loading) {
     return (
@@ -42,9 +31,10 @@ export default function AccountPage() {
 
         <Card className="space-y-4 text-center py-8">
           <p className="text-sm text-ink-800">Maak een account om profielen voor je kinderen aan te maken en verhalen op te slaan.</p>
-          <Button onClick={signInWithGoogle} className="w-full">
+          <Button onClick={signInWithGoogle} className="w-full shadow-soft">
             Inloggen met Google
           </Button>
+          <EmailLoginForm />
         </Card>
       </main>
     )
@@ -61,28 +51,24 @@ export default function AccountPage() {
 
       <Card className="space-y-4">
         <div className="flex justify-between items-center">
-          <p className="text-sm font-extrabold">Mijn Kinderen</p>
-          <Link href="/wizard"><Button variant="secondary" size="md">+ Toevoegen</Button></Link>
+          <SectionTitle title="Mijn Kinderen" subtitle="Beheer profielen." />
+          <Link href="/profiles">
+            <Button variant="secondary" size="md">Beheren</Button>
+          </Link>
         </div>
-
-        {profiles.length === 0 ? (
-          <p className="text-xs text-ink-500 italic">Nog geen profielen. Maak er eentje aan!</p>
-        ) : (
-          <div className="space-y-2">
-            {profiles.map(profile => (
-              <div key={profile.id} className="flex items-center justify-between p-2 rounded-lg bg-moon-50 border border-moon-100">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{profile.avatar || '👤'}</span>
-                  <div>
-                    <p className="text-sm font-bold text-ink-900">{profile.name}</p>
-                    <p className="text-xs text-ink-600">Leeftijd: {profile.ageGroup}</p>
-                  </div>
-                </div>
-                <Pill>{profile.themePreference}</Pill>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-3">
+          {profiles.slice(0, 2).map(p => (
+            <div key={p.id} className="bg-moon-50 rounded-xl p-3 flex items-center gap-2 border border-moon-100">
+              <span className="text-xl">{p.avatar || '👤'}</span>
+              <span className="font-bold text-sm text-navy-900 truncate">{p.name}</span>
+            </div>
+          ))}
+          {profiles.length > 2 && (
+            <div className="bg-moon-50 rounded-xl p-3 flex items-center justify-center text-xs font-medium text-navy-500">
+              +{profiles.length - 2} meer
+            </div>
+          )}
+        </div>
       </Card>
 
       <Card className="space-y-2">

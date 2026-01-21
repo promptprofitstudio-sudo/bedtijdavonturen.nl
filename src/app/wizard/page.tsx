@@ -88,50 +88,64 @@ export default function WizardPage() {
   }
 
   return (
-    <main className="px-4 py-6 space-y-6">
-      <header className="space-y-3">
+    <main className="px-5 py-6 space-y-8 pb-32">
+      <header className="space-y-4">
         <div className="flex items-center justify-between">
           <SectionTitle title="Maak verhaal" subtitle="60 seconden — rustig, persoonlijk, klaar." />
-          <ProgressDots step={step} total={4} />
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-bold text-navy-800/60 uppercase tracking-widest">Stap {step}/4</div>
+            <ProgressDots step={step} total={4} />
+          </div>
         </div>
       </header>
 
-      <Card className="space-y-5">
+      {/* Step Container with Animation */}
+      <div className="space-y-6">
         {step === 1 ? (
-          <div className="space-y-4">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-navy-900">Voor wie is het verhaal?</h2>
+              <p className="text-navy-800/60 text-sm">We maken een profiel aan zodat je volgende keer sneller bent.</p>
+            </div>
+
             <Field label="Naam van je kind" hint="Alleen voornaam">
               <Input
                 placeholder="Bijv. Noor"
                 value={childName}
                 onChange={(e) => setChildName(e.target.value)}
                 autoFocus
+                className="text-2xl font-bold h-16"
               />
             </Field>
-            <Field label="Leeftijd" hint="Voor toon & lengte">
-              <div className="flex gap-2">
-                <Chip selected={age === '2-4'} onClick={() => setAge('2-4')}>2–4</Chip>
-                <Chip selected={age === '4-7'} onClick={() => setAge('4-7')}>4–7</Chip>
+
+            <Field label="Leeftijd" hint="Bepaalt toon & lengte">
+              <div className="flex gap-3">
+                <Chip selected={age === '2-4'} onClick={() => setAge('2-4')} variant="teal" >2–4 jaar</Chip>
+                <Chip selected={age === '4-7'} onClick={() => setAge('4-7')} variant="teal" >4–7 jaar</Chip>
               </div>
             </Field>
-            <p className="text-xs text-ink-800/70">
-              We slaan dit straks op als profiel — zodat je morgen in 1 tik verder kunt.
-            </p>
           </div>
         ) : null}
 
         {step === 2 ? (
-          <div className="space-y-4">
-            <Field label="Sfeer vanavond" hint="Bedtijd = liever rustig">
-              <div className="flex flex-wrap gap-2">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-navy-900">Sfeer vanavond</h2>
+              <p className="text-navy-800/60 text-sm">Bedtijd = liever rustig. Wij houden het veilig.</p>
+            </div>
+
+            <Field label="Kies een gevoel" hint="">
+              <div className="flex flex-wrap gap-3">
                 {moods.map((m) => (
-                  <Chip key={m} selected={mood === m} onClick={() => setMood(m)}>{m}</Chip>
+                  <Chip key={m} selected={mood === m} onClick={() => setMood(m)} variant={m === 'Rustig' ? 'teal' : 'def'}>{m}</Chip>
                 ))}
               </div>
             </Field>
-            <Field label="Lengte" hint="Kies wat haalbaar is">
-              <div className="flex gap-2">
+
+            <Field label="Lengte verhaal" hint="">
+              <div className="flex gap-3">
                 {lengths.map((l) => (
-                  <Chip key={l} selected={minutes === l} onClick={() => setMinutes(l)}>{l} min</Chip>
+                  <Chip key={l} selected={minutes === l} onClick={() => setMinutes(l)} variant="def">{l} min</Chip>
                 ))}
               </div>
             </Field>
@@ -139,50 +153,65 @@ export default function WizardPage() {
         ) : null}
 
         {step === 3 ? (
-          <div className="space-y-4">
-            <Field label="Thema (optioneel)" hint="Laat leeg voor verrassing">
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-navy-900">Waar gaat het over?</h2>
+              <p className="text-navy-800/60 text-sm">Optioneel. Laat leeg voor een verrassing.</p>
+            </div>
+
+            <Field label="Thema" hint="Bijv. ruimte, dinos, unicorns">
               <Input
-                placeholder="Bijv. ruimte, dinos, unicorns…"
+                placeholder="Typ een thema..."
                 value={themeInput}
                 onChange={(e) => setThemeInput(e.target.value)}
+                className="h-14"
               />
             </Field>
-            <Field label="Vandaag gebeurde… (optioneel)" hint="1 zin is genoeg">
+            <Field label="Vandaag gebeurde..." hint="Bijv. eerste schooldag">
               <Input
-                placeholder="Bijv. spannende dag op school"
+                placeholder="Gebeurtenis..."
                 value={contextInput}
                 onChange={(e) => setContextInput(e.target.value)}
+                className="h-14"
               />
             </Field>
-            <p className="text-xs text-ink-800/70">
-              Minder is meer: hoe minder input, hoe sneller je in de lees-/luistermodus bent.
-            </p>
           </div>
         ) : null}
 
         {step === 4 ? (
-          <div className="space-y-4">
-            <div className="rounded-2xl bg-moon-100 p-4">
-              <p className="text-xs font-semibold text-ink-800/70">Samenvatting</p>
-              <p className="mt-1 text-sm font-extrabold">{childName || 'Je kind'} • {age} • {mood} • {minutes} min</p>
-              <p className="mt-2 text-xs text-ink-800/70">Je kunt daarna lezen, luisteren (soon) of printen.</p>
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="rounded-2xl bg-gradient-to-br from-navy-900 to-navy-800 p-6 text-white shadow-soft">
+              <p className="text-xs font-bold text-teal-400 uppercase tracking-widest mb-2">Samenvatting</p>
+              <h2 className="text-2xl font-extrabold mb-1">{childName || 'Je kind'} & het avontuur</h2>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{age} jaar</span>
+                <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{mood}</span>
+                <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{minutes} min</span>
+              </div>
+              <p className="mt-6 text-sm text-navy-100/80">Klaar om te genereren? Dit duurt ongeveer 10 seconden.</p>
             </div>
-            <Button size="lg" onClick={finish} disabled={isGenerating}>
-              {isGenerating ? 'Aan het schrijven...' : 'Maak verhaal'}
+
+            <Button size="lg" variant="teal" onClick={finish} disabled={isGenerating} className="w-full text-lg h-16 shadow-soft">
+              {isGenerating ? 'Avontuur schrijven...' : '✨ Maak Verhaal'}
             </Button>
-            <p className="text-xs text-ink-800/70">
-              Onze AI-schrijver bedenkt nu een uniek verhaal. Dit duurt ongeveer 10 seconden.
-            </p>
           </div>
         ) : null}
+      </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <Button variant="ghost" onClick={prev} disabled={step === 1 || isGenerating}>Terug</Button>
+      {/* Navigation Buttons */}
+      <div className="fixed bottom-24 left-0 right-0 px-6">
+        <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
+          {step > 1 && !isGenerating ? (
+            <Button variant="ghost" onClick={prev} className="flex-1">Terug</Button>
+          ) : <div className="flex-1" />}
+
           {step < 4 ? (
-            <Button onClick={next} disabled={!canNext}>Volgende</Button>
-          ) : null}
+            <Button onClick={next} disabled={!canNext} variant="primary" className="flex-[2] shadow-soft">
+              Volgende
+            </Button>
+          ) : <div className="flex-[2]" />}
         </div>
-      </Card>
+      </div>
     </main>
   )
 }

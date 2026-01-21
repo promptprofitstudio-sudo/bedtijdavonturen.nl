@@ -8,30 +8,44 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Bedtijdavonturen: calm bedtime palette
+        // Bedtijdavonturen: calm bedtime palette (Refactor 2026)
+        navy: {
+          50: '#F0F4F8',
+          100: '#D9E2EC',
+          200: '#BCCCDC',
+          800: '#243B53',
+          900: '#102A43', // Primary Deep Navy
+          950: '#0B1C2E', // Darker Reader Mode
+        },
+        teal: {
+          100: '#E3F8F3',
+          400: '#3EBD93',
+          500: '#199473', // Primary Access
+        },
+        amber: {
+          100: '#FBF3D0',
+          400: '#F0B429', // Highlight
+          500: '#CB6E17',
+        },
         ink: {
-          950: '#0B1020',
-          900: '#0F1730',
-          800: '#141F3D',
-          700: '#1C2A54',
+          950: '#102A43', // Mapped to Navy-900 for transition
+          900: '#243B53',
+          800: '#334E68',
+          700: '#486581',
         },
         moon: {
-          50: '#F5F7FF',
-          100: '#ECEFFF',
-          200: '#D9E0FF',
+          50: '#F0F4F8', // Mapped to Navy-50
+          100: '#D9E2EC',
+          200: '#BCCCDC',
         },
         lavender: {
           300: '#B7B5FF',
-          400: '#9A97FF',
-          500: '#7C78FF',
+          400: '#7C78FF', // Kept for legacy compatibility
+          500: '#645DD7',
         },
-        mint: {
-          400: '#3EE2C1',
-          500: '#22C7A9',
-        },
-        sand: {
-          50: '#FFF9F0',
-          100: '#FFF0D9',
+        bg: {
+          DEFAULT: '#F5F2EC', // "Warm Paper" / Off-white from Mockup
+          dark: '#102A43',
         },
         danger: {
           500: '#EF4444',

@@ -18,6 +18,8 @@ interface AuthContextType {
     user: UserData | null
     loading: boolean
     signInWithGoogle: () => Promise<void>
+    signInWithEmail: (email: string, pass: string) => Promise<void>
+    registerWithEmail: (email: string, pass: string, name: string) => Promise<void>
     signOut: () => Promise<void>
     db: Firestore | null // Expose DB for other services
 }
@@ -98,6 +100,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
+    const signInWithEmail = async (email: string, pass: string) => {
+        if (!services) return
+        const { signInWithEmailAndPassword } = await import('firebase/auth')
+        await signInWithEmailAndPassword(services.auth, email, pass)
+    }
+
+    const registerWithEmail = async (email: string, pass: string, name: string) => {
+        if (!services) return
+        const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth')
+        const cred = await createUserWithEmailAndPassword(services.auth, email, pass)
+        if (cred.user) {
+            await updateProfile(cred.user, { displayName: name })
+            // Trigger the onAuthStateChanged logic to create DB doc
+        }
+    }
+
     const signOut = async () => {
         if (!services) return
         try {
@@ -114,6 +132,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             user,
             loading,
             signInWithGoogle,
+            signInWithEmail,
+            registerWithEmail,
             signOut,
             db: services?.db || null
         }}>

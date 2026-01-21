@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { BottomNav } from '@/components/BottomNav'
@@ -9,10 +9,23 @@ const inter = Inter({
   display: 'swap',
 })
 
+export const viewport: Viewport = {
+  themeColor: '#0F172A',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
 export const metadata: Metadata = {
-  title: 'Bedtijdavonturen — Gepersonaliseerde slaapverhalen',
-  description: 'Maak in 60 seconden een rustig, gepersonaliseerd bedtijdverhaal — lees, luister of print.',
-  viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+  title: 'Bedtijdavonturen',
+  description: 'Magische verhalen voor het slapengaan',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Bedtijdavonturen',
+  },
 }
 
 import { AuthProvider } from '@/context/AuthContext'
