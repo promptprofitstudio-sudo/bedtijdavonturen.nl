@@ -113,6 +113,7 @@ export default function WizardPage() {
                 placeholder="Bijv. Noor"
                 value={childName}
                 onChange={(e) => setChildName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && canNext && next()}
                 autoFocus
                 className="text-2xl font-bold h-16"
               />
@@ -164,6 +165,8 @@ export default function WizardPage() {
                 placeholder="Typ een thema..."
                 value={themeInput}
                 onChange={(e) => setThemeInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && canNext && next()}
+                autoFocus
                 className="h-14"
               />
             </Field>
@@ -172,6 +175,7 @@ export default function WizardPage() {
                 placeholder="Gebeurtenis..."
                 value={contextInput}
                 onChange={(e) => setContextInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && canNext && next()}
                 className="h-14"
               />
             </Field>
@@ -199,7 +203,7 @@ export default function WizardPage() {
       </div>
 
       {/* Navigation Bar (Glassmorphism above BottomNav) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-moon-50/95 backdrop-blur-xl border-t border-moon-200/60 pb-[calc(88px+env(safe-area-inset-bottom,20px))] pt-4 px-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-moon-50/95 backdrop-blur-xl border-t border-moon-200/60 pb-[calc(88px+env(safe-area-inset-bottom,20px)+24px)] pt-6 px-6 shadow-[0_-8px_30px_rgba(0,0,0,0.04)]">
         <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
           {step > 1 && !isGenerating ? (
             <Button variant="ghost" onClick={prev} className="flex-1 border border-moon-200 bg-white shadow-sm hover:bg-moon-100">Terug</Button>

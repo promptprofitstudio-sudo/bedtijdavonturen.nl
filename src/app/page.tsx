@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button, Card, Chip, SectionTitle, Pill } from '@/components/ui'
 import { StoryCard } from '@/components/StoryCard'
+import { Footer } from '@/components/Footer'
 import { sampleStories } from '@/lib/mockData'
 
 const moods = ['Rustig', 'Grappig', 'Dapper', 'Troost'] as const
@@ -84,6 +85,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <Footer />
     </main>
   )
 }
