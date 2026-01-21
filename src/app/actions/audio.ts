@@ -1,9 +1,7 @@
 'use server'
 
-import OpenAI from 'openai'
-import { getSecret } from '@/lib/ai/generator'
+import { generateAudio } from "@/lib/ai/audio"
 import { getAdminDb } from '@/lib/firebase/admin'
-import { uploadStoryAudio } from '@/lib/firebase/admin-storage'
 import { revalidatePath } from 'next/cache'
 import { Story } from '@/lib/types'
 
@@ -35,30 +33,17 @@ export async function generateAudioAction(storyId: string) {
             return { success: true, audioUrl: mockUrl }
         }
 
-        // 2. Setup OpenAI
-        const apiKey = await getSecret('OPENAI_API_KEY')
-        if (!apiKey) throw new Error('Missing OpenAI Key')
-
-        const openai = new OpenAI({ apiKey })
-
-        // 3. Generate Speech
+        // 3. Generate Audio with ElevenLabs
         const textToRead = `${story.title}. \n\n ${story.body.filter(b => b.type === 'p').map(b => b.text).join('\n\n')}`
 
-        console.log('Sending text to OpenAI TTS...')
-        const mp3 = await openai.audio.speech.create({
-            model: "tts-1",
-            voice: "alloy",
-            input: textToRead,
+        const audioUrl = await generateAudio({
+            text: textToRead,
+            mood: story.mood,
+            storyId: story.id,
+            userId: story.userId
         })
 
-        const buffer = Buffer.from(await mp3.arrayBuffer())
-
-        // 4. Upload using Admin SDK (Secure Write)
-        console.log('Uploading audio to Storage...')
-        // Ensure story.userId exists. It should.
-        const audioUrl = await uploadStoryAudio(storyId, buffer, story.userId)
-
-        // 5. Update Firestore using Admin SDK (Secure Update)
+        // 4. Update Firestore using Admin SDK (Secure Update)
         console.log('Updating story with audio URL...')
         await storyRef.update({ audioUrl })
 

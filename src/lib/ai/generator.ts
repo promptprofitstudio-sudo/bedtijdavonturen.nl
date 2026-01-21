@@ -1,23 +1,6 @@
 import OpenAI from 'openai'
 import { StoryMood } from '@/lib/types'
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
-
-// Duplicate getSecret here to avoid dependency cycle or complexity with client-config
-// In a real app, I'd extract this to src/lib/secrets.ts
-const client = new SecretManagerServiceClient()
-export async function getSecret(name: string): Promise<string | undefined> {
-    try {
-        // Hardcoded project ID for scaffold simplicity as per user context
-        const projectId = 'bedtijdavonturen-prod'
-        const [version] = await client.accessSecretVersion({
-            name: `projects/${projectId}/secrets/${name}/versions/latest`,
-        })
-        return version.payload?.data?.toString()
-    } catch (error) {
-        console.error(`Failed to fetch secret ${name}:`, error)
-        return undefined
-    }
-}
+import { getSecret } from '@/lib/secrets'
 
 interface GeneratedStoryData {
     title: string

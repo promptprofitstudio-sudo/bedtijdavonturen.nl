@@ -31,19 +31,22 @@ export const metadata: Metadata = {
 import { Footer } from '@/components/Footer'
 import { CookieBanner } from '@/components/CookieBanner'
 import { AuthProvider } from '@/context/AuthContext'
+import { PostHogProvider } from '@/components/PostHogProvider'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="nl" className={inter.variable}>
       <body className="min-h-dvh bg-moon-50 text-ink-950">
-        <AuthProvider>
-          <div className="mx-auto min-h-dvh max-w-md pb-24 relative">
-            {children}
-            <Footer />
-            <CookieBanner />
-          </div>
-          <BottomNav />
-        </AuthProvider>
+        <PostHogProvider>
+          <AuthProvider>
+            <div className="mx-auto min-h-dvh max-w-md pb-24 relative">
+              {children}
+              <Footer />
+              <CookieBanner />
+            </div>
+            <BottomNav />
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   )

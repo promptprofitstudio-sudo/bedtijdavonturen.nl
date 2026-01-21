@@ -42,6 +42,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const s = initializeFirebaseServices(config)
                 setServices(s)
 
+                // Handle Redirect Result (for Mobile Auth return)
+                try {
+                    const { getRedirectResult } = await import('firebase/auth')
+                    const result = await getRedirectResult(s.auth)
+                    if (result?.user) {
+                        console.log("Redirect login successful:", result.user.uid)
+                        // User state will be handled by onAuthStateChanged below
+                    }
+                } catch (redirectError) {
+                    console.error("Redirect login error:", redirectError)
+                    // Continue initialization even if redirect check fails
+                }
+
                 unsubscribe = onAuthStateChanged(s.auth, async (firebaseUser: FirebaseUser | null) => {
                     if (firebaseUser) {
                         const userRef = doc(s.db, 'users', firebaseUser.uid)
@@ -97,7 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         const provider = new GoogleAuthProvider()
         try {
-            await signInWithPopup(services.auth, provider)
+            // Use Redirect for reliable mobile/PWA auth (no popups)
+            const { signInWithRedirect } = await import('firebase/auth')
+            await signInWithRedirect(services.auth, provider)
         } catch (error) {
             console.error('Error signing in with Google', error)
             throw error
