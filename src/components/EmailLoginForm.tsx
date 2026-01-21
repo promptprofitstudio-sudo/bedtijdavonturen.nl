@@ -73,14 +73,17 @@ export function EmailLoginForm() {
 
             <p className="text-center text-xs text-navy-500">
                 {isRegister ? 'Heb je al een account?' : 'Nieuw hier?'}
-                <button
+                {isRegister ? 'Heb je al een account?' : 'Nieuw hier?'}
+                <Button
+                    variant="ghost"
+                    size="md"
                     onClick={() => setIsRegister(!isRegister)}
-                    className="ml-1 text-teal-600 font-bold underline"
+                    className="ml-1 text-teal-600 font-bold underline hover:bg-transparent hover:text-teal-700 h-auto px-1 py-0"
                     type="button"
                 >
                     {isRegister ? 'Log in' : 'Maak account'}
-                </button>
+                </Button>
             </p>
-        </div>
+        </div >
     )
 }

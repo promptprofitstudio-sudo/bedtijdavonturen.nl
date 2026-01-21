@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui'
+import { Button, Chip } from '@/components/ui'
 import { AgeGroup, ChildProfile } from '@/lib/types'
 import { createProfile, updateProfile } from '@/lib/firebase/db'
 import { useAuth } from '@/context/AuthContext'
@@ -77,17 +77,14 @@ export function ProfileForm({ onSuccess, onCancel, initialData }: ProfileFormPro
                 <label className="block text-sm font-bold text-ink-700 mb-1">Leeftijd</label>
                 <div className="flex gap-2">
                     {(['2-4', '4-7'] as AgeGroup[]).map((age) => (
-                        <button
+                        <Chip
                             key={age}
-                            type="button"
+                            selected={ageGroup === age}
                             onClick={() => setAgeGroup(age)}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${ageGroup === age
-                                ? 'bg-primary-500 text-white shadow-sm'
-                                : 'bg-moon-50 text-ink-600 hover:bg-moon-100'
-                                }`}
+                            variant="teal"
                         >
                             {age} jaar
-                        </button>
+                        </Chip>
                     ))}
                 </div>
             </div>

@@ -6,14 +6,16 @@ import { cn } from '@/lib/utils'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'teal'
-  size?: 'lg' | 'md'
+  size?: 'lg' | 'md' | 'icon'
 }
 
 export function Button({ variant = 'primary', size = 'md', className, ...props }: ButtonProps) {
   const base = 'inline-flex items-center justify-center rounded-xl font-bold outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
   const sizes = size === 'lg'
     ? 'h-14 px-6 text-lg' // Larger tap targets per mockup
-    : 'h-12 px-4 text-base'
+    : size === 'icon'
+      ? 'h-12 w-12 p-0' // Square icon button
+      : 'h-12 px-4 text-base'
 
   const variants: Record<string, string> = {
     primary: 'bg-navy-900 text-white shadow-soft hover:bg-navy-800 active:scale-[0.98]',

@@ -8,7 +8,7 @@ const secretsClient = new SecretManagerServiceClient()
 export async function getSecret(name: string): Promise<string | undefined> {
     try {
         console.log(`[Admin] Attempting to fetch secret: ${name}`)
-        const projectId = 'pps-core-441'
+        const projectId = 'bedtijdavonturen-prod'
         const [version] = await secretsClient.accessSecretVersion({
             name: `projects/${projectId}/secrets/${name}/versions/latest`,
         })
@@ -36,8 +36,15 @@ export async function getAdminApp(): Promise<App> {
 
     console.log(`[Admin] Initializing new app: ${ADMIN_APP_NAME}...`)
 
-    const projectId = 'pps-core-441'
-    const serviceAccountKey = await getSecret('FIREBASE_SERVICE_ACCOUNT_KEY')
+    const projectId = 'bedtijdavonturen-prod'
+
+    // In TEST_MODE (or local dev), skip secret fetch to avoid crashes if secret is missing
+    let serviceAccountKey: string | undefined = undefined
+    if (process.env.TEST_MODE !== 'true') {
+        serviceAccountKey = await getSecret('FIREBASE_SERVICE_ACCOUNT_KEY')
+    } else {
+        console.log('[Admin] TEST_MODE detected. Skipping Service Account Key fetch, defaulting to ADC.')
+    }
 
     const options: any = {
         // projectId, // Remove explicit projectId, let credential handle it if present

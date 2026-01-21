@@ -88,7 +88,7 @@ export default function WizardPage() {
   }
 
   return (
-    <main className="px-5 py-6 space-y-8 pb-32">
+    <main className="px-5 py-6 space-y-8 pb-40">
       <header className="space-y-4">
         <div className="flex items-center justify-between">
           <SectionTitle title="Maak verhaal" subtitle="60 seconden — rustig, persoonlijk, klaar." />

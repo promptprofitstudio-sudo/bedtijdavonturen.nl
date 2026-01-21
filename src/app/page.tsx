@@ -9,15 +9,11 @@ export default function HomePage() {
   return (
     <main className="px-4 py-6 space-y-6">
       <header className="space-y-6 pt-2">
-        {/* Active Child Indicator (Mockup: Fabi • 1 kind) */}
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-navy-900 flex items-center justify-center text-white font-bold shadow-soft">
-              B
-            </div>
-            <h1 className="text-xl font-extrabold text-navy-900">Bedtijd</h1>
-          </div>
-          <Pill variant="default">Mijn Kind • 1 kind</Pill>
+        {/* Logo Header */}
+        <div className="flex items-center justify-center py-2">
+          <h1 className="text-2xl font-black text-navy-900 tracking-tight">
+            Bedtijd<span className="text-teal-500">Avonturen</span>
+          </h1>
         </div>
 
         {/* Hero Card: "Vanavond" */}

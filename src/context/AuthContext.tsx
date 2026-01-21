@@ -90,7 +90,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     const signInWithGoogle = async () => {
-        if (!services) return
+        if (!services) {
+            console.error("Firebase services not initialized");
+            alert("De inlog-service is nog aan het laden. Probeer het over enkele seconden opnieuw.");
+            return
+        }
         const provider = new GoogleAuthProvider()
         try {
             await signInWithPopup(services.auth, provider)

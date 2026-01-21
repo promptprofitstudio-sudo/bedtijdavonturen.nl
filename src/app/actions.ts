@@ -17,6 +17,7 @@ const GenerateStoryInput = z.object({
 })
 
 export async function generateStoryAction(formData: FormData) {
+
     // 1. Parse Input
     const rawData = {
         userId: formData.get('userId'),
@@ -27,9 +28,11 @@ export async function generateStoryAction(formData: FormData) {
         theme: formData.get('theme'),
     }
 
+
     const result = GenerateStoryInput.safeParse(rawData)
 
     if (!result.success) {
+        console.error('Validation error:', result.error);
         return { error: 'Ongeldige invoer: ' + result.error.message }
     }
 
@@ -39,22 +42,35 @@ export async function generateStoryAction(formData: FormData) {
         // 2. Generate Story (AI)
         const generatedStory = await generateStoryWithAI(childName, ageGroup, mood as StoryMood, theme)
 
-        // 3. Save to DB using Admin SDK (Server-side)
-        const { getAdminDb } = await import('@/lib/firebase/admin')
-        const adminDb = await getAdminDb()
-
         const newStory = {
             ...generatedStory,
             userId,
             profileId,
             childName,
             ageGroup: ageGroup,
-            createdAt: new Date() // Admin SDK uses native Date or Timestamp
+            createdAt: new Date()
         }
 
-        console.log('[Action] Attempting to write story to Firestore...', { storyId: null, userId })
+        // 3. Save to DB using Admin SDK (Server-side)
+        if (process.env.TEST_MODE === 'true') {
+            const mockId = `mock-${Date.now()}`
+
+
+            // Persist to global mock store
+            if (!(globalThis as any)._mockStories) {
+                (globalThis as any)._mockStories = {}
+            }
+            (globalThis as any)._mockStories[mockId] = { id: mockId, ...newStory }
+
+            return { success: true, storyId: mockId }
+        }
+
+        const { getAdminDb } = await import('@/lib/firebase/admin')
+        const adminDb = await getAdminDb()
+
+
+
         const docRef = await adminDb.collection('stories').add(newStory)
-        console.log('[Action] Successfully wrote story:', docRef.id)
 
         // 4. Return Success
         return { success: true, storyId: docRef.id }

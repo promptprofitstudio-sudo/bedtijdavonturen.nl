@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 }
 
 import { Footer } from '@/components/Footer'
+import { CookieBanner } from '@/components/CookieBanner'
 import { AuthProvider } from '@/context/AuthContext'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mx-auto min-h-dvh max-w-md pb-24 relative">
             {children}
             <Footer />
+            <CookieBanner />
           </div>
           <BottomNav />
         </AuthProvider>

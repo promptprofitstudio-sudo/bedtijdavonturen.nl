@@ -8,7 +8,7 @@ const client = new SecretManagerServiceClient()
 export async function getSecret(name: string): Promise<string | undefined> {
     try {
         // Hardcoded project ID for scaffold simplicity as per user context
-        const projectId = 'pps-core-441'
+        const projectId = 'bedtijdavonturen-prod'
         const [version] = await client.accessSecretVersion({
             name: `projects/${projectId}/secrets/${name}/versions/latest`,
         })
