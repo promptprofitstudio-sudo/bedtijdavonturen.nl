@@ -129,19 +129,67 @@ async function configureDashboard(apiKey: string, projectId: string | number) {
     ]
 
     for (const insight of insights) {
+        // 1. Create the Insight
         const res = await fetch(`${baseUrl}/insights/`, {
             method: 'POST',
             headers,
+            body: JSON.stringify(insight) // Create without attaching first
+        })
+
+        if (!res.ok) {
+            console.error(`   - Failed to create insight ${insight.name}:`, await res.text())
+            continue
+        }
+
+        const createdInsight = await res.json()
+        console.log(`   + Created insight: ${insight.name} (ID: ${createdInsight.id})`)
+
+        // 2. Explicitly Add to Dashboard
+        // Using the add_to_dashboard endpoint
+        // POST /api/projects/:id/insights/:insight_id/dashboard
+        // OR POST /api/projects/:id/dashboards/:dashboard_id/move_tile
+
+        // Trying the "add_to_dashboard" action often found in their internal API
+        // actually for public API, updating the dashboard with existing tiles is common, 
+        // BUT let's try strict relation update.
+
+        // Strategy: We will use the 'dashboard' field in a PATCH to the insight if the initial create didn't work,
+        // BUT simpler: PostHog API usually accepts 'dashboard' in creation if the token has correct scope.
+        // Let's try the specific add_to_dashboard endpoint if available.
+
+        // From research: POST /api/projects/{project_id}/insights/{insight_id}/viewed ... no
+
+        // Let's try: PATCH /api/projects/{project_id}/insights/{insight_id}
+        // with body { dashboards: [dashboard.id] }  <-- Note plural "dashboards" is common in newer systems
+
+        // Let's try to update the insight with the dashboard array.
+        const updateRes = await fetch(`${baseUrl}/insights/${createdInsight.id}`, {
+            method: 'PATCH',
+            headers,
             body: JSON.stringify({
-                ...insight,
-                dashboard: dashboard.id
+                dashboards: [dashboard.id]
             })
         })
 
-        if (res.ok) {
-            console.log(`   + Added insight: ${insight.name}`)
+        if (updateRes.ok) {
+            console.log(`     -> Linked to dashboard (Method: PATCH dashboards=[])`)
         } else {
-            console.error(`   - Failed to add ${insight.name}:`, await res.text())
+            // Fallback: Try the legacy "dashboard" field patch or checks
+            console.warn(`     -> Failed to link via PATCH, trying add_to_dashboard endpoint...`)
+
+            // Python snippet suggested: /insights/:id/add_to_dashboard
+            // Body: { dashboard_id: ... }
+            const addRes = await fetch(`${baseUrl}/insights/${createdInsight.id}/add_to_dashboard`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ dashboard_id: dashboard.id })
+            })
+
+            if (addRes.ok) {
+                console.log(`     -> Linked to dashboard (Method: add_to_dashboard)`)
+            } else {
+                console.error(`     -> FAILED to link to dashboard:`, await addRes.text())
+            }
         }
     }
 
