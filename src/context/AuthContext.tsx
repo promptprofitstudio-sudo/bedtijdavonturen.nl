@@ -47,12 +47,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     const { getRedirectResult } = await import('firebase/auth')
                     const result = await getRedirectResult(s.auth)
                     if (result?.user) {
-                        console.log("Redirect login successful:", result.user.uid)
+                        console.log("✅ Redirect login successful:", result.user.uid)
                         // User state will be handled by onAuthStateChanged below
+                    } else {
+                        console.log("ℹ️ No redirect result found (Normal page load)")
                     }
-                } catch (redirectError) {
-                    console.error("Redirect login error:", redirectError)
-                    // Continue initialization even if redirect check fails
+                } catch (redirectError: any) {
+                    console.error("❌ Redirect login error:", redirectError)
+                    console.error("   Message:", redirectError.message)
+                    console.error("   Code:", redirectError.code)
+                    if (redirectError.code === 'auth/unauthorized-domain') {
+                        alert("Fout: Dit domein is niet geautoriseerd in Firebase Auth instellingen.")
+                    }
                 }
 
                 unsubscribe = onAuthStateChanged(s.auth, async (firebaseUser: FirebaseUser | null) => {
@@ -110,8 +116,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         const provider = new GoogleAuthProvider()
         try {
-            // Use Redirect for reliable mobile/PWA auth (no popups)
-            const { signInWithRedirect } = await import('firebase/auth')
+            // Import persistence explicitly to bundle it
+            const { signInWithRedirect, setPersistence, browserLocalPersistence } = await import('firebase/auth')
+
+            // Force Local Persistence to ensure session survives redirects/refreshes
+            await setPersistence(services.auth, browserLocalPersistence)
+
             await signInWithRedirect(services.auth, provider)
         } catch (error) {
             console.error('Error signing in with Google', error)
