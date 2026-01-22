@@ -37,4 +37,5 @@ jobs:
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BEDTIJDAVONTUREN_PROD }}' > "$HOME/gcp-key.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
+          export FIREBASE_CLI_EXPERIMENTS=webframeworks
           npx firebase-tools deploy --project bedtijdavonturen-prod --non-interactive
