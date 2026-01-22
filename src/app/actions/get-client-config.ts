@@ -29,7 +29,7 @@ export async function getFirebaseClientConfig() {
 
     return {
         apiKey: validApiKey,
-        authDomain: 'bedtijdavonturen-prod.firebaseapp.com',
+        authDomain: 'bedtijdavonturen.nl',
         projectId: 'bedtijdavonturen-prod',
         storageBucket: 'bedtijdavonturen-prod.firebasestorage.app',
         messagingSenderId: '340393072153',
