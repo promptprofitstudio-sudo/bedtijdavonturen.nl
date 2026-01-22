@@ -42,9 +42,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const s = initializeFirebaseServices(config)
                 setServices(s)
 
+                console.log("🔐 AuthContext: Initializing...")
+
+                // Force persistence on init
+                try {
+                    const { setPersistence, browserLocalPersistence } = await import('firebase/auth')
+                    await setPersistence(s.auth, browserLocalPersistence)
+                    console.log("🔐 AuthContext: Persistence set to local")
+                } catch (e) {
+                    console.error("❌ AuthContext: Persistence error", e)
+                }
+
                 // Handle Redirect Result (for Mobile Auth return)
                 try {
                     const { getRedirectResult } = await import('firebase/auth')
+                    console.log("🔐 AuthContext: Checking redirect result...")
                     const result = await getRedirectResult(s.auth)
                     if (result?.user) {
                         console.log("✅ Redirect login successful:", result.user.uid)
@@ -62,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
 
                 unsubscribe = onAuthStateChanged(s.auth, async (firebaseUser: FirebaseUser | null) => {
+                    console.log("🔐 AuthContext: Auth state changed:", firebaseUser?.uid || 'null')
                     if (firebaseUser) {
                         const userRef = doc(s.db, 'users', firebaseUser.uid)
                         const userSnap = await getDoc(userRef)
@@ -111,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const signInWithGoogle = async () => {
         if (!services) {
             console.error("Firebase services not initialized");
-            alert("De inlog-service is nog aan het laden. Probeer het over enkele seconden opnieuw.");
+            // alert("De inlog-service is nog aan het laden. Probeer het over enkele seconden opnieuw.");
             return
         }
         const provider = new GoogleAuthProvider()
