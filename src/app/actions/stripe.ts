@@ -11,7 +11,10 @@ export async function createCheckoutSession(priceId: string, userId: string) {
     }
 
     // Determine domain
-    const origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    // Determine domain (Fix for Production)
+    let origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    if (process.env.VERCEL_URL) origin = `https://${process.env.VERCEL_URL}` // Fallback for Vercel
+    if (process.env.FIREBASE_APP_HOSTING_URL) origin = process.env.FIREBASE_APP_HOSTING_URL; // Fallback for Firebase
 
     const mode = getCheckoutMode(priceId)
 

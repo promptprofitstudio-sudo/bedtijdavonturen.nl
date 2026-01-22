@@ -21,6 +21,8 @@ export default {
           100: '#E3F8F3',
           400: '#3EBD93',
           500: '#199473', // Primary Access
+          600: '#137C5E', // Hover / Darker
+          700: '#0F6049', // Active
         },
         amber: {
           100: '#FBF3D0',
