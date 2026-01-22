@@ -1,8 +1,8 @@
 import { StoryMood } from "@/lib/types"
 import { uploadStoryAudio } from "@/lib/firebase/admin-storage"
 import { getSecret } from "@/lib/secrets"
+import { ElevenLabsClient } from "elevenlabs"
 
-// Voice Configuration
 const VOICE_SETTINGS = {
     stability: 0.65,
     similarity_boost: 0.75,
@@ -25,6 +25,10 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
         throw new Error("Missing ELEVENLABS_API_KEY")
     }
 
+    const client = new ElevenLabsClient({
+        apiKey: apiKey
+    })
+
     // Voice Selection Logic
     // Rustig/Troost -> Female (Default)
     // Dapper/Grappig -> Male
@@ -32,7 +36,6 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
 
     if (mood === 'Dapper' || mood === 'Grappig') {
         const maleVoice = await getSecret('EL_VOICE_MALE')
-        // Fallback to female if male not set? No, prefer error to ensure config is correct.
         if (maleVoice) {
             voiceId = maleVoice
         } else {
@@ -45,27 +48,18 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
     }
 
     try {
-        // Explicitly request MP3 44.1kHz 128kbps typical for ElevenLabs/Web
-        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
-            method: 'POST',
-            headers: {
-                'xi-api-key': apiKey,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                text,
-                model_id: MODEL_ID,
-                voice_settings: VOICE_SETTINGS
-            })
+        const audioStream = await client.textToSpeech.convert(voiceId, {
+            text,
+            model_id: MODEL_ID,
+            voice_settings: VOICE_SETTINGS,
+            output_format: "mp3_44100_128"
         })
 
-        if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(`ElevenLabs API Error: ${JSON.stringify(errorData)}`)
+        const chunks: Buffer[] = []
+        for await (const chunk of audioStream) {
+            chunks.push(Buffer.from(chunk))
         }
-
-        const arrayBuffer = await response.arrayBuffer()
-        const buffer = Buffer.from(arrayBuffer)
+        const buffer = Buffer.concat(chunks)
 
         // Upload to Firebase Storage using Admin SDK
         const downloadUrl = await uploadStoryAudio(storyId, buffer, userId)
