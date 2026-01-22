@@ -13,6 +13,12 @@ function getClient() {
 const secretCache: Record<string, string> = {}
 
 export async function getSecret(name: string): Promise<string | undefined> {
+    // 1. Check process.env (Runtime Env Vars / Local Overrides)
+    if (process.env[name]) {
+        return process.env[name]
+    }
+
+    // 2. Check In-Memory Cache
     if (secretCache[name]) {
         return secretCache[name]
     }
