@@ -48,6 +48,29 @@ export async function generateAudioAction(storyId: string) {
         await storyRef.update({ audioUrl })
 
         revalidatePath(`/listen/${storyId}`)
+
+        // Capture Analytics
+        try {
+            const { PostHog } = await import('posthog-node')
+            const client = new PostHog(
+                process.env.NEXT_PUBLIC_POSTHOG_KEY!,
+                { host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com' }
+            )
+
+            client.capture({
+                distinctId: story.userId,
+                event: 'audio_generated',
+                properties: {
+                    story_id: storyId,
+                    mood: story.mood,
+                    audio_url: audioUrl
+                }
+            })
+            await client.shutdown()
+        } catch (e) {
+            console.error('Failed to capture analytics:', e)
+        }
+
         return { success: true, audioUrl }
 
     } catch (error) {

@@ -11,6 +11,12 @@ import { useAuth } from '@/context/AuthContext'
 const moods: StoryMood[] = ['Rustig', 'Grappig', 'Dapper', 'Troost']
 const lengths = [5, 7, 10] as const
 
+declare global {
+  interface Window {
+    posthog: any
+  }
+}
+
 export default function WizardPage() {
   const router = useRouter()
   const { user, db } = useAuth() // To check auth
@@ -25,10 +31,21 @@ export default function WizardPage() {
 
   const [isGenerating, setIsGenerating] = React.useState(false)
 
+  React.useEffect(() => {
+    if (step === 1 && window.posthog) {
+      window.posthog.capture('wizard_started')
+    }
+  }, [])
+
   const canNext = step === 1 ? childName.trim().length > 0 : true
 
   const next = () => {
-    if (step < 4) setStep((s) => s + 1)
+    if (step < 4) {
+      if (window.posthog) {
+        window.posthog.capture('wizard_step_completed', { step_number: step })
+      }
+      setStep((s) => s + 1)
+    }
   }
   const prev = () => {
     if (step > 1) setStep((s) => s - 1)
