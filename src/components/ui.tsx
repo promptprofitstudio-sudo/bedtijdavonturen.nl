@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'teal'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'teal' | 'soft'
   size?: 'lg' | 'md' | 'icon'
 }
 
@@ -23,6 +23,7 @@ export function Button({ variant = 'primary', size = 'md', className, ...props }
     secondary: 'bg-white border-2 border-moon-200 text-navy-900 hover:border-navy-200 hover:bg-moon-50',
     ghost: 'bg-transparent text-navy-800 hover:bg-navy-50',
     danger: 'bg-danger-500 text-white hover:opacity-95',
+    soft: 'bg-moon-100 text-navy-900 hover:bg-moon-200 active:scale-[0.98]',
   }
 
   return (

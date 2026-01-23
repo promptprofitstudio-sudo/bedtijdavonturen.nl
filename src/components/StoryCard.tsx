@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Card, Pill } from '@/components/ui'
+import { Card, Pill, Button } from '@/components/ui'
 import { ShareButton } from '@/components/ShareButton'
 import { cn } from '@/lib/utils'
 import type { Story } from '@/lib/types'
@@ -20,14 +20,11 @@ export function StoryCard({ story, className }: { story: Story; className?: stri
       <p className="line-clamp-2 text-sm text-ink-800/80">{story.excerpt}</p>
 
       <div className="grid grid-cols-3 gap-2">
-        <Link href={`/story/${story.id}`} className="h-10 rounded-xl bg-moon-100 text-center text-sm font-semibold leading-10 hover:bg-moon-200">
-          Lees
+        <Link href={`/story/${story.id}`}>
+          <Button variant="soft" className="w-full h-10 text-sm">Lees</Button>
         </Link>
-        <Link
-          href={story.audioUrl ? `/story/${story.id}?mode=audio` : `/story/${story.id}/generate-audio`}
-          className="h-10 rounded-xl bg-moon-100 text-center text-sm font-semibold leading-10 hover:bg-moon-200"
-        >
-          Luister
+        <Link href={story.audioUrl ? `/story/${story.id}?mode=audio` : `/story/${story.id}/generate-audio`}>
+          <Button variant="soft" className="w-full h-10 text-sm">Luister</Button>
         </Link>
         <ShareButton storyId={story.id} userId={story.userId} />
       </div>

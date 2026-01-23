@@ -45,9 +45,9 @@ export function ShareButton({ storyId, userId, currentShareToken }: ShareButtonP
         return (
             <div className="space-y-2">
                 <Button
-                    variant="secondary"
+                    variant="soft"
                     onClick={() => copyToClipboard(token)}
-                    className="w-full relative"
+                    className="w-full h-10 text-sm relative"
                 >
                     {copied ? 'Link Gekopieerd! ✅' : '🔗 Deel Link opnieuw kopiëren'}
                 </Button>
@@ -58,10 +58,10 @@ export function ShareButton({ storyId, userId, currentShareToken }: ShareButtonP
 
     return (
         <Button
-            variant="secondary"
+            variant="soft"
             onClick={handleShare}
             disabled={loading}
-            className="w-full"
+            className="w-full h-10 text-sm"
         >
             {loading ? '...' : (
                 <div className="flex items-center gap-1">
