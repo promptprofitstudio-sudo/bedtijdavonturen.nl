@@ -22,8 +22,11 @@ interface GenerateAudioParams {
 export async function generateAudio({ text, mood, storyId, userId }: GenerateAudioParams): Promise<string> {
     const apiKey = await getSecret('ELEVENLABS_API_KEY')
     if (!apiKey) {
+        console.error("❌ AudioGen: Missing ELEVENLABS_API_KEY")
         throw new Error("Missing ELEVENLABS_API_KEY")
     }
+
+    console.log(`AudioGen: Key Loaded. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. Preview: ${apiKey.slice(0, 3)}...${apiKey.slice(-3)}`)
 
     const client = new ElevenLabsClient({
         apiKey: apiKey
@@ -67,6 +70,10 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
 
     } catch (error) {
         console.error("Error generating/uploading audio:", error)
+        try {
+            // Deep inspection of error object for 401 debugging
+            console.error("AudioGen Error Detail:", JSON.stringify(error, null, 2))
+        } catch (e) { /* ignore circular */ }
         throw error
     }
 }
