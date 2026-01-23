@@ -1,7 +1,9 @@
 import { StoryMood } from "@/lib/types"
 import { uploadStoryAudio } from "@/lib/firebase/admin-storage"
 import { getSecret } from "@/lib/secrets"
-import { ElevenLabsClient } from "elevenlabs"
+
+// Removed SDK import to use native fetch for debugging
+// import { ElevenLabsClient } from "elevenlabs"
 
 const VOICE_SETTINGS = {
     stability: 0.65,
@@ -26,14 +28,9 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
         throw new Error("Missing ELEVENLABS_API_KEY")
     }
 
-    // Log key details to stderr for visibility in Cloud Run logs
-    console.error(`AudioGen: Key Details. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. First3: ${apiKey.slice(0, 3)}. Last3: ${apiKey.slice(-3)}`)
+    console.error(`AudioGen: Key Loaded. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. First3: ${apiKey.slice(0, 3)}. Last3: ${apiKey.slice(-3)}`)
 
-    const client = new ElevenLabsClient({
-        apiKey: apiKey
-    })
-
-    // Verify Voice configuration
+    // Voice Selection Logic
     let voiceId = await getSecret('EL_VOICE_FEMALE')
     console.error(`AudioGen: Default Voice ID loaded. Present: ${!!voiceId}`)
 
@@ -52,32 +49,51 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
         throw new Error(`Missing Voice ID configuration (EL_VOICE_FEMALE / EL_VOICE_MALE) for mood: ${mood}`)
     }
 
-    try {
-        console.error(`AudioGen: Attempting conversion. Text Len: ${text.length}. VoiceID: ${voiceId}`)
+    console.error(`AudioGen: Attempting Raw Fetch. Text Len: ${text.length}. VoiceID: ${voiceId}`)
 
-        const audioStream = await client.textToSpeech.convert(voiceId, {
+    try {
+        const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`
+        const payload = {
             text,
             model_id: MODEL_ID,
             voice_settings: VOICE_SETTINGS,
-            output_format: "mp3_44100_128"
+            // output_format not supported in JSON body for stream/TFS, but usually query param?
+            // SDK puts it in query or body? API docs say Query Param for output_format usually?
+            // Let's try standard body first.
+        }
+
+        // Add output_format via query param as per reliable API patterns
+        // Defaults to mp3_44100_128 if unrelated.
+
+        console.error(`AudioGen: Payload Preview: ${JSON.stringify({ ...payload, text: text.substring(0, 20) + '...' })}`)
+
+        const response = await fetch(`${url}?output_format=mp3_44100_128`, {
+            method: 'POST',
+            headers: {
+                'xi-api-key': apiKey, // Correct Header for ElevenLabs
+                'Content-Type': 'application/json',
+                'Accept': 'audio/mpeg'
+            },
+            body: JSON.stringify(payload)
         })
 
-        const chunks: Buffer[] = []
-        for await (const chunk of audioStream) {
-            chunks.push(Buffer.from(chunk))
+        if (!response.ok) {
+            const errorText = await response.text()
+            console.error(`❌ ElevenLabs API Error: ${response.status} ${response.statusText}`)
+            console.error(`❌ Raw Error Body: ${errorText}`)
+            throw new Error(`ElevenLabs API Failed: ${response.status} ${response.statusText} - ${errorText}`)
         }
-        const buffer = Buffer.concat(chunks)
+
+        // Get ArrayBuffer from response
+        const arrayBuffer = await response.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
 
         // Upload to Firebase Storage using Admin SDK
         const downloadUrl = await uploadStoryAudio(storyId, buffer, userId)
         return downloadUrl
 
     } catch (error) {
-        console.error("Error generating/uploading audio:", error)
-        try {
-            // Deep inspection of error object for 401 debugging
-            console.error("AudioGen Error Detail:", JSON.stringify(error, null, 2))
-        } catch (e) { /* ignore circular */ }
+        console.error("Error generating/uploading audio (Raw Fetch):", error)
         throw error
     }
 }
