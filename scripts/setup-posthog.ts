@@ -125,6 +125,16 @@ async function configureDashboard(apiKey: string, projectId: string | number) {
                 display: 'Pie',
                 date_from: '-30d'
             }
+        },
+        {
+            name: 'User Stickiness (Retention)',
+            filters: {
+                insight: 'RETENTION',
+                target_entity: { id: 'story_generated', type: 'events' },
+                returning_entity: { id: 'story_generated', type: 'events' },
+                date_from: '-30d',
+                period: 'Week'
+            }
         }
     ]
 
