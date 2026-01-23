@@ -10,11 +10,16 @@ export function GenerateAudioButton({ storyId }: { storyId: string }) {
     const handleGenerate = async () => {
         setLoading(true)
         try {
-            await generateAudioAction(storyId)
+            const result = await generateAudioAction(storyId)
+            if (result.error) {
+                console.error('Server Action Error:', result.error)
+                throw new Error(result.error)
+            }
             // Path revalidation happens on server, page should refresh
         } catch (error) {
             console.error(error)
-            alert('Fout bij genereren audio')
+            const message = error instanceof Error ? error.message : 'Onbekende fout'
+            alert(`Fout bij genereren audio: ${message}`)
         } finally {
             setLoading(false)
         }
