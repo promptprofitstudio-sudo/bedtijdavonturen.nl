@@ -8,6 +8,7 @@ export type Plan = {
   features: string[]
   variant?: 'default' | 'family' | 'weekend'
   priceId?: string
+  intervalLabel?: string
 }
 
 export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?: () => void; isLoading?: boolean }) {
@@ -43,7 +44,7 @@ export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?:
         </p>
         <div className="flex items-baseline gap-2">
           <span className="text-3xl font-extrabold">{plan.price}</span>
-          {!isWeekend && <span className="text-sm text-ink-800/70">per maand</span>}
+          {plan.intervalLabel && <span className="text-sm text-ink-800/70">{plan.intervalLabel}</span>}
         </div>
         <p className="text-sm text-ink-800/80">{plan.tagline}</p>
       </div>
@@ -59,8 +60,8 @@ export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?:
 
       <Button
         size="lg"
-        variant={isFamily ? 'primary' : 'secondary'}
-        className={cn("w-full", isWeekend && "bg-teal-600 hover:bg-teal-700 text-white border-transparent")}
+        variant={isWeekend ? 'primary' : (isFamily ? 'primary' : 'secondary')}
+        className={cn("w-full", isWeekend && "bg-teal-600 hover:bg-teal-700 border-teal-600")}
         onClick={onSelect}
         disabled={isLoading}
       >

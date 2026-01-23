@@ -14,30 +14,34 @@ export default function PricingPage() {
   const [isPending, startTransition] = React.useTransition()
   const [toast, setToast] = React.useState<string | null>(null)
 
+  /* Refined Packages based on new features */
   const plans: Plan[] = [
     {
       name: 'Weekend Bundel',
-      price: '€1,99',
-      tagline: '3 losse verhalen. Ideaal om te proberen.',
-      features: ['Geen abonnement', '3 credits', 'Blijft altijd geldig'],
+      price: '€2,99', // Slightly higher to push sub
+      tagline: '3 losse verhalen om te proberen.',
+      features: ['Geen abonnement', '3 Credits', 'Toegang tot Voice Cloning'],
       variant: 'weekend',
-      priceId: STRIPE_CONFIG.prices.weekend
+      priceId: STRIPE_CONFIG.prices.weekend,
+      intervalLabel: 'eenmalig'
     },
     {
       name: 'Premium Maandelijks',
       price: '€9,99',
-      tagline: 'Onbeperkt verhalen & audio.',
-      features: ['Onbeperkt verhalen', 'Onbeperkt audio', 'Opzegbaar per maand'],
+      tagline: 'Onbeperkt toegang.',
+      features: ['Onbeperkt verhalen', 'Onbeperkt audio', 'Jouw Stem (Cloning)', 'Opzegbaar per maand'],
       variant: 'default',
-      priceId: STRIPE_CONFIG.prices.monthly
+      priceId: STRIPE_CONFIG.prices.monthly,
+      intervalLabel: 'per maand'
     },
     {
       name: 'Premium Jaarlijks',
       price: '€99,00',
       tagline: '2 maanden gratis.',
-      features: ['Alles van Premium', 'Beste deal', 'Vo优先 support'],
+      features: ['Alles van Premium', 'Beste deal', 'Voorrang Support', '3 Stemmen Klonen'],
       variant: 'family',
-      priceId: STRIPE_CONFIG.prices.annual
+      priceId: STRIPE_CONFIG.prices.annual,
+      intervalLabel: 'per jaar'
     },
   ]
 
