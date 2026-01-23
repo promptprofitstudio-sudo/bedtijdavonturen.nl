@@ -19,5 +19,5 @@ Focus on user trust, legal compliance, and reliable analytics.
 
 ## v2.0: The "Magic" Update (Future) ⚪
 - [x] **Voice:** Cloning (Parents can clone their own voice).
-- [ ] **Mobile:** PWA / Native App Wrapper. [/]
-- [ ] **Social:** Share stories with grandparents.
+- [x] **Mobile:** PWA / Native App Wrapper.
+- [ ] **Social:** Share stories with grandparents. [/]

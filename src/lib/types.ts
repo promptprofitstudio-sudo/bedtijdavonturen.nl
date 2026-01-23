@@ -60,6 +60,7 @@ export const StorySchema = z.object({
     body: StoryBodySchema,
     dialogicPrompts: z.array(DialogicPromptSchema), // Added mandatory prompts
     audioUrl: z.string().optional(),
+    shareToken: z.string().optional().nullable(), // [NEW] For public sharing
     createdAt: z.custom<Timestamp>(),
     userId: z.string(),
     profileId: z.string(),
