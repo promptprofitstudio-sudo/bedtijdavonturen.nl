@@ -26,25 +26,21 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
         throw new Error("Missing ELEVENLABS_API_KEY")
     }
 
-    // Verify Voice configuration
-    let voiceId = await getSecret('EL_VOICE_FEMALE')
-    console.error(`AudioGen: Default Voice ID loaded. Present: ${!!voiceId}`)
-
-    // Log partial key
+    // Log key details to stderr for visibility in Cloud Run logs
     console.error(`AudioGen: Key Details. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. First3: ${apiKey.slice(0, 3)}. Last3: ${apiKey.slice(-3)}`)
-
 
     const client = new ElevenLabsClient({
         apiKey: apiKey
     })
 
-    // Voice Selection Logic
-    // Rustig/Troost -> Female (Default)
-    // Dapper/Grappig -> Male
+    // Verify Voice configuration
     let voiceId = await getSecret('EL_VOICE_FEMALE')
+    console.error(`AudioGen: Default Voice ID loaded. Present: ${!!voiceId}`)
 
     if (mood === 'Dapper' || mood === 'Grappig') {
         const maleVoice = await getSecret('EL_VOICE_MALE')
+        console.error(`AudioGen: Male Voice ID loaded. Present: ${!!maleVoice}`)
+
         if (maleVoice) {
             voiceId = maleVoice
         } else {
@@ -57,6 +53,8 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
     }
 
     try {
+        console.error(`AudioGen: Attempting conversion. Text Len: ${text.length}. VoiceID: ${voiceId}`)
+
         const audioStream = await client.textToSpeech.convert(voiceId, {
             text,
             model_id: MODEL_ID,
