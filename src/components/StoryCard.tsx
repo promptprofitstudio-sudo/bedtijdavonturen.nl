@@ -26,7 +26,7 @@ export function StoryCard({ story, className }: { story: Story; className?: stri
         <Link href={story.audioUrl ? `/story/${story.id}?mode=audio` : `/story/${story.id}/generate-audio`}>
           <Button variant="soft" className="w-full h-10 text-sm">Luister</Button>
         </Link>
-        <ShareButton storyId={story.id} userId={story.userId} />
+        <ShareButton storyId={story.id} userId={story.userId} title={story.title} />
       </div>
     </Card >
   )

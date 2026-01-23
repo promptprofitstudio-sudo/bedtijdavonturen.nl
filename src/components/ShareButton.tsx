@@ -4,20 +4,23 @@ import { useState } from 'react'
 import { Button } from './ui'
 import { generateShareToken } from '@/app/actions/share'
 
+import { ShareModal } from './ShareModal'
+
 interface ShareButtonProps {
     storyId: string
     userId: string
     currentShareToken?: string | null
+    title?: string // Add title prop for better sharing
 }
 
-export function ShareButton({ storyId, userId, currentShareToken }: ShareButtonProps) {
+export function ShareButton({ storyId, userId, currentShareToken, title = 'Bedtijdavontuur' }: ShareButtonProps) {
     const [token, setToken] = useState<string | null>(currentShareToken || null)
     const [loading, setLoading] = useState(false)
-    const [copied, setCopied] = useState(false)
+    const [isModalOpen, setModalOpen] = useState(false)
 
-    const handleShare = async () => {
+    const handleShareClick = async () => {
         if (token) {
-            copyToClipboard(token)
+            setModalOpen(true)
             return
         }
 
@@ -27,47 +30,35 @@ export function ShareButton({ storyId, userId, currentShareToken }: ShareButtonP
 
         if (result.success && result.token) {
             setToken(result.token)
-            copyToClipboard(result.token)
+            setModalOpen(true)
         } else {
             alert('Kon geen link maken: ' + result.error)
         }
     }
 
-    const copyToClipboard = (t: string) => {
-        // Construct full URL
-        const url = `${window.location.origin}/listen/${storyId}?token=${t}`
-        navigator.clipboard.writeText(url)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 3000)
-    }
-
-    if (token) {
-        return (
-            <div className="space-y-2">
-                <Button
-                    variant="soft"
-                    onClick={() => copyToClipboard(token)}
-                    className="w-full h-10 text-sm relative"
-                >
-                    {copied ? 'Link Gekopieerd! ✅' : '🔗 Deel Link opnieuw kopiëren'}
-                </Button>
-                {copied && <p className="text-xs text-center text-green-600">Link staat op je klembord! Stuur hem naar opa & oma.</p>}
-            </div>
-        )
-    }
+    const shareUrl = token ? `${window.location.origin}/listen/${storyId}?token=${token}` : ''
 
     return (
-        <Button
-            variant="soft"
-            onClick={handleShare}
-            disabled={loading}
-            className="w-full h-10 text-sm"
-        >
-            {loading ? '...' : (
-                <div className="flex items-center gap-1">
-                    <span>🔗</span> <span>Deel</span>
-                </div>
-            )}
-        </Button>
+        <>
+            <Button
+                variant="soft"
+                onClick={handleShareClick}
+                disabled={loading}
+                className="w-full h-10 text-sm"
+            >
+                {loading ? '...' : (
+                    <div className="flex items-center gap-1">
+                        <span>🔗</span> <span>Deel</span>
+                    </div>
+                )}
+            </Button>
+
+            <ShareModal
+                isOpen={isModalOpen}
+                onClose={() => setModalOpen(false)}
+                url={shareUrl}
+                title={title}
+            />
+        </>
     )
 }
