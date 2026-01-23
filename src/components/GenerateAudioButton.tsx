@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui'
-import { generateStoryAudio } from '@/app/actions/generate-audio'
+import { generateAudioAction } from '@/app/actions/audio'
 import { useRouter } from 'next/navigation'
 
 export function GenerateAudioButton({ storyId, userId }: { storyId: string, userId: string }) {
@@ -12,7 +12,7 @@ export function GenerateAudioButton({ storyId, userId }: { storyId: string, user
     const handleGenerate = async () => {
         setLoading(true)
         try {
-            const res = await generateStoryAudio(storyId, userId)
+            const res = await generateAudioAction(storyId)
             if (res.success) {
                 router.push(`/story/${storyId}?mode=audio`)
             } else {
