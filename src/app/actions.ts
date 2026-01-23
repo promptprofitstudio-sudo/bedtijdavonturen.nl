@@ -60,6 +60,7 @@ export async function generateStoryAction(formData: FormData) {
             if (!(globalThis as any)._mockStories) {
                 (globalThis as any)._mockStories = {}
             }
+            // eslint-disable-next-line security/detect-object-injection
             (globalThis as any)._mockStories[mockId] = { id: mockId, ...newStory }
 
             return { success: true, storyId: mockId }

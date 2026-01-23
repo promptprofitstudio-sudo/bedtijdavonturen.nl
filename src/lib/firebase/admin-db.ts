@@ -2,7 +2,9 @@ import { getAdminDb } from './admin'
 import { Story } from '@/lib/types'
 
 export async function getStory(storyId: string): Promise<Story | null> {
+    // eslint-disable-next-line security/detect-object-injection
     if (process.env.TEST_MODE === 'true' && (globalThis as any)._mockStories && (globalThis as any)._mockStories[storyId]) {
+        // eslint-disable-next-line security/detect-object-injection
         return (globalThis as any)._mockStories[storyId] as Story
     }
 

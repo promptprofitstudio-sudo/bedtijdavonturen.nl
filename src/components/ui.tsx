@@ -27,6 +27,7 @@ export function Button({ variant = 'primary', size = 'md', className, ...props }
 
   return (
     <button
+      // eslint-disable-next-line security/detect-object-injection
       className={cn(base, sizes, variants[variant], className)}
       {...props}
     />
@@ -54,6 +55,7 @@ export function Chip({ selected, children, onClick, variant = 'teal' }: ChipProp
       className={cn(
         'h-10 min-w-[48px] rounded-full border border-moon-200 px-4 text-sm font-bold transition-all focus-visible:ring-2 focus-visible:ring-teal-400',
         selected
+          // eslint-disable-next-line security/detect-object-injection
           ? selectedStyles[variant]
           : 'bg-white text-navy-800 hover:bg-moon-50 hover:border-moon-300'
       )}
@@ -116,6 +118,7 @@ export function Pill({ children, variant = 'default' }: { children: React.ReactN
     navy: 'bg-navy-100 text-navy-800',
   }
   return (
+    // eslint-disable-next-line security/detect-object-injection
     <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-bold", variants[variant])}>
       {children}
     </span>

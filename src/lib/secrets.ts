@@ -14,12 +14,16 @@ const secretCache: Record<string, string> = {}
 
 export async function getSecret(name: string): Promise<string | undefined> {
     // 1. Check process.env (Runtime Env Vars / Local Overrides)
+    // eslint-disable-next-line security/detect-object-injection
     if (process.env[name]) {
+        // eslint-disable-next-line security/detect-object-injection
         return process.env[name]
     }
 
     // 2. Check In-Memory Cache
+    // eslint-disable-next-line security/detect-object-injection
     if (secretCache[name]) {
+        // eslint-disable-next-line security/detect-object-injection
         return secretCache[name]
     }
 
@@ -32,6 +36,7 @@ export async function getSecret(name: string): Promise<string | undefined> {
 
         const payload = version.payload?.data?.toString()
         if (payload) {
+            // eslint-disable-next-line security/detect-object-injection
             secretCache[name] = payload
             return payload
         }

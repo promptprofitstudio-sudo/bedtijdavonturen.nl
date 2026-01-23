@@ -35,7 +35,7 @@ export default function WizardPage() {
     if (step === 1 && window.posthog) {
       window.posthog.capture('wizard_started')
     }
-  }, [])
+  }, [step])
 
   const canNext = step === 1 ? childName.trim().length > 0 : true
 

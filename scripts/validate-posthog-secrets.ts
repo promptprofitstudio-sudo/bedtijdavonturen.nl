@@ -11,7 +11,7 @@ async function getSecret(name: string) {
         })
         return version.payload?.data?.toString()
     } catch (error) {
-        console.error(`❌ Failed to fetch ${name}:`, error.message)
+        console.error(`❌ Failed to fetch ${name}:`, (error as any).message)
         return null
     }
 }
