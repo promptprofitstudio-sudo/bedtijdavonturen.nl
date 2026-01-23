@@ -6,6 +6,7 @@ import { Button, Card, SectionTitle, Pill } from '@/components/ui'
 import { EmailLoginForm } from '@/components/EmailLoginForm'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { useAuth } from '@/context/AuthContext'
+import { InstallPwaButton } from '@/components/InstallPwaButton'
 // AddProfileForm removed
 import { getProfiles, deleteProfile } from '@/lib/firebase/db'
 import { ChildProfile } from '@/lib/types'
@@ -124,6 +125,8 @@ export default function AccountPage() {
       </Card>
 
       <div className="text-center space-y-4">
+        <InstallPwaButton />
+
         <p className="text-xs text-ink-400">User ID: {user.uid}</p>
         <div className="border-t border-moon-100 pt-4">
           <Button
