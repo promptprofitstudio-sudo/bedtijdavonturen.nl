@@ -3,13 +3,16 @@ import { Button, Card, Pill } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { getStory } from '@/lib/firebase/admin-db'
 
-export default async function StoryPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function StoryPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ mode?: string }> }) {
   const { id } = await params
+  const { mode } = await searchParams
   const story = await getStory(id)
 
   if (!story) return <div className="p-8 text-center font-bold text-navy-900">Verhaal niet gevonden</div>
 
-  const isToddler = story.ageGroup === '2-4'
+  // Force toddler/audio mode if query param set
+  const isAudioMode = mode === 'audio'
+  const isToddler = story.ageGroup === '2-4' || isAudioMode
 
   return (
     <main className="min-h-screen bg-navy-950 text-navy-50 font-sans pb-20">

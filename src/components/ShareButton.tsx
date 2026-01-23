@@ -63,7 +63,11 @@ export function ShareButton({ storyId, userId, currentShareToken }: ShareButtonP
             disabled={loading}
             className="w-full"
         >
-            {loading ? 'Link maken...' : '🔗 Delen met Opa & Oma'}
+            {loading ? '...' : (
+                <div className="flex items-center gap-1">
+                    <span>🔗</span> <span>Deel</span>
+                </div>
+            )}
         </Button>
     )
 }
