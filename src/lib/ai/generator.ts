@@ -55,19 +55,25 @@ export async function generateStoryWithAI(
 
     const prompt = `
     Je bent een expert in rustgevende kinderboekjes.
-    Schrijf een kort bedtijdverhaal voor ${name} (${ageGroup}).
+    Schrijf een RUSTGEVEND bedtijdverhaal voor ${name} (${ageGroup}).
     Thema: ${theme}.
     Sfeer: ${mood}.
     
     AGE GROUP INSTRUCTIONS:
     ${safetyInstruction}
 
-    Vereisten:
-    - Veilig, rustgevend, geen spanning.
-    - Kort (ong. 5 minuten voorlezen).
-    - Output MOET valide JSON zijn.
-    - Gebruik de PEER-methode voor dialogisch lezen: genereer 3 specifieke momenten om te stoppen en een vraag te stellen.
-    
+    BELANGRIJKE VEREISTEN:
+    1. LENGTE: Minimaal 500 woorden (zodat het ong. 5 minuten duurt om rustig voor te lezen).
+    2. ZINTUIGLIJK: Gebruik rijke details over geuren, geluiden en texturen (zacht, warm, fluisterend, zoet).
+    3. EINDE: Het verhaal MOET eindigen met het hoofdpersonage dat gaat slapen (gapen, liggen, ogen dicht).
+    4. STRUCTUUR:
+       - Introductie (Rustige sfeer)
+       - Reis/Avontuur (Veilig, zintuiglijk)
+       - Afbouw (Tempo vertraagt, zinnen worden rustiger)
+       - Einde (Het personage valt in slaap)
+    5. Output MOET valide JSON zijn.
+    6. Gebruik de PEER-methode: genereer 3 vragen voor tijdens het lezen.
+
     JSON Structuur:
     {
       "title": "Titel",
@@ -75,7 +81,7 @@ export async function generateStoryWithAI(
       "minutes": 5,
       "excerpt": "Korte samenvatting van 1 zin",
       "body": [
-        { "type": "p", "text": "Paragraaf tekst..." },
+        { "type": "p", "text": "Paragraaf tekst (gebruik zintuiglijke details)..." },
         { "type": "p", "text": "Volgende paragraaf..." }
       ],
       "dialogicPrompts": [
