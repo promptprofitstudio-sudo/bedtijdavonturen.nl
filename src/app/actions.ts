@@ -14,6 +14,7 @@ const GenerateStoryInput = z.object({
     ageGroup: AgeGroupSchema,
     mood: StoryMoodSchema,
     theme: z.string().min(3),
+    context: z.string().optional(),
 })
 
 export async function generateStoryAction(formData: FormData) {
@@ -26,6 +27,7 @@ export async function generateStoryAction(formData: FormData) {
         ageGroup: formData.get('ageGroup'),
         mood: formData.get('mood'),
         theme: formData.get('theme'),
+        context: formData.get('context'),
     }
 
 
@@ -36,11 +38,11 @@ export async function generateStoryAction(formData: FormData) {
         return { error: 'Ongeldige invoer: ' + result.error.message }
     }
 
-    const { userId, profileId, childName, ageGroup, mood, theme } = result.data
+    const { userId, profileId, childName, ageGroup, mood, theme, context } = result.data
 
     try {
         // 2. Generate Story (AI)
-        const generatedStory = await generateStoryWithAI(childName, ageGroup, mood as StoryMood, theme)
+        const generatedStory = await generateStoryWithAI(childName, ageGroup, mood as StoryMood, theme, context)
 
         const newStory = {
             ...generatedStory,

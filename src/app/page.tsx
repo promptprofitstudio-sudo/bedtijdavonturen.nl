@@ -27,7 +27,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-extrabold leading-tight">
                 Vanavond een verhaal in 60 sec.
               </h2>
-              <p className="text-navy-200 text-sm font-medium">Rustig • Persoonlijk • Bedtijd-safe</p>
+              <p className="text-navy-200 text-sm font-medium">Rustig • Persoonlijk • 100% Kindvriendelijk</p>
             </div>
 
             <div className="flex flex-wrap gap-2 pt-2">

@@ -15,7 +15,8 @@ export async function generateStoryWithAI(
     name: string,
     ageGroup: string,
     mood: StoryMood,
-    theme: string
+    theme: string,
+    context?: string // [NEW] Optional daily event
 ): Promise<GeneratedStoryData> {
 
     // --- TEST MODE MOCK ---
@@ -57,6 +58,7 @@ export async function generateStoryWithAI(
     Je bent een expert in rustgevende kinderboekjes.
     Schrijf een RUSTGEVEND bedtijdverhaal voor ${name} (${ageGroup}).
     Thema: ${theme}.
+    ${context ? `CONTEXT/GEBEURTENIS VANDAAG: ${context}. Verwerk dit subtiel in het verhaal.` : ''}
     Sfeer: ${mood}.
     
     AGE GROUP INSTRUCTIONS:

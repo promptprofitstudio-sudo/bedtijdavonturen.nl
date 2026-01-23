@@ -84,9 +84,8 @@ export default function WizardPage() {
     const finalTheme = themeInput.trim() || `Een ${mood.toLowerCase()} verhaal`
     formData.append('theme', finalTheme)
 
-    // contextInput is not in the Server Action validation yet (Schema has theme, but not context/excerpt input?)
-    // Checking actions.ts Schema: userId, profileId, childName, ageGroup, mood, theme. 
-    // That's it. contextInput is ignored for now. Correct.
+    // Context input is now supported
+    formData.append('context', contextInput)
 
     try {
       const result = await generateStoryAction(formData)
@@ -213,7 +212,7 @@ export default function WizardPage() {
             </div>
 
             <Button size="lg" variant="teal" onClick={finish} disabled={isGenerating} className="w-full text-lg h-16 shadow-soft">
-              {isGenerating ? 'Avontuur schrijven...' : '✨ Maak Verhaal'}
+              {isGenerating ? '✨ De magie wordt gestart...' : '✨ Maak Verhaal'}
             </Button>
           </div>
         ) : null}
