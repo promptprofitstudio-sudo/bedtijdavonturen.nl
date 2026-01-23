@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Button, Card, Pill } from '@/components/ui'
+import { ToddlerPlayer } from '@/components/ToddlerPlayer'
 import { cn } from '@/lib/utils'
 import { getStory } from '@/lib/firebase/admin-db'
 
@@ -65,12 +66,7 @@ export default async function StoryPage({ params, searchParams }: { params: Prom
           {isToddler ? (
             <div className="flex flex-col items-center justify-center py-12 space-y-10">
               {/* Play Button */}
-              <button className="group relative flex items-center justify-center">
-                <div className="absolute inset-0 bg-teal-500/20 rounded-full blur-2xl group-hover:bg-teal-500/30 transition-all duration-500" />
-                <div className="relative h-24 w-24 rounded-full bg-teal-500 flex items-center justify-center shadow-lg shadow-teal-900/50 group-active:scale-95 transition-transform">
-                  <svg className="w-10 h-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                </div>
-              </button>
+              <ToddlerPlayer audioUrl={story.audioUrl} />
 
               <div className="space-y-6 w-full">
                 <details className="group">
