@@ -69,7 +69,7 @@ export default async function ListenPage({
           <AudioPlayer title={story.title} src={story.audioUrl} />
         ) : (
           <Card className="border-dashed border-2 bg-white/50">
-            <GenerateAudioButton storyId={story.id} />
+            <GenerateAudioButton storyId={story.id} userId={story.userId} />
           </Card>
         )
       }
