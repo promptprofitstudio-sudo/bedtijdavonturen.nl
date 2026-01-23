@@ -27,7 +27,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-extrabold leading-tight">
                 Vanavond een verhaal in 60 sec.
               </h2>
-              <p className="text-navy-200 text-sm font-medium">Rustig • Persoonlijk • 100% Kindvriendelijk</p>
+              <p className="text-navy-100 text-sm font-medium">Rustig • Persoonlijk • 100% Kindvriendelijk</p>
             </div>
 
             <div className="flex flex-wrap gap-2 pt-2">
@@ -51,7 +51,7 @@ export default function HomePage() {
           </div>
 
           {/* Decorative Gradient Blob */}
-          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-teal-500/20 blur-3xl" />
+          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-teal-500/30 blur-3xl animate-floaty" />
         </div>
       </header>
 

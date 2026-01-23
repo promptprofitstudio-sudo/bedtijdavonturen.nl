@@ -43,7 +43,15 @@ export default function LibraryPage() {
           <p className="text-navy-800/60 font-medium">Laden van jouw collectie...</p>
         </header>
         <div className="space-y-4">
-          {[1, 2, 3].map(i => <div key={i} className="h-40 bg-navy-50 rounded-3xl animate-pulse" />)}
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="h-40 bg-white/50 animate-pulse border-moon-100 flex flex-col justify-between">
+              <div className="h-4 bg-moon-100 w-3/4 rounded" />
+              <div className="space-y-2">
+                <div className="h-3 bg-moon-100 w-full rounded" />
+                <div className="h-3 bg-moon-100 w-1/2 rounded" />
+              </div>
+            </Card>
+          ))}
         </div>
       </main>
     )

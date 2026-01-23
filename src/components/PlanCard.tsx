@@ -20,7 +20,7 @@ export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?:
       className={cn(
         'space-y-4 transition-all duration-300 relative overflow-hidden',
         isFamily && 'border-lavender-400 ring-1 ring-lavender-200 shadow-md scale-[1.02]',
-        isWeekend && 'border-teal-200 bg-teal-50/50'
+        isWeekend && 'border-teal-200 bg-teal-50'
       )}
     >
       {isFamily && (
