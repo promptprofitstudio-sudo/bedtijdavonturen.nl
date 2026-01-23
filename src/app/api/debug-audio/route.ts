@@ -21,16 +21,8 @@ export async function GET() {
             return NextResponse.json({
                 status: 'Combined Success',
                 keyPreview: apiKey.slice(0, 5) + '...',
-                user: {
-                    id: userInfo.id,
-                    first_name: userInfo.first_name,
-                },
-                subscription: {
-                    tier: subscription.tier,
-                    status: subscription.status,
-                    character_count: subscription.character_count,
-                    character_limit: subscription.character_limit
-                }
+                user: userInfo, // Dump whole object to avoid type errors
+                subscription: subscription
             })
         } catch (apiError: any) {
             return NextResponse.json({
