@@ -72,26 +72,31 @@ export async function generateStoryAction(formData: FormData) {
 
         const docRef = await adminDb.collection('stories').add(newStory)
 
-        // Capture Analytics
         try {
             const { PostHog } = await import('posthog-node')
-            const client = new PostHog(
-                process.env.NEXT_PUBLIC_POSTHOG_KEY!,
-                { host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com' }
-            )
+            const { getSecret } = await import('@/lib/secrets')
 
-            client.capture({
-                distinctId: userId,
-                event: 'story_generated',
-                properties: {
-                    story_id: docRef.id,
-                    mood: mood,
-                    age_group: ageGroup,
-                    has_theme: !!theme,
-                    child_name_length: childName.length
-                }
-            })
-            await client.shutdown()
+            const phKey = await getSecret('NEXT_PUBLIC_POSTHOG_KEY')
+            const phHost = (await getSecret('NEXT_PUBLIC_POSTHOG_HOST')) || 'https://app.posthog.com'
+
+            if (!phKey) {
+                console.warn('⚠️ PostHog Key not found, skipping analytics.')
+            } else {
+                const client = new PostHog(phKey, { host: phHost })
+
+                client.capture({
+                    distinctId: userId,
+                    event: 'story_generated',
+                    properties: {
+                        story_id: docRef.id,
+                        mood: mood,
+                        age_group: ageGroup,
+                        has_theme: !!theme,
+                        child_name_length: childName.length
+                    }
+                })
+                await client.shutdown()
+            }
         } catch (e) {
             console.error('Failed to capture analytics:', e)
         }

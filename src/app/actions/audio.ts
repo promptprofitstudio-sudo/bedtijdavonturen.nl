@@ -52,21 +52,27 @@ export async function generateAudioAction(storyId: string) {
         // Capture Analytics
         try {
             const { PostHog } = await import('posthog-node')
-            const client = new PostHog(
-                process.env.NEXT_PUBLIC_POSTHOG_KEY!,
-                { host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com' }
-            )
+            const { getSecret } = await import('@/lib/secrets')
 
-            client.capture({
-                distinctId: story.userId,
-                event: 'audio_generated',
-                properties: {
-                    story_id: storyId,
-                    mood: story.mood,
-                    audio_url: audioUrl
-                }
-            })
-            await client.shutdown()
+            const phKey = await getSecret('NEXT_PUBLIC_POSTHOG_KEY')
+            const phHost = (await getSecret('NEXT_PUBLIC_POSTHOG_HOST')) || 'https://app.posthog.com'
+
+            if (!phKey) {
+                console.warn('⚠️ PostHog Key not found, skipping analytics.')
+            } else {
+                const client = new PostHog(phKey, { host: phHost })
+
+                client.capture({
+                    distinctId: story.userId,
+                    event: 'audio_generated',
+                    properties: {
+                        story_id: storyId,
+                        mood: story.mood,
+                        audio_url: audioUrl
+                    }
+                })
+                await client.shutdown()
+            }
         } catch (e) {
             console.error('Failed to capture analytics:', e)
         }
