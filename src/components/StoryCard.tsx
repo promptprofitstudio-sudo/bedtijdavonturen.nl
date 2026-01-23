@@ -23,7 +23,10 @@ export function StoryCard({ story, className }: { story: Story; className?: stri
         <Link href={`/story/${story.id}`} className="h-10 rounded-xl bg-moon-100 text-center text-sm font-semibold leading-10 hover:bg-moon-200">
           Lees
         </Link>
-        <Link href={`/story/${story.id}?mode=audio`} className="h-10 rounded-xl bg-moon-100 text-center text-sm font-semibold leading-10 hover:bg-moon-200">
+        <Link
+          href={story.audioUrl ? `/story/${story.id}?mode=audio` : `/story/${story.id}/generate-audio`}
+          className="h-10 rounded-xl bg-moon-100 text-center text-sm font-semibold leading-10 hover:bg-moon-200"
+        >
           Luister
         </Link>
         <ShareButton storyId={story.id} userId={story.userId} />

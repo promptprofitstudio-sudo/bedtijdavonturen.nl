@@ -2,48 +2,38 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui'
-import { generateAudioAction } from '@/app/actions/audio'
+import { generateStoryAudio } from '@/app/actions/generate-audio'
+import { useRouter } from 'next/navigation'
 
-export function GenerateAudioButton({ storyId }: { storyId: string }) {
+export function GenerateAudioButton({ storyId, userId }: { storyId: string, userId: string }) {
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
     const handleGenerate = async () => {
         setLoading(true)
         try {
-            const result = await generateAudioAction(storyId)
-            if (result.error) {
-                console.error('Server Action Error:', result.error)
-                throw new Error(result.error)
+            const res = await generateStoryAudio(storyId, userId)
+            if (res.success) {
+                router.push(`/story/${storyId}?mode=audio`)
+            } else {
+                alert('Fout: ' + res.error)
             }
-            // Path revalidation happens on server, page should refresh
-        } catch (error) {
-            console.error(error)
-            const message = error instanceof Error ? error.message : 'Onbekende fout'
-            alert(`Fout bij genereren audio: ${message}`)
+        } catch (e) {
+            console.error(e)
+            alert('Er ging iets mis.')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="text-center space-y-4 py-8">
-            <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 text-teal-600 mb-4 animate-pulse">
-                🎙️
-            </div>
-            <h3 className="text-lg font-bold text-navy-900">Nog geen audio</h3>
-            <p className="text-sm text-navy-800/70 max-w-xs mx-auto">
-                Maak een voorleesversie met onze rustige AI-stem.
-            </p>
-            <Button
-                onClick={handleGenerate}
-                disabled={loading}
-                variant="teal"
-                size="lg"
-                className="w-full max-w-xs shadow-soft"
-            >
-                {loading ? 'Genereren (10s)...' : '✨ Maak Audio (Gratis)'}
-            </Button>
-            <p className="text-xs text-navy-400">Wordt opgeslagen in je bibliotheek.</p>
-        </div>
+        <Button
+            variant="primary"
+            className="w-full h-12 text-lg shadow-soft"
+            onClick={handleGenerate}
+            disabled={loading}
+        >
+            {loading ? 'Bezig met genereren...' : '✨ Genereer Audio (1 Credit)'}
+        </Button>
     )
 }
