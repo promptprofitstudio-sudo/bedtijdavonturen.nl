@@ -56,20 +56,27 @@ export default function HomePage() {
       </header>
 
       <section className="space-y-4">
-        <SectionTitle title="Drie manieren om te gebruiken" subtitle="Kies wat past bij vanavond." />
+        <SectionTitle title="Kies jouw bedtijd-magie" subtitle="Elke avond anders, altijd vertrouwd." />
         <div className="grid gap-3">
           <Card className="flex items-center gap-4 p-4 hover:border-teal-400 cursor-pointer transition-colors group">
             <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">📖</div>
             <div>
-              <h4 className="font-bold text-navy-900">Lees</h4>
-              <p className="text-xs text-navy-800/60">Dim-modus voor in het donker</p>
+              <h4 className="font-bold text-navy-900">Samen Lezen</h4>
+              <p className="text-xs text-navy-800/60">Jij leest voor, zonder blauw licht.</p>
             </div>
           </Card>
           <Card className="flex items-center gap-4 p-4 hover:border-teal-400 cursor-pointer transition-colors group">
             <div className="h-12 w-12 rounded-full bg-teal-100 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎧</div>
             <div>
-              <h4 className="font-bold text-navy-900">Luister</h4>
-              <p className="text-xs text-navy-800/60">Scherm uit, audio aan</p>
+              <h4 className="font-bold text-navy-900">Audio Luisteren</h4>
+              <p className="text-xs text-navy-800/60">Ogen dicht, oortjes in, slapen.</p>
+            </div>
+          </Card>
+          <Card className="flex items-center gap-4 p-4 hover:border-purple-400 cursor-pointer transition-colors group">
+            <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">🎤</div>
+            <div>
+              <h4 className="font-bold text-navy-900">Met Jouw Stem</h4>
+              <p className="text-xs text-navy-800/60">De AI leest voor, mèt jouw stemgeluid.</p>
             </div>
           </Card>
         </div>
