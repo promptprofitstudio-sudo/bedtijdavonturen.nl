@@ -14,8 +14,8 @@ The MVP is live. Focus is on stability and critical bug fixes.
 ## v1.1: The "Trust" Update (Next Up) 🟡
 Focus on user trust, legal compliance, and reliable analytics.
 - [x] **Data:** PostHog Dashboards (Funnel visualization).
-- [ ] **Legal:** Cookie Consent Banner (GDPR).
-- [ ] **User:** "My Stories" Library (Save functionality).
+- [x] **Legal:** Cookie Consent Banner (GDPR).
+- [x] **User:** "My Stories" Library (Save functionality).
 
 ## v2.0: The "Magic" Update (Future) ⚪
 - [ ] **Voice:** Cloning (Parents can clone their own voice).

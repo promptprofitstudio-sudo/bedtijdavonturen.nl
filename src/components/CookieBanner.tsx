@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui'
 
+import posthog from 'posthog-js'
+
 export function CookieBanner() {
     const [isVisible, setIsVisible] = useState(false)
 
@@ -18,6 +20,13 @@ export function CookieBanner() {
 
     const accept = () => {
         localStorage.setItem('cookie_consent', 'true')
+        posthog.opt_in_capturing()
+        setIsVisible(false)
+    }
+
+    const decline = () => {
+        localStorage.setItem('cookie_consent', 'false')
+        posthog.opt_out_capturing()
         setIsVisible(false)
     }
 
@@ -30,7 +39,7 @@ export function CookieBanner() {
                     <div className="space-y-2 text-center">
                         <h3 className="font-bold text-lg text-navy-900">🍪 Cookies & Privacy</h3>
                         <p className="text-sm text-navy-800/80 leading-relaxed">
-                            We gebruiken functionele cookies om je ingelogd te houden en je sessie te bewaren.
+                            We gebruiken cookies om je sessie te bewaren en onze app te verbeteren.
                         </p>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -40,7 +49,15 @@ export function CookieBanner() {
                             onClick={accept}
                             className="w-full font-bold shadow-soft"
                         >
-                            Prima, doorgaan
+                            Accepteren
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="md"
+                            onClick={decline}
+                            className="w-full text-navy-600 hover:text-navy-900"
+                        >
+                            Weigeren
                         </Button>
                         <Link href="/privacy" className="text-xs text-center text-navy-400 hover:text-navy-600 underline">
                             Lees privacybeleid

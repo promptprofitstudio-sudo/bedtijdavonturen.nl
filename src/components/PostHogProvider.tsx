@@ -12,10 +12,19 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
             posthog.init(key, {
                 api_host: host,
                 person_profiles: 'identified_only',
-                capture_pageview: false, // Manually capture pageviews if using Next.js router events, but for App Router default is okay-ish, or use a PageView tracker. 
-                // Creating a separate PageView component is cleaner for App Router. Let's start basic.
+                capture_pageview: false,
                 capture_pageleave: true,
+                opt_out_capturing_by_default: true, // Wait for consent
+                persistence: 'localStorage+cookie',
             })
+
+            // Check existing consent
+            const consent = localStorage.getItem('cookie_consent')
+            if (consent === 'true') {
+                posthog.opt_in_capturing()
+            } else if (consent === 'false') {
+                posthog.opt_out_capturing()
+            }
         }
     }, [])
 
