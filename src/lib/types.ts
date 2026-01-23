@@ -12,6 +12,7 @@ export const UserSchema = z.object({
     subscriptionStatus: z.enum(['free', 'premium', 'trialing', 'canceled', 'past_due']), // Updated enum values
     stripeCustomerId: z.string().optional(), // Added Stripe customer ID
     subscriptionId: z.string().optional(), // Added Stripe subscription ID
+    customVoiceId: z.string().optional().nullable(), // [NEW] ElevenLabs Voice ID
     createdAt: z.custom<Timestamp>(),
 })
 

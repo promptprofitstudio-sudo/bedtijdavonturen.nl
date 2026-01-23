@@ -33,6 +33,12 @@ export async function generateAudioAction(storyId: string) {
             return { success: true, audioUrl: mockUrl }
         }
 
+        // 2b. Fetch User Profile for Custom Voice
+        const userRef = db.collection('users').doc(story.userId)
+        const userSnap = await userRef.get()
+        const userData = userSnap.data()
+        const customVoiceId = userData?.customVoiceId
+
         // 3. Generate Audio with ElevenLabs
         const textToRead = `${story.title}. \n\n ${story.body.filter(b => b.type === 'p').map(b => b.text).join('\n\n')}`
 
@@ -40,7 +46,8 @@ export async function generateAudioAction(storyId: string) {
             text: textToRead,
             mood: story.mood,
             storyId: story.id,
-            userId: story.userId
+            userId: story.userId,
+            customVoiceId // [NEW] Pass custom voice
         })
 
         // 4. Update Firestore using Admin SDK (Secure Update)

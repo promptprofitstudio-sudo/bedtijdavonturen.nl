@@ -17,9 +17,10 @@ interface GenerateAudioParams {
     mood: StoryMood
     storyId: string
     userId: string
+    customVoiceId?: string | null // [NEW] Optional custom voice
 }
 
-export async function generateAudio({ text, mood, storyId, userId }: GenerateAudioParams): Promise<string> {
+export async function generateAudio({ text, mood, storyId, userId, customVoiceId }: GenerateAudioParams): Promise<string> {
     const apiKey = await getSecret('ELEVENLABS_API_KEY')
     if (!apiKey) {
         console.error("❌ AudioGen: Missing ELEVENLABS_API_KEY")
@@ -31,16 +32,19 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
     })
 
     // Voice Selection Logic
-    // Rustig/Troost -> Female (Default)
-    // Dapper/Grappig -> Male
-    let voiceId = await getSecret('EL_VOICE_FEMALE')
+    let voiceId: string | undefined = customVoiceId || undefined
 
-    if (mood === 'Dapper' || mood === 'Grappig') {
-        const maleVoice = await getSecret('EL_VOICE_MALE')
-        if (maleVoice) {
-            voiceId = maleVoice
-        } else {
-            console.warn("EL_VOICE_MALE not set, falling back to female/default if available")
+    if (!voiceId) {
+        // Fallback to defaults
+        voiceId = await getSecret('EL_VOICE_FEMALE')
+
+        if (mood === 'Dapper' || mood === 'Grappig') {
+            const maleVoice = await getSecret('EL_VOICE_MALE')
+            if (maleVoice) {
+                voiceId = maleVoice
+            } else {
+                console.warn("EL_VOICE_MALE not set, falling back to female/default if available")
+            }
         }
     }
 

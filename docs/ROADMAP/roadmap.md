@@ -18,6 +18,6 @@ Focus on user trust, legal compliance, and reliable analytics.
 - [x] **User:** "My Stories" Library (Save functionality).
 
 ## v2.0: The "Magic" Update (Future) ⚪
-- [ ] **Voice:** Cloning (Parents can clone their own voice).
+- [ ] **Voice:** Cloning (Parents can clone their own voice). [/]
 - [ ] **Mobile:** PWA / Native App Wrapper.
 - [ ] **Social:** Share stories with grandparents.

@@ -107,6 +107,22 @@ export default function AccountPage() {
         )}
       </Card>
 
+      <Card className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <SectionTitle title="Jouw Stem" subtitle="Laat de AI voorlezen met jouw stem." />
+            {user.customVoiceId ? (
+              <Pill>Actief ✅</Pill>
+            ) : (
+              <p className="text-xs text-navy-500">Nog niet ingesteld</p>
+            )}
+          </div>
+          <Link href="/account/voice">
+            <Button variant="teal" size="md">Instellen</Button>
+          </Link>
+        </div>
+      </Card>
+
       <div className="text-center space-y-4">
         <p className="text-xs text-ink-400">User ID: {user.uid}</p>
         <div className="border-t border-moon-100 pt-4">
