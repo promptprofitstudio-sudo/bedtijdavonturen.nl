@@ -22,14 +22,26 @@ async function main() {
     let projectId = manualProjectId
 
     if (!projectId) {
-        console.log("⚠️ No Project ID provided. Fetching from EU Cloud...")
+        console.log("⚠️ No Project ID provided. Fetching Organization & Projects from EU Cloud...")
         try {
-            const projectsRes = await fetch('https://eu.posthog.com/api/projects', { headers })
-            if (!projectsRes.ok) throw new Error(`Fetch failed: ${projectsRes.statusText}`)
+            // 1. Get Organization ID
+            const orgRes = await fetch('https://eu.posthog.com/api/organizations/@current', { headers })
+            if (!orgRes.ok) throw new Error(`Org Fetch failed: ${orgRes.statusText}`)
+            const orgData = await orgRes.json()
+            const orgId = orgData.id
+
+            // 2. Get Projects for Organization
+            const projectsRes = await fetch(`https://eu.posthog.com/api/organizations/${orgId}/projects/`, { headers })
+            if (!projectsRes.ok) throw new Error(`Projects Fetch failed: ${projectsRes.statusText}`)
             const projects = await projectsRes.json()
-            projectId = projects.results[0].id
+
+            if (projects.results && projects.results.length > 0) {
+                projectId = projects.results[0].id
+            } else {
+                throw new Error("No projects found in organization.")
+            }
         } catch (e) {
-            console.error("❌ Could not auto-discover Project ID (EU).")
+            console.error("❌ Could not auto-discover Project ID (EU). Error:", e)
             console.error("👉 Please run: npx tsx scripts/update-posthog-dashboard.ts <PROJECT_ID>")
             process.exit(1)
         }
