@@ -5,10 +5,10 @@ async function main() {
     console.log('--- STRIPE FRESH START ---');
 
     // 1. Initialize Stripe
-    const key = process.env.STRIPE_SECRET_KEY || await getSecret('STRIPE_SECRET_KEY');
+    const key = await getSecret('STRIPE_SECRET_KEY');
 
     if (!key) {
-        console.error('❌ CRITICAL: STRIPE_SECRET_KEY is missing (checked env and GSM).');
+        console.error('❌ CRITICAL: STRIPE_SECRET_KEY is missing in GSM.');
         process.exit(1);
     }
 

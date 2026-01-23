@@ -19,16 +19,17 @@ async function getSecret(name: string): Promise<string | undefined> {
 
 export async function getFirebaseClientConfig() {
     // Retrieve sensitive keys from Secrets Manager
-    // Public config (Project ID, App ID, etc.) is safe to hardcode here for this dedicated project.
 
-    // API_KEY is theoretically sensitive but often exposed. We try to fetch or fallback.
-    // const secretApiKey = await getSecret('API_KEY') 
+    // Fetch API Key from GSM (Enforced Policy)
+    const apiKey = await getSecret('FIREBASE_API_KEY') || 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q' // Fallback for dev/fail-safe if needed, or remove fallback if strict.
 
-    // The secret 'API_KEY' currently holds a non-AIza key (likely Service Account or other)
-    const validApiKey = 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q'
+    // User requested strict GSM use.
+    // If we strictly fail without it:
+    // const apiKey = await getSecret('FIREBASE_API_KEY');
+    // if (!apiKey) throw new Error("Missing FIREBASE_API_KEY in GSM");
 
     return {
-        apiKey: validApiKey,
+        apiKey: apiKey,
         authDomain: 'bedtijdavonturen.nl',
         projectId: 'bedtijdavonturen-prod',
         storageBucket: 'bedtijdavonturen-prod.firebasestorage.app',

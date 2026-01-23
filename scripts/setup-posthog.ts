@@ -12,8 +12,9 @@ async function getSecret(name: string) {
         })
         return version.payload?.data?.toString()
     } catch (error) {
-        console.warn(`Could not fetch secret ${name} from Secret Manager.`)
-        return process.env[name]
+        console.error(`Could not fetch secret ${name} from Secret Manager.`)
+        // Enforce GSM: Do not fallback to process.env
+        return undefined
     }
 }
 

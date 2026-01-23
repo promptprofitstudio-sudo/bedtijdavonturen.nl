@@ -3,12 +3,20 @@ import 'dotenv/config'
 import { PostHog } from 'posthog-node'
 
 async function testPostHog() {
-    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
-    const host = process.env.NEXT_PUBLIC_POSTHOG_HOST
+    // GSM Enforcement
+    // We need to import getSecret from a relative path or implementation.
+    // Since this is a standalone script, we might need the GSM client logic here or import it.
+    // 'src/lib/secrets' is usually available.
+
+    // Dynamic import to avoid relative path hell if moved, but assuming structure:
+    const { getSecret } = await import('../src/lib/secrets')
+
+    const key = await getSecret('NEXT_PUBLIC_POSTHOG_KEY')
+    const host = await getSecret('NEXT_PUBLIC_POSTHOG_HOST')
 
     console.log('Testing PostHog with:', { key: key?.substring(0, 8) + '...', host })
 
-    if (!key) throw new Error('No key')
+    if (!key) throw new Error('No key in GSM')
 
     const client = new PostHog(key, { host })
 
