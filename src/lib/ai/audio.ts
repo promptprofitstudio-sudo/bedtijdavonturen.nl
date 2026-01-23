@@ -26,7 +26,13 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
         throw new Error("Missing ELEVENLABS_API_KEY")
     }
 
-    console.log(`AudioGen: Key Loaded. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. Preview: ${apiKey.slice(0, 3)}...${apiKey.slice(-3)}`)
+    // Verify Voice configuration
+    let voiceId = await getSecret('EL_VOICE_FEMALE')
+    console.error(`AudioGen: Default Voice ID loaded. Present: ${!!voiceId}`)
+
+    // Log partial key
+    console.error(`AudioGen: Key Details. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. First3: ${apiKey.slice(0, 3)}. Last3: ${apiKey.slice(-3)}`)
+
 
     const client = new ElevenLabsClient({
         apiKey: apiKey
