@@ -82,7 +82,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="space-y-4 pb-20">
+      {/* <section className="space-y-4 pb-20">
         <div className="bg-gradient-to-r from-teal-50 to-moon-100 rounded-3xl p-6 border border-teal-100">
           <div className="space-y-2">
             <Pill variant="teal">Nieuw: Serie-universum</Pill>
@@ -91,7 +91,7 @@ export default function HomePage() {
             <Button variant="primary" className="w-full mt-2">Start een serie</Button>
           </div>
         </div>
-      </section>
+      </section> */}
       <Footer />
     </main>
   )
