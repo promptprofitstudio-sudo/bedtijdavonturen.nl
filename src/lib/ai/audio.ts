@@ -1,9 +1,7 @@
 import { StoryMood } from "@/lib/types"
 import { uploadStoryAudio } from "@/lib/firebase/admin-storage"
 import { getSecret } from "@/lib/secrets"
-
-// Removed SDK import to use native fetch for debugging
-// import { ElevenLabsClient } from "elevenlabs"
+import { ElevenLabsClient } from "elevenlabs"
 
 const VOICE_SETTINGS = {
     stability: 0.65,
@@ -28,16 +26,17 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
         throw new Error("Missing ELEVENLABS_API_KEY")
     }
 
-    console.error(`AudioGen: Key Loaded. Len: ${apiKey.length}. EndsOnNewline: ${apiKey.endsWith('\n')}. First3: ${apiKey.slice(0, 3)}. Last3: ${apiKey.slice(-3)}`)
+    const client = new ElevenLabsClient({
+        apiKey: apiKey
+    })
 
     // Voice Selection Logic
+    // Rustig/Troost -> Female (Default)
+    // Dapper/Grappig -> Male
     let voiceId = await getSecret('EL_VOICE_FEMALE')
-    console.error(`AudioGen: Default Voice ID loaded. Present: ${!!voiceId}`)
 
     if (mood === 'Dapper' || mood === 'Grappig') {
         const maleVoice = await getSecret('EL_VOICE_MALE')
-        console.error(`AudioGen: Male Voice ID loaded. Present: ${!!maleVoice}`)
-
         if (maleVoice) {
             voiceId = maleVoice
         } else {
@@ -46,54 +45,31 @@ export async function generateAudio({ text, mood, storyId, userId }: GenerateAud
     }
 
     if (!voiceId) {
-        throw new Error(`Missing Voice ID configuration (EL_VOICE_FEMALE / EL_VOICE_MALE) for mood: ${mood}`)
+        throw new Error(`Missing Voice ID configuration for mood: ${mood}`)
     }
 
-    console.error(`AudioGen: Attempting Raw Fetch. Text Len: ${text.length}. VoiceID: ${voiceId}`)
+    console.log(`AudioGen: Generating... Mood: ${mood}, Voice: ${voiceId}`)
 
     try {
-        const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`
-        const payload = {
+        const audioStream = await client.textToSpeech.convert(voiceId, {
             text,
             model_id: MODEL_ID,
             voice_settings: VOICE_SETTINGS,
-            // output_format not supported in JSON body for stream/TFS, but usually query param?
-            // SDK puts it in query or body? API docs say Query Param for output_format usually?
-            // Let's try standard body first.
-        }
-
-        // Add output_format via query param as per reliable API patterns
-        // Defaults to mp3_44100_128 if unrelated.
-
-        console.error(`AudioGen: Payload Preview: ${JSON.stringify({ ...payload, text: text.substring(0, 20) + '...' })}`)
-
-        const response = await fetch(`${url}?output_format=mp3_44100_128`, {
-            method: 'POST',
-            headers: {
-                'xi-api-key': apiKey, // Correct Header for ElevenLabs
-                'Content-Type': 'application/json',
-                'Accept': 'audio/mpeg'
-            },
-            body: JSON.stringify(payload)
+            output_format: "mp3_44100_128"
         })
 
-        if (!response.ok) {
-            const errorText = await response.text()
-            console.error(`❌ ElevenLabs API Error: ${response.status} ${response.statusText}`)
-            console.error(`❌ Raw Error Body: ${errorText}`)
-            throw new Error(`ElevenLabs API Failed: ${response.status} ${response.statusText} - ${errorText}`)
+        const chunks: Buffer[] = []
+        for await (const chunk of audioStream) {
+            chunks.push(Buffer.from(chunk))
         }
-
-        // Get ArrayBuffer from response
-        const arrayBuffer = await response.arrayBuffer()
-        const buffer = Buffer.from(arrayBuffer)
+        const buffer = Buffer.concat(chunks)
 
         // Upload to Firebase Storage using Admin SDK
         const downloadUrl = await uploadStoryAudio(storyId, buffer, userId)
         return downloadUrl
 
     } catch (error) {
-        console.error("Error generating/uploading audio (Raw Fetch):", error)
+        console.error("Error generating/uploading audio:", error)
         throw error
     }
 }
