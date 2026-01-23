@@ -60,8 +60,8 @@ export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?:
 
       <Button
         size="lg"
-        variant={isWeekend ? 'primary' : (isFamily ? 'primary' : 'secondary')}
-        className={cn("w-full", isWeekend && "bg-teal-600 hover:bg-teal-700 border-teal-600")}
+        variant={isWeekend ? 'teal' : (isFamily ? 'primary' : 'secondary')}
+        className="w-full text-lg h-14"
         onClick={onSelect}
         disabled={isLoading}
       >
