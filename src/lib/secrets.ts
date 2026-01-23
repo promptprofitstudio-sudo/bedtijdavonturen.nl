@@ -37,8 +37,9 @@ export async function getSecret(name: string): Promise<string | undefined> {
         const payload = version.payload?.data?.toString()
         if (payload) {
             // eslint-disable-next-line security/detect-object-injection
-            secretCache[name] = payload
-            return payload
+            const trimmed = payload.trim()
+            secretCache[name] = trimmed
+            return trimmed
         }
         return undefined
     } catch (error) {
