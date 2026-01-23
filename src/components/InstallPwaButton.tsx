@@ -35,6 +35,10 @@ export function InstallPwaButton() {
 
     const handleInstallClick = async () => {
         if (!deferredPrompt) return
+
+        // Track Click
+        if (window.posthog) window.posthog.capture('pwa_install_clicked', { platform: 'android_desktop' })
+
         await deferredPrompt.prompt()
         const { outcome } = await deferredPrompt.userChoice
         if (outcome === 'accepted') {

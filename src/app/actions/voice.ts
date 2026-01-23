@@ -19,6 +19,23 @@ export async function cloneVoiceAction(formData: FormData): Promise<{ success: b
         // Validate File Size (Max 10MB)
         if (file.size > 10 * 1024 * 1024) throw new Error('File too large (Max 10MB)')
 
+        if (process.env.TEST_MODE === 'true') {
+            console.log('[Mock] Cloning Voice in TEST_MODE')
+            // Simulate delay
+            await new Promise(r => setTimeout(r, 500))
+            const voiceId = "mock-voice-id-123"
+
+            // Save to Firestore (Mock update)
+            const db = await getAdminDb()
+            await db.collection('users').doc(userId).update({
+                customVoiceId: voiceId,
+                isVoiceCloned: true
+            })
+
+            revalidatePath('/account')
+            return { success: true }
+        }
+
         const apiKey = await getSecret('ELEVENLABS_API_KEY')
         if (!apiKey) throw new Error('Missing API Key')
 
@@ -38,10 +55,19 @@ export async function cloneVoiceAction(formData: FormData): Promise<{ success: b
         console.log('✅ Voice Cloned! ID:', voiceId)
 
         // Save to Firestore
+        // Save to Firestore
         const db = await getAdminDb()
         await db.collection('users').doc(userId).update({
             customVoiceId: voiceId,
             isVoiceCloned: true
+        })
+
+        // Track Event
+        const { trackServerEvent } = await import('@/lib/server-analytics')
+        await trackServerEvent({
+            userId,
+            event: 'voice_cloned',
+            properties: { voice_id: voiceId }
         })
 
         revalidatePath('/account') // Update UI
