@@ -31,16 +31,7 @@ async function main() {
         process.exit(1)
     }
 
-    // 3. Clear Existing Tiles (Soft Reset to Avoid Duplicates)
-    // We fetch current tiles to find their Insight IDs
-    const detailedDash = await (await fetch(`${BASE_URL}/dashboards/${targetDash.id}/`, { headers })).json()
-    const existingTiles = detailedDash.tiles || []
-
-    // We will unlink ALL current tiles to start fresh, then re-link or re-create needed ones.
-    // Actually, destroying them is aggressive. Let's just create a list of "Desired Metrics" 
-    // and find the best matching existing insight for each, then link ONLY those in the right order.
-
-    // DEFINITION OF DESIRED METRICS
+    // 3. Definitions
     const definitions = [
         {
             name: "Total Stories Generated",
@@ -82,70 +73,63 @@ async function main() {
         }
     ]
 
-    console.log("🧹 Re-organizing tiles...")
-
-    // First, unlink everything to clear the board arrangement
-    // (PostHog doesn't have a 'clear' endpoint easily, so we just treat this as a 'ensure these exist' pass)
-    // Actually, to dedup, we should find specific insights and delete duplicate *Insights* if they exist? 
-    // That's risky.
-    // Strategy: 
-    // 1. Iterate definitions.
-    // 2. Search for existing insight by name.
-    // 3. If exists, update its filters (sync code to dashboards) and ensure linked.
-    // 4. If duplicates found (same name), KEEP ONE, DELETE OTHERS.
-    // 5. If missing, create.
-
+    console.log("🧹 Syncing insights...")
     const allInsights = (await (await fetch(`${BASE_URL}/insights/?limit=200`, { headers })).json()).results
 
     for (const def of definitions) {
         console.log(`Processing: ${def.name}...`)
-
-        const matches = allInsights.filter((i: any) => i.name === def.name || i.name === def.name + " (Copy)") // handle copies
+        const matches = allInsights.filter((i: any) => i.name === def.name || i.name === def.name + " (Copy)")
 
         let primaryInsightId = null
-
         if (matches.length > 0) {
-            // Pick first as primary
             primaryInsightId = matches[0].id
             console.log(`   Found existing ID: ${primaryInsightId}`)
-
-            // Update definition
             await fetch(`${BASE_URL}/insights/${primaryInsightId}`, {
                 method: 'PATCH',
                 headers,
-                body: JSON.stringify({
-                    filters: def.filter,
-                    dashboards: [targetDash.id] // Ensure linked
-                })
+                body: JSON.stringify({ filters: def.filter, dashboards: [targetDash.id] })
             })
-
             // Delete duplicates
             for (let i = 1; i < matches.length; i++) {
-                console.log(`   🗑️ Deleting duplicate: ${matches[i].id}`)
+                console.log(`   🗑️ Deleting duplicate insight: ${matches[i].id}`)
                 await fetch(`${BASE_URL}/insights/${matches[i].id}`, { method: 'DELETE', headers })
             }
         } else {
-            // Create New
             console.log(`   ✨ Creating new...`)
             const res = await fetch(`${BASE_URL}/insights/`, {
                 method: 'POST',
                 headers,
-                body: JSON.stringify({
-                    name: def.name,
-                    filters: def.filter,
-                    dashboards: [targetDash.id]
-                })
+                body: JSON.stringify({ name: def.name, filters: def.filter, dashboards: [targetDash.id] })
             })
-            const json = await res.json()
-            primaryInsightId = json.id
+            primaryInsightId = (await res.json()).id
         }
     }
 
-    // Final cleanup: Unlink any tiles on the dashboard that are NOT in our definition list?
-    // This removes user-created custom stuff, which might be bad.
-    // But user asked to "Align with code", implying strict Sync.
-    // I'll skip destructive unlink for unknown tiles to be safe, but duplicates are gone.
+    // 4. Aggressive Deduplication on Dashboard Level
+    console.log("🔥 Deduplicating Tiles on Dashboard...")
+    const finalDash = await (await fetch(`${BASE_URL}/dashboards/${targetDash.id}/`, { headers })).json()
+    const currentTiles = finalDash.tiles || []
+    const tileGroups: Record<string, any[]> = {}
 
+    currentTiles.forEach((t: any) => {
+        const name = t.insight?.name || "Untitled"
+        if (!tileGroups[name]) tileGroups[name] = []
+        tileGroups[name].push(t)
+    })
+
+    for (const [name, tiles] of Object.entries(tileGroups)) {
+        if (tiles.length > 1) {
+            console.log(`   Found ${tiles.length} copies of '${name}'. Keeping the last one.`)
+            const toRemove = tiles.slice(0, tiles.length - 1)
+            for (const t of toRemove) {
+                console.log(`     🗑️ Removing tile ID: ${t.id}`)
+                // In PostHog, deleting an insight generally removes it from dashboard.
+                if (t.insight?.id) {
+                    await fetch(`${BASE_URL}/insights/${t.insight.id}`, { method: 'DELETE', headers })
+                }
+            }
+        }
+    }
     console.log("✅ Dashboard Reorganized.")
 }
 

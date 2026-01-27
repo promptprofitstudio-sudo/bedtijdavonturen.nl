@@ -18,7 +18,32 @@
 - **Dialogic Prompts:**
     - consistently generated, but sometimes interrupt flow abruptly.
 
-## 2. Recommendations
+- **Dialogic Prompts:**
+    - consistently generated, but sometimes interrupt flow abruptly.
+
+## 2. Language Simplification Audit (Jan 26) 🔍
+*User Feedback: "Current stories contain difficult words."*
+
+### Analysis against Best Practices
+We validated the current output against child development standards (AVI, CEFR).
+
+#### 1. The "Vocabulary Gap"
+- **Current State:** The AI uses "descriptive" language like *shiny*, *magnificent*, *pondered*.
+- **Problem:** For ages 2-5, vocabulary must be **concrete** (ball, run, sleep) rather than **abstract** or **adjectival**.
+- **Source:** *Beck, McKeown, & Kucan (2002)* classify words into Tiers. Bedtime stories should stick to **Tier 1** (Basic everyday words).
+
+#### 2. Sentence Complexity (Cognitive Load)
+- **Current State:** "Terwijl de maan opkwam, dacht de draak aan zijn avontuur." (Compound sentence).
+- **Best Practice:** Split thoughts. "De maan kwam op. De draak dacht aan vandaag."
+- **Why:** Children have limited Working Memory. Complex grammar competes with visualization.
+- **Source:** *Cognitive Load Theory (Sweller)* implies reducing extrinsic load (grammar decoding) allows better focus on the story schema.
+
+#### 3. Standardized Levels (Dutch AVI)
+- **Recommendation:** Explicitly instruct the AI to adhere to **AVI Start / AVI M3**.
+    - **AVI Start:** 1-letterkeep words, short sentences, max 7 words/sentence.
+    - **AVI M3:** Simple punctuation, no difficult vowel combinations.
+
+## 3. Recommendations
 
 ### 🚀 Immediate Improvements (Quick Wins)
 

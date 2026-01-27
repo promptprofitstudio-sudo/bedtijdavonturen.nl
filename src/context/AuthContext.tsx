@@ -37,8 +37,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const init = async () => {
             try {
                 const config = await getFirebaseClientConfig()
-                if (!config.apiKey) throw new Error('Failed to load Firebase config from secrets')
 
+                // TEST MODE BYPASS
+                if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
+                    console.warn("⚠️ AuthContext: Running in TEST MODE. Simulating logged-in user.")
+                    // Simulate a loaded user
+                    setUser({
+                        uid: 'test-user-id',
+                        email: 'test@example.com',
+                        displayName: 'Test User',
+                        subscriptionStatus: 'premium',
+                        createdAt: Timestamp.now(),
+                        customVoiceId: null
+                    })
+                    setServices(null)
+                    setLoading(false)
+                    return
+                }
+
+                if (!config.apiKey) throw new Error('Failed to load Firebase config from secrets')
                 const s = initializeFirebaseServices(config)
                 setServices(s)
 

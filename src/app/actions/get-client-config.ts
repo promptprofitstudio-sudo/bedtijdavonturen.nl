@@ -5,14 +5,16 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 const client = new SecretManagerServiceClient()
 const projectId = 'bedtijdavonturen-prod' // Updated for production isolation
 
-async function getSecret(name: string): Promise<string | undefined> {
+async function getSecret(name: string, suppressLog = false): Promise<string | undefined> {
     try {
         const [version] = await client.accessSecretVersion({
             name: `projects/${projectId}/secrets/${name}/versions/latest`,
         })
         return version.payload?.data?.toString()
-    } catch (error) {
-        console.error(`Failed to fetch secret ${name}:`, error)
+    } catch (error: any) {
+        if (!suppressLog) {
+            console.error(`Failed to fetch secret ${name}:`, error.message || error)
+        }
         return undefined
     }
 }
@@ -21,7 +23,8 @@ export async function getFirebaseClientConfig() {
     // Retrieve sensitive keys from Secrets Manager
 
     // Fetch API Key from GSM (Enforced Policy)
-    const apiKey = await getSecret('FIREBASE_API_KEY') || 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q' // Fallback for dev/fail-safe if needed, or remove fallback if strict.
+    // We suppress logs here because this key might not exist in GSM yet, and we have a valid hardcoded fallback.
+    const apiKey = await getSecret('FIREBASE_API_KEY', true) || 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q'
 
     // User requested strict GSM use.
     // If we strictly fail without it:

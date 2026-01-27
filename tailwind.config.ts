@@ -9,6 +9,11 @@ export default {
     extend: {
       colors: {
         // Bedtijdavonturen: calm bedtime palette (Refactor 2026)
+        primary: "#730bda",
+        "accent-yellow": "#fffbeb",
+        "accent-orange": "#fff7ed",
+        "background-light": "#fcfafc",
+        "background-dark": "#191022",
         navy: {
           50: '#F0F4F8',
           100: '#D9E2EC',
@@ -54,7 +59,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'sans-serif'],
         serif: ['ui-serif', 'Georgia', 'serif'],
       },
       boxShadow: {

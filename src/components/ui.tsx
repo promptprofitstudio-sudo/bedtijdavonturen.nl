@@ -70,17 +70,17 @@ export function Chip({ selected, children, onClick, variant = 'teal' }: ChipProp
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-2xl bg-white p-5 shadow-card border border-moon-100', className)}
+      className={cn('rounded-2xl bg-white p-5 shadow-card border border-moon-100 text-navy-900', className)}
       {...props}
     />
   )
 }
 
-export function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
+export function SectionTitle({ title, subtitle, className }: { title: string; subtitle?: string, className?: string }) {
   return (
-    <div className="space-y-1 mb-4">
-      <h1 className="text-2xl font-extrabold tracking-tight text-navy-900">{title}</h1>
-      {subtitle ? <p className="text-sm text-navy-800/70 font-medium">{subtitle}</p> : null}
+    <div className={cn("space-y-1 mb-4", className)}>
+      <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
+      {subtitle ? <p className="text-sm opacity-80 font-medium">{subtitle}</p> : null}
     </div>
   )
 }

@@ -51,8 +51,14 @@ export async function generateStoryWithAI(
     // SAFETY & DIALOGIC LOGIC
     const isToddler = ageGroup === '2-4'
     const safetyInstruction = isToddler
-        ? "CRITICAL SAFETY FOR TODDLERS (2-4): Simple words only. Focus on sensory details (soft, warm, quiet). NO scary elements, NO conflict, NO abstract concepts. Keep sentences short."
-        : "For Age 4-7: Use warm, slightly more descriptive language. Gentle adventures are okay."
+        ? `CRITICAL SAFETY FOR TODDLERS (2-4):
+           1. VOCABULARY: Use ONLY "Tier 1" words (ball, sleep, moon). NO abstract concepts.
+           2. COMPLEXITY: Strict "AVI Start" level. Short sentences (max 7 words). NO compound sentences.
+           3. CONTENT: Purely sensory (soft, warm). No conflict.`
+        : `For Age 4-7:
+           1. VOCABULARY: mostly Tier 1, some Tier 2 (glowing, brave).
+           2. COMPLEXITY: "AVI M3" level. Simple sentences.
+           3. CONTENT: Gentle adventures allowed.`
 
     const prompt = `
     Je bent een expert in rustgevende kinderboekjes.
@@ -63,6 +69,11 @@ export async function generateStoryWithAI(
     
     AGE GROUP INSTRUCTIONS:
     ${safetyInstruction}
+
+    TAALRICHTLIJNEN (STRENGE HANDHAVING):
+    - Gebruik Jip-en-Janneketaal.
+    - Vermijd bijzinnen. (Niet: "Terwijl hij liep, zag hij...", maar: "Hij liep. Hij zag...")
+    - Focus op CONCRETE woorden.
 
     BELANGRIJKE VEREISTEN:
     1. LENGTE: Minimaal 500 woorden (zodat het ong. 5 minuten duurt om rustig voor te lezen).
