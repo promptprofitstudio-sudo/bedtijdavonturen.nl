@@ -22,7 +22,7 @@
     "firebase": "^12.8.0",
     "firebase-admin": "^13.6.0",
     "micro": "^10.0.1",
-    "next": "^15.1.0",
+    "next": "^16.1.5",
     "openai": "^6.16.0",
     "posthog-js": "^1.333.0",
     "posthog-node": "^5.21.2",
