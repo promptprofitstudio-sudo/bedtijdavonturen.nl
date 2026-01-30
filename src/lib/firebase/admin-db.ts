@@ -9,7 +9,12 @@ export async function getStory(storyId: string): Promise<Story | null> {
     }
 
     const db = await getAdminDb()
+    // @ts-ignore
+    const projectId = db.app?.options?.projectId
+    console.log(`[AdminDB] Connected to Project: ${projectId}`)
+    console.log(`[AdminDB] Fetching story ${storyId} from stories collection`)
     const snap = await db.collection('stories').doc(storyId).get()
+    console.log(`[AdminDB] Snap exist: ${snap.exists}`)
     if (!snap.exists) return null
 
     const data = snap.data()

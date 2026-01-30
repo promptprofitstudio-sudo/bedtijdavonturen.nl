@@ -51,7 +51,7 @@ export default async function GenerateAudioPage({ params }: { params: Promise<{ 
                 <div className="space-y-4">
                     <p className="text-lg font-medium text-white">Klaar om te genereren?</p>
                     <p className="text-sm text-navy-400">
-                        Dit gebruikt 1 Credit van je bundel. Je hebt er nog <strong>{credits}</strong>.
+                        Dit gebruikt 1 Luisterpunt van je bundel. Je hebt er nog <strong>{credits}</strong>.
                     </p>
                 </div>
 

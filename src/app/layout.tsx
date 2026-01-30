@@ -31,6 +31,7 @@ export const metadata: Metadata = {
 import { CookieBanner } from '@/components/CookieBanner'
 import { AuthProvider } from '@/context/AuthContext'
 import { PostHogProvider } from '@/components/PostHogProvider'
+import { PartnerGiftBanner } from '@/components/PartnerGiftBanner'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -64,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PostHogProvider>
           <AuthProvider>
             <div className="mx-auto min-h-dvh max-w-md pb-24 relative">
+              <PartnerGiftBanner />
               {children}
               <CookieBanner />
             </div>
@@ -74,3 +76,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+

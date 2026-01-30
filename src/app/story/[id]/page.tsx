@@ -7,9 +7,14 @@ import { getStory } from '@/lib/firebase/admin-db'
 export default async function StoryPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<{ mode?: string }> }) {
   const { id } = await params
   const { mode } = await searchParams
+  console.log('[StoryPage] Loading story:', id)
   const story = await getStory(id)
+  console.log('[StoryPage] Loaded story:', story ? story.title : 'NULL')
 
-  if (!story) return <div className="p-8 text-center font-bold text-navy-900">Verhaal niet gevonden</div>
+  if (!story) {
+    console.error('[StoryPage] 404 - Story not found for ID:', id)
+    return <div className="p-8 text-center font-bold text-navy-900">Verhaal niet gevonden</div>
+  }
 
   // Force toddler/audio mode if query param set
   const isAudioMode = mode === 'audio'

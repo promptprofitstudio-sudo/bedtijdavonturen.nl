@@ -38,9 +38,9 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
         const userSnap = await userRef.get()
         const userData = userSnap.data() as { customVoiceId?: string, credits?: number, subscriptionStatus?: string } | undefined
 
-        const isPremium = userData?.subscriptionStatus === 'premium'
+        const isPremium = userData?.subscriptionStatus === 'premium' || userData?.subscriptionStatus === 'trial' || userData?.subscriptionStatus === 'admin'
 
-        // [NEW] Check Credits (Bypass for Premium)
+        // [NEW] Check Credits (Bypass for Premium/Trial)
         const credits = userData?.credits ?? 0
         if (!isPremium && credits <= 0) {
             return { error: 'Geen credits meer. Koop een bundel om verder te gaan.' }

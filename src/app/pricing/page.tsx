@@ -17,25 +17,25 @@ export default function PricingPage() {
   /* Refined Packages (v2.2) */
   const plans: Plan[] = [
     {
-      name: 'Weekend Rust',
+      name: 'Weekend Pakket',
       price: '€2,99',
       period: 'eenmalig',
       tagline: 'Ideaal voor logeren of oppas.',
-      features: ['3x Luisterverhaal (Scherm uit)', 'Onbeperkt geldig', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
+      features: ['3x Audio Generatie (Scherm uit)', 'Onbeperkt geldig', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
       variant: 'weekend',
       highlighted: false,
       buttonText: 'Koop 3x Rust',
       priceId: STRIPE_CONFIG.prices.weekend,
     },
     {
-      name: 'Elke Avond',
+      name: 'Rust & Regelmaat',
       price: '€7,99',
       period: '/ maand',
       tagline: 'Elke dag een nieuw avontuur.',
-      features: ['Onbeperkt Luisteren 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Maandelijks opzegbaar'],
+      features: ['Onbeperkt Audio 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Maandelijks opzegbaar'],
       variant: 'default',
       highlighted: true,
-      buttonText: 'Kies Abonnement', // "Start 7 dagen gratis" requires trial logic not defined yet
+      buttonText: 'Kies Basis',
       priceId: STRIPE_CONFIG.prices.monthly,
     },
     {
@@ -43,11 +43,11 @@ export default function PricingPage() {
       price: '€9,99',
       period: '/ maand',
       tagline: 'Voor het hele gezin.',
-      features: ['Alles van Basis', '5 Kindprofielen (Broertjes/Zusjes)', 'Opa & Oma kunnen meeluisteren', 'Premium Support'],
+      features: ['Onbeperkt Audio 🎧', '5 Kindprofielen', 'Premium Stemmen', 'Opa & Oma luisteren mee'],
       variant: 'default',
       highlighted: false,
       buttonText: 'Kies Family',
-      priceId: STRIPE_CONFIG.prices.annual, // Maps to Family plan
+      priceId: STRIPE_CONFIG.prices.annual,
     },
   ]
 
@@ -89,6 +89,17 @@ export default function PricingPage() {
       <header className="space-y-2">
         <SectionTitle title="Kies je plan" subtitle="Investeer in magische momenten." />
       </header>
+
+      {/* [NEW] Trial Status Banner */}
+      {user?.subscriptionStatus === 'trial' && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-2">
+          <p className="text-green-800 font-bold">✨ Je geniet van 7 dagen gratis Premium!</p>
+          <p className="text-xs text-green-700">
+            Dankzij onze partner{user.referredBy ? ` (${user.referredBy})` : ''} luister je gratis.<br />
+            Na de proefperiode val je automatisch terug naar gratis (geen kosten).
+          </p>
+        </div>
+      )}
 
       <div className="space-y-3">
         {/* Compliance Checkbox */}
@@ -132,4 +143,3 @@ export default function PricingPage() {
     </main>
   )
 }
-

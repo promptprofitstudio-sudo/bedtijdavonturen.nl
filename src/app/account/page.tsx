@@ -7,6 +7,7 @@ import { EmailLoginForm } from '@/components/EmailLoginForm'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { useAuth } from '@/context/AuthContext'
 import { InstallPwaButton } from '@/components/InstallPwaButton'
+import { RedeemCouponForm } from '@/components/RedeemCouponForm'
 // AddProfileForm removed
 import { getProfiles, deleteProfile } from '@/lib/firebase/db'
 import { ChildProfile } from '@/lib/types'
@@ -94,6 +95,9 @@ export default function AccountPage() {
           )}
         </div>
       </Card>
+
+      {/* Coupon Redemption */}
+      <RedeemCouponForm />
 
       <Card className="space-y-2">
         <p className="text-sm font-extrabold">Abonnement</p>

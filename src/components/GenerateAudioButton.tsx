@@ -73,7 +73,7 @@ export function GenerateAudioButton({
                     onClick={handleGenerate}
                     disabled={loading}
                 >
-                    {loading ? 'Bezig met genereren...' : `✨ Genereer Audio (Saldo: ${credits})`}
+                    {loading ? 'Bezig met genereren...' : `✨ Genereer Audio (Luisterpunten: ${credits})`}
                 </Button>
             ) : (
                 <div className="space-y-3">
@@ -82,10 +82,10 @@ export function GenerateAudioButton({
                         className="w-full h-12 text-lg opacity-50 cursor-not-allowed"
                         disabled
                     >
-                        Geen credits (Saldo: 0)
+                        Geen luisterpunten (Totaal: 0)
                     </Button>
                     <p className="text-xs text-center text-red-300">
-                        Je hebt geen credits meer. <a href="/pricing" className="underline hover:text-white">Koop nieuwe bundel</a>.
+                        Je hebt geen luisterpunten meer. <a href="/pricing" className="underline hover:text-white">Koop nieuwe bundel</a>.
                     </p>
                 </div>
             )}

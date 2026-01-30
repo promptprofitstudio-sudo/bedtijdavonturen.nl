@@ -55,10 +55,17 @@ export async function getAdminApp(): Promise<App> {
         try {
             console.log('[Admin] Found explicit service account key! Attempting to parse...')
             const parsedKey = JSON.parse(serviceAccountKey)
-            options.credential = cert(parsedKey)
-            // Explicitly set projectId from key to be safe, but cert should handle it
-            options.projectId = parsedKey.project_id
-            console.log(`[Admin] Successfully created cert credential. Project: ${options.projectId}`)
+
+            // Security Check: Ensure the key belongs to the correct project
+            if (parsedKey.project_id !== projectId) {
+                console.error(`[Admin] 🚨 CRITICAL MISMATCH: Secret key is for '${parsedKey.project_id}' but expected '${projectId}'. Ignoring key and using ADC.`)
+                options.projectId = projectId
+                // Do NOT set options.credential, checking fall back to ADC
+            } else {
+                options.credential = cert(parsedKey)
+                options.projectId = parsedKey.project_id
+                console.log(`[Admin] Successfully created cert credential. Project: ${options.projectId}`)
+            }
         } catch (e) {
             console.error('[Admin] Failed to parse service account key, falling back to ADC', e)
             options.projectId = projectId // Fallback

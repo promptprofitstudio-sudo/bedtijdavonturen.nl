@@ -94,6 +94,9 @@ export default function WizardPage() {
       if (result.error) {
         alert(result.error)
       } else if (result.success && result.storyId) {
+        if (result.debugProject && result.debugProject !== 'bedtijdavonturen-prod') {
+          alert(`⚠️ CRITICAL: Wrote to wrong project: ${result.debugProject}`)
+        }
         router.push(`/story/${result.storyId}`)
       }
     } catch (e) {

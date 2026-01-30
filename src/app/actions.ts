@@ -105,7 +105,10 @@ export async function generateStoryAction(formData: FormData) {
         }
 
         // 4. Return Success
-        return { success: true, storyId: docRef.id }
+        // @ts-ignore
+        const currentProject = adminDb.app?.options?.projectId || 'unknown'
+        console.log(`[GenerateAction] Success. ID: ${docRef.id}, Project: ${currentProject}`)
+        return { success: true, storyId: docRef.id, debugProject: currentProject }
     } catch (error) {
         console.error('Story generation failed:', error)
         const message = error instanceof Error ? error.message : 'Onbekende fout'

@@ -9,11 +9,13 @@ export const UserSchema = z.object({
     email: z.string().email().nullable(), // Updated to allow null
     displayName: z.string().nullable(),
     photoURL: z.string().nullable().optional(), // Added photoURL
-    subscriptionStatus: z.enum(['free', 'basic', 'family', 'premium', 'trialing', 'canceled', 'past_due']), // Updated enum values
-    stripeCustomerId: z.string().optional(), // Added Stripe customer ID
-    subscriptionId: z.string().optional(), // Added Stripe subscription ID
-    customVoiceId: z.string().optional().nullable(), // [NEW] ElevenLabs Voice ID
-    credits: z.number().default(0), // [NEW] Credit balance
+    subscriptionStatus: z.enum(['free', 'basic', 'family', 'premium', 'trial', 'trialing', 'canceled', 'past_due']), // Added 'trial'
+    stripeCustomerId: z.string().optional(),
+    subscriptionId: z.string().optional(),
+    customVoiceId: z.string().optional().nullable(),
+    credits: z.number().default(0),
+    referredBy: z.string().optional(), // [NEW] Partner code
+    trialEndsAt: z.number().optional(), // [NEW] Timestamp for trial expiry
     createdAt: z.custom<Timestamp>(),
 })
 
