@@ -13,6 +13,7 @@ export const UserSchema = z.object({
     stripeCustomerId: z.string().optional(), // Added Stripe customer ID
     subscriptionId: z.string().optional(), // Added Stripe subscription ID
     customVoiceId: z.string().optional().nullable(), // [NEW] ElevenLabs Voice ID
+    credits: z.number().default(0), // [NEW] Credit balance
     createdAt: z.custom<Timestamp>(),
 })
 

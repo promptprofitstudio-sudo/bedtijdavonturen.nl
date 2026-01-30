@@ -27,11 +27,14 @@ export default async function ListenPage({
 
   // Fetch Voice Status (if needed for generator)
   let hasClonedVoice = false
+  let credits = 0
   if (!story.audioUrl) {
     const { getAdminDb } = await import('@/lib/firebase/admin')
     const db = await getAdminDb()
     const userDoc = await db.collection('users').doc(story.userId).get()
-    hasClonedVoice = !!userDoc.data()?.customVoiceId
+    const userData = userDoc.data()
+    hasClonedVoice = !!userData?.customVoiceId
+    credits = userData?.credits ?? 0
   }
 
   if (!isOwner && !isPublicShare) {
@@ -78,7 +81,7 @@ export default async function ListenPage({
           <AudioPlayer title={story.title} src={story.audioUrl} />
         ) : (
           <Card className="border-dashed border-2 bg-white/50">
-            <GenerateAudioButton storyId={story.id} userId={story.userId} hasClonedVoice={hasClonedVoice} />
+            <GenerateAudioButton storyId={story.id} userId={story.userId} hasClonedVoice={hasClonedVoice} credits={credits} />
           </Card>
         )
       }

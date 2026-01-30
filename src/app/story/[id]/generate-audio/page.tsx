@@ -17,6 +17,7 @@ export default async function GenerateAudioPage({ params }: { params: Promise<{ 
     const userDoc = await db.collection('users').doc(story.userId).get()
     const userData = userDoc.data()
     const hasClonedVoice = !!userData?.customVoiceId
+    const credits = userData?.credits ?? 0
 
     if (story.audioUrl) {
         return (
@@ -29,7 +30,7 @@ export default async function GenerateAudioPage({ params }: { params: Promise<{ 
 
                 <div className="mt-8 pt-8 border-t border-navy-800 w-full max-w-md">
                     <p className="text-sm text-navy-400 mb-4 text-center">Wil je een andere stem proberen?</p>
-                    <GenerateAudioButton storyId={id} userId={story.userId} hasClonedVoice={hasClonedVoice} />
+                    <GenerateAudioButton storyId={id} userId={story.userId} hasClonedVoice={hasClonedVoice} credits={credits} />
                 </div>
             </div>
         )
@@ -50,11 +51,11 @@ export default async function GenerateAudioPage({ params }: { params: Promise<{ 
                 <div className="space-y-4">
                     <p className="text-lg font-medium text-white">Klaar om te genereren?</p>
                     <p className="text-sm text-navy-400">
-                        Dit gebruikt 1 Credit van je bundel. We gebruiken je gekloonde stem (indien beschikbaar) of onze verteller.
+                        Dit gebruikt 1 Credit van je bundel. Je hebt er nog <strong>{credits}</strong>.
                     </p>
                 </div>
 
-                <GenerateAudioButton storyId={id} userId={story.userId} hasClonedVoice={hasClonedVoice} />
+                <GenerateAudioButton storyId={id} userId={story.userId} hasClonedVoice={hasClonedVoice} credits={credits} />
 
                 <a href={`/story/${id}`} className="block text-sm text-navy-500 hover:text-white underline mt-4">
                     Nee, ik wil alleen lezen

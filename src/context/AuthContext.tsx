@@ -48,7 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         displayName: 'Test User',
                         subscriptionStatus: 'premium',
                         createdAt: Timestamp.now(),
-                        customVoiceId: null
+                        customVoiceId: null,
+                        credits: 10
                     })
                     setServices(null)
                     setLoading(false)
@@ -105,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 displayName: firebaseUser.displayName || null,
                                 subscriptionStatus: 'free',
                                 createdAt: Timestamp.now(),
+                                credits: 0,
                             }
                             await setDoc(userRef, newUser)
                             setUser(newUser)

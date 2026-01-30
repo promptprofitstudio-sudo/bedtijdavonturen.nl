@@ -36,13 +36,19 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
         // 2b. Fetch User Profile for Custom Voice
         const userRef = db.collection('users').doc(story.userId)
         const userSnap = await userRef.get()
-        const userData = userSnap.data()
+        const userData = userSnap.data() as { customVoiceId?: string, credits?: number } | undefined
+
+        // [NEW] Check Credits
+        const credits = userData?.credits ?? 0
+        if (credits <= 0) {
+            return { error: 'Geen credits meer. Koop een bundel om verder te gaan.' }
+        }
 
         // Only use custom voice if available AND requested (default true if available)
         const shouldUseCustomVoice = options?.useCustomVoice !== false
         const customVoiceId = shouldUseCustomVoice ? userData?.customVoiceId : undefined
 
-        console.log(`Audio Logic: HasCustomVoice=${!!userData?.customVoiceId}, Requested=${shouldUseCustomVoice}, Using=${customVoiceId}`)
+        console.log(`Audio Logic: HasCustomVoice=${!!userData?.customVoiceId}, Requested=${shouldUseCustomVoice}, Using=${customVoiceId}, Credits=${credits}`)
 
         // 3. Generate Audio with ElevenLabs
         const textToRead = `${story.title}. \n\n ${story.body.filter(b => b.type === 'p').map(b => b.text).join('\n\n')}`
@@ -57,7 +63,15 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
 
         // 4. Update Firestore using Admin SDK (Secure Update)
         console.log('Updating story with audio URL...')
+        const { FieldValue } = await import('firebase-admin/firestore')
+
         await storyRef.update({ audioUrl })
+
+        // [NEW] Deduct Credit
+        await userRef.update({
+            credits: FieldValue.increment(-1)
+        })
+
 
         revalidatePath(`/listen/${storyId}`)
 

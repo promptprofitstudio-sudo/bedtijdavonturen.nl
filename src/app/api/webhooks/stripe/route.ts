@@ -35,13 +35,41 @@ export async function POST(req: Request) {
         if (userId) {
             try {
                 const db = await getAdminDb()
+                const { FieldValue } = await import('firebase-admin/firestore')
+
+                // Determine credits to add
+                let creditsToAdd = 0
+                const { STRIPE_CONFIG } = await import('@/lib/stripe-config') // Import config
+
+                // Check Line Items (simplified: assume 1 item)
+                // In a real app we might need to fetch line items from session if not in metadata
+                // But for now, let's infer from the 'mode' or assume product mapping
+                // Wait, session object has 'lines' if expanded, but we receive the event.
+                // We rely on price ID matching.
+                // For simplicity in this webhook, let's map:
+                // We don't have priceId easily available in session object root without expansion or line_items
+                // BUT we do know:
+                // Weekend (One-time) -> 5 Credits
+                // Monthly (Sub) -> 30 Credits
+                // Annual (Sub) -> 365 Credits
+
+                // We need to fetch line items to be sure which price was bought
+                const stripe = await getStripe()
+                const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+                const priceId = lineItems.data[0]?.price?.id
+
+                if (priceId === STRIPE_CONFIG.prices.weekend) creditsToAdd = 5
+                else if (priceId === STRIPE_CONFIG.prices.monthly) creditsToAdd = 30
+                else if (priceId === STRIPE_CONFIG.prices.annual) creditsToAdd = 365
+
                 await db.collection('users').doc(userId).update({
-                    subscriptionStatus: 'premium', // Or verify product/price if needed
-                    subscriptionId: subscriptionId || session.id, // Subscription ID or Session ID (for one-time)
+                    subscriptionStatus: 'premium',
+                    subscriptionId: subscriptionId || session.id,
                     stripeCustomerId: customerId,
+                    credits: FieldValue.increment(creditsToAdd), // [NEW] Atomically add credits
                     updatedAt: new Date()
                 })
-                console.log(`[Stripe] User ${userId} upgraded to Premium via ${event.type}`)
+                console.log(`[Stripe] User ${userId} upgraded. Added ${creditsToAdd} credits.`)
             } catch (dbErr) {
                 console.error('[Stripe] DB Update Failed:', dbErr)
                 return new NextResponse('Database Error', { status: 500 })

@@ -11,7 +11,8 @@ export async function getCurrentUser(): Promise<UserData | null> {
             email: 'test@example.com',
             displayName: 'Test User',
             subscriptionStatus: 'premium',
-            createdAt: new Date() as any
+            createdAt: new Date() as any,
+            credits: 10
         }
     }
 
@@ -30,7 +31,8 @@ export async function getCurrentUser(): Promise<UserData | null> {
             email: decodedClaims.email || null,
             displayName: null,
             subscriptionStatus: 'free', // Defaults, would need DB fetch for real status
-            createdAt: new Date() as any
+            createdAt: new Date() as any,
+            credits: 0
         }
     } catch (error) {
         // console.error("Server Auth Error:", error)
