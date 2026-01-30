@@ -14,34 +14,40 @@ export default function PricingPage() {
   const [isPending, startTransition] = React.useTransition()
   const [toast, setToast] = React.useState<string | null>(null)
 
-  /* Refined Packages based on new features */
+  /* Refined Packages (v2.2) */
   const plans: Plan[] = [
     {
-      name: 'Weekend Bundel',
-      price: '€1,99', // Updated price
-      tagline: '3 losse verhalen om te proberen.',
-      features: ['Geen abonnement', '5 Credits', 'Toegang tot Voice Cloning', 'Direct Beschikbaar'], // Updated features
+      name: 'Weekend Rust',
+      price: '€2,99',
+      period: 'eenmalig',
+      tagline: 'Ideaal voor logeren of oppas.',
+      features: ['3x Luisterverhaal (Scherm uit)', 'Onbeperkt geldig', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
       variant: 'weekend',
+      highlighted: false,
+      buttonText: 'Koop 3x Rust',
       priceId: STRIPE_CONFIG.prices.weekend,
-      intervalLabel: 'eenmalig'
     },
     {
-      name: 'Premium Maandelijks',
-      price: '€9,99',
-      tagline: 'Onbeperkt toegang.',
-      features: ['Onbeperkt verhalen', 'Onbeperkt audio', 'Jouw Stem (Cloning)', 'Opzegbaar per maand'],
+      name: 'Elke Avond',
+      price: '€7,99',
+      period: '/ maand',
+      tagline: 'Elke dag een nieuw avontuur.',
+      features: ['Onbeperkt Luisteren 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Maandelijks opzegbaar'],
       variant: 'default',
+      highlighted: true,
+      buttonText: 'Kies Abonnement', // "Start 7 dagen gratis" requires trial logic not defined yet
       priceId: STRIPE_CONFIG.prices.monthly,
-      intervalLabel: 'per maand'
     },
     {
-      name: 'Premium Jaarlijks',
-      price: '€99,00',
-      tagline: '2 maanden gratis.',
-      features: ['Alles van Premium', 'Beste deal', 'Voorrang Support', '3 Stemmen Klonen'],
-      variant: 'family',
-      priceId: STRIPE_CONFIG.prices.annual,
-      intervalLabel: 'per jaar'
+      name: 'Family',
+      price: '€9,99',
+      period: '/ maand',
+      tagline: 'Voor het hele gezin.',
+      features: ['Alles van Basis', '5 Kindprofielen (Broertjes/Zusjes)', 'Opa & Oma kunnen meeluisteren', 'Premium Support'],
+      variant: 'default',
+      highlighted: false,
+      buttonText: 'Kies Family',
+      priceId: STRIPE_CONFIG.prices.annual, // Maps to Family plan
     },
   ]
 
@@ -110,8 +116,8 @@ export default function PricingPage() {
       </div>
 
       <Card className="space-y-2">
-        <p className="text-sm font-extrabold">Niet tevreden? Geld terug</p>
-        <p className="text-xs text-ink-800/70">Probeer het 7 dagen. Beëindigen kan meteen.</p>
+        <p className="text-sm font-extrabold">Niet goed? Geld terug.</p>
+        <p className="text-xs text-ink-800/70">Abonnementen zijn op elk moment met 1 klik te stoppen in je account.</p>
       </Card>
 
       {toast && (

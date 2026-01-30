@@ -100,15 +100,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         if (userSnap.exists()) {
                             setUser(userSnap.data() as UserData)
                         } else {
+                            // DEVICE-LEVEL WELCOME CREDIT CHECK
+                            // Prevents farming 1 credit by creating new accounts on same device
+                            const hasClaimedWelcome = typeof window !== 'undefined' && localStorage.getItem('bedtijd_welcome_claimed') === 'true'
+                            const initialCredits = !hasClaimedWelcome ? 1 : 0
+
                             const newUser: UserData = {
                                 uid: firebaseUser.uid,
                                 email: firebaseUser.email || '',
                                 displayName: firebaseUser.displayName || null,
                                 subscriptionStatus: 'free',
                                 createdAt: Timestamp.now(),
-                                credits: 0,
+                                credits: initialCredits,
                             }
                             await setDoc(userRef, newUser)
+
+                            if (initialCredits > 0 && typeof window !== 'undefined') {
+                                localStorage.setItem('bedtijd_welcome_claimed', 'true')
+                                console.log("🎁 Welcome Credit Granted!")
+                            }
+
                             setUser(newUser)
                         }
 

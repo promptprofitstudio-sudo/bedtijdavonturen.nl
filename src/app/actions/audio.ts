@@ -36,11 +36,13 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
         // 2b. Fetch User Profile for Custom Voice
         const userRef = db.collection('users').doc(story.userId)
         const userSnap = await userRef.get()
-        const userData = userSnap.data() as { customVoiceId?: string, credits?: number } | undefined
+        const userData = userSnap.data() as { customVoiceId?: string, credits?: number, subscriptionStatus?: string } | undefined
 
-        // [NEW] Check Credits
+        const isPremium = userData?.subscriptionStatus === 'premium'
+
+        // [NEW] Check Credits (Bypass for Premium)
         const credits = userData?.credits ?? 0
-        if (credits <= 0) {
+        if (!isPremium && credits <= 0) {
             return { error: 'Geen credits meer. Koop een bundel om verder te gaan.' }
         }
 
@@ -48,7 +50,7 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
         const shouldUseCustomVoice = options?.useCustomVoice !== false
         const customVoiceId = shouldUseCustomVoice ? userData?.customVoiceId : undefined
 
-        console.log(`Audio Logic: HasCustomVoice=${!!userData?.customVoiceId}, Requested=${shouldUseCustomVoice}, Using=${customVoiceId}, Credits=${credits}`)
+        console.log(`Audio Logic: IsPremium=${isPremium}, HasCustomVoice=${!!userData?.customVoiceId}, Requested=${shouldUseCustomVoice}, Using=${customVoiceId}, Credits=${credits}`)
 
         // 3. Generate Audio with ElevenLabs
         const textToRead = `${story.title}. \n\n ${story.body.filter(b => b.type === 'p').map(b => b.text).join('\n\n')}`
@@ -67,10 +69,12 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
 
         await storyRef.update({ audioUrl })
 
-        // [NEW] Deduct Credit
-        await userRef.update({
-            credits: FieldValue.increment(-1)
-        })
+        // [NEW] Deduct Credit (Only if NOT premium)
+        if (!isPremium) {
+            await userRef.update({
+                credits: FieldValue.increment(-1)
+            })
+        }
 
 
         revalidatePath(`/listen/${storyId}`)

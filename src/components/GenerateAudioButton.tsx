@@ -5,7 +5,19 @@ import { Button } from '@/components/ui'
 import { generateAudioAction } from '@/app/actions/audio'
 import { useRouter } from 'next/navigation'
 
-export function GenerateAudioButton({ storyId, userId, hasClonedVoice = false, credits = 0 }: { storyId: string, userId: string, hasClonedVoice?: boolean, credits?: number }) {
+export function GenerateAudioButton({
+    storyId,
+    userId,
+    hasClonedVoice = false,
+    credits = 0,
+    showWelcomeBadge = false
+}: {
+    storyId: string,
+    userId: string,
+    hasClonedVoice?: boolean,
+    credits?: number,
+    showWelcomeBadge?: boolean
+}) {
     const [loading, setLoading] = useState(false)
     const [useCustomVoice, setUseCustomVoice] = useState(true)
     const router = useRouter()
@@ -34,7 +46,14 @@ export function GenerateAudioButton({ storyId, userId, hasClonedVoice = false, c
     }
 
     return (
-        <div className="w-full space-y-4">
+        <div className="w-full space-y-4 relative">
+            {showWelcomeBadge && (
+                <div className="absolute -top-10 right-0 bg-teal-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-bounce z-10">
+                    🎁 Probeer nu gratis (1 cadeau)
+                    <div className="absolute bottom-[-4px] right-4 w-2 h-2 bg-teal-500 rotate-45" />
+                </div>
+            )}
+
             {hasClonedVoice && (
                 <div className="bg-navy-800/50 p-3 rounded-xl border border-navy-700 flex items-center justify-between">
                     <span className="text-sm text-navy-200">Gebruik mijn stem</span>

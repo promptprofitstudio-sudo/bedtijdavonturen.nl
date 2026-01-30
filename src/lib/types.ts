@@ -9,7 +9,7 @@ export const UserSchema = z.object({
     email: z.string().email().nullable(), // Updated to allow null
     displayName: z.string().nullable(),
     photoURL: z.string().nullable().optional(), // Added photoURL
-    subscriptionStatus: z.enum(['free', 'premium', 'trialing', 'canceled', 'past_due']), // Updated enum values
+    subscriptionStatus: z.enum(['free', 'basic', 'family', 'premium', 'trialing', 'canceled', 'past_due']), // Updated enum values
     stripeCustomerId: z.string().optional(), // Added Stripe customer ID
     subscriptionId: z.string().optional(), // Added Stripe subscription ID
     customVoiceId: z.string().optional().nullable(), // [NEW] ElevenLabs Voice ID

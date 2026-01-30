@@ -28,6 +28,8 @@ export default async function ListenPage({
   // Fetch Voice Status (if needed for generator)
   let hasClonedVoice = false
   let credits = 0
+  let subStatus = 'free'
+
   if (!story.audioUrl) {
     const { getAdminDb } = await import('@/lib/firebase/admin')
     const db = await getAdminDb()
@@ -35,7 +37,11 @@ export default async function ListenPage({
     const userData = userDoc.data()
     hasClonedVoice = !!userData?.customVoiceId
     credits = userData?.credits ?? 0
+    subStatus = userData?.subscriptionStatus || 'free'
   }
+
+  // Welcome Badge Logic (First Time Experience)
+  const showWelcomeBadge = credits === 1 && subStatus === 'free'
 
   if (!isOwner && !isPublicShare) {
     if (!user) {
@@ -81,7 +87,13 @@ export default async function ListenPage({
           <AudioPlayer title={story.title} src={story.audioUrl} />
         ) : (
           <Card className="border-dashed border-2 bg-white/50">
-            <GenerateAudioButton storyId={story.id} userId={story.userId} hasClonedVoice={hasClonedVoice} credits={credits} />
+            <GenerateAudioButton
+              storyId={story.id}
+              userId={story.userId}
+              hasClonedVoice={hasClonedVoice}
+              credits={credits}
+              showWelcomeBadge={showWelcomeBadge} // [NEW] Pass badge state
+            />
           </Card>
         )
       }
