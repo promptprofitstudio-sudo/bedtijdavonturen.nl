@@ -7,6 +7,8 @@ import { ShareButton } from '@/components/ShareButton'
 
 import { getCurrentUser } from '@/lib/firebase/server-auth'
 
+import { getAdminDb } from '@/lib/firebase/admin'
+
 export default async function ListenPage({
   params,
   searchParams
@@ -31,7 +33,6 @@ export default async function ListenPage({
   let subStatus = 'free'
 
   if (!story.audioUrl) {
-    const { getAdminDb } = await import('@/lib/firebase/admin')
     const db = await getAdminDb()
     const userDoc = await db.collection('users').doc(story.userId).get()
     const userData = userDoc.data()
