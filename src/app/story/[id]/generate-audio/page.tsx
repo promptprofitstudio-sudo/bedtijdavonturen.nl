@@ -1,5 +1,6 @@
 
 import { getStory } from '@/lib/firebase/admin-db'
+import { getAdminDb } from '@/lib/firebase/admin'
 import { GenerateAudioButton } from '@/components/GenerateAudioButton'
 import { Button } from '@/components/ui'
 
@@ -11,14 +12,25 @@ export default async function GenerateAudioPage({ params }: { params: Promise<{ 
         return <div className="p-8 text-center text-white">Verhaal niet gevonden.</div>
     }
 
+    // Fetch User to check for voice clone
+    const db = await getAdminDb()
+    const userDoc = await db.collection('users').doc(story.userId).get()
+    const userData = userDoc.data()
+    const hasClonedVoice = !!userData?.customVoiceId
+
     if (story.audioUrl) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-navy-950 text-white p-6 space-y-6">
                 <h1 className="text-2xl font-bold">Audio Bestaat Al! 🎧</h1>
                 <p>Je hebt dit verhaal al ingesproken (of gegenereerd).</p>
-                <a href={`/story/${id}?mode=audio`} className="bg-teal-500 px-6 py-3 rounded-xl font-bold">
+                <a href={`/story/${id}?mode=audio`} className="bg-teal-500 px-6 py-3 rounded-xl font-bold hover:bg-teal-400 transition-colors">
                     Naar de Speler
                 </a>
+
+                <div className="mt-8 pt-8 border-t border-navy-800 w-full max-w-md">
+                    <p className="text-sm text-navy-400 mb-4 text-center">Wil je een andere stem proberen?</p>
+                    <GenerateAudioButton storyId={id} userId={story.userId} hasClonedVoice={hasClonedVoice} />
+                </div>
             </div>
         )
     }
@@ -42,7 +54,7 @@ export default async function GenerateAudioPage({ params }: { params: Promise<{ 
                     </p>
                 </div>
 
-                <GenerateAudioButton storyId={id} userId={story.userId} />
+                <GenerateAudioButton storyId={id} userId={story.userId} hasClonedVoice={hasClonedVoice} />
 
                 <a href={`/story/${id}`} className="block text-sm text-navy-500 hover:text-white underline mt-4">
                     Nee, ik wil alleen lezen

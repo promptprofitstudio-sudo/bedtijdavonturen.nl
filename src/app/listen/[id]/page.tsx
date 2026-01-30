@@ -25,6 +25,15 @@ export default async function ListenPage({
   const isOwner = user && user.uid === story.userId
   const isPublicShare = token && story.shareToken === token
 
+  // Fetch Voice Status (if needed for generator)
+  let hasClonedVoice = false
+  if (!story.audioUrl) {
+    const { getAdminDb } = await import('@/lib/firebase/admin')
+    const db = await getAdminDb()
+    const userDoc = await db.collection('users').doc(story.userId).get()
+    hasClonedVoice = !!userDoc.data()?.customVoiceId
+  }
+
   if (!isOwner && !isPublicShare) {
     if (!user) {
       // Public user trying to access without token
@@ -69,7 +78,7 @@ export default async function ListenPage({
           <AudioPlayer title={story.title} src={story.audioUrl} />
         ) : (
           <Card className="border-dashed border-2 bg-white/50">
-            <GenerateAudioButton storyId={story.id} userId={story.userId} />
+            <GenerateAudioButton storyId={story.id} userId={story.userId} hasClonedVoice={hasClonedVoice} />
           </Card>
         )
       }

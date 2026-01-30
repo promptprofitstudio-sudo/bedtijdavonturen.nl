@@ -49,7 +49,7 @@ export default function HomePage() {
             <img
               alt="Ouder en kind genieten van een rustig voorleesmoment"
               className="w-full h-full object-cover rounded-xl"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv_IYXzSqgpArINPX55jYhlaxwTDpyvAxuhnKxtKVoNwlQz1DNCognSvpGoX8PeSRvOccsBB0VAj5lUwzcKtV12EiQd_FsvRJLkG4cYuWxSIcHYByD85j42QcsLOJWyTfvw8AP2E5LM6cZV2bUkIik3F7QRKGiyhvPY16VcrkMCwuRDCHK3AOlCOo5XO9ZDQGWsrwTQ2Y0TGQ5AS8L-qf4ctcsZ_3rne1uVFiktkMWf7aCzenMhw6DFBg7KNf-BuiZSAWXty-a4w"
+              src="/assets/hero-illustration.png"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-orange-200/40 to-transparent pointer-events-none"></div>
           </div>

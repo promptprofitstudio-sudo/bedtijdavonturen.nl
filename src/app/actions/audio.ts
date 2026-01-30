@@ -5,8 +5,8 @@ import { getAdminDb } from '@/lib/firebase/admin'
 import { revalidatePath } from 'next/cache'
 import { Story } from '@/lib/types'
 
-export async function generateAudioAction(storyId: string) {
-    console.log('🎙️ Generating Audio for:', storyId)
+export async function generateAudioAction(storyId: string, options?: { useCustomVoice?: boolean, force?: boolean }) {
+    console.log('🎙️ Generating Audio for:', storyId, options)
 
     try {
         // 1. Fetch Story using Admin SDK (Secure Read)
@@ -19,7 +19,7 @@ export async function generateAudioAction(storyId: string) {
         const data = storySnap.data()
         const story = { id: storySnap.id, ...data } as Story
 
-        if (story.audioUrl) {
+        if (story.audioUrl && !options?.force) {
             console.log('Audio already exists, skipping generation.')
             return { success: true, audioUrl: story.audioUrl }
         }
@@ -37,7 +37,12 @@ export async function generateAudioAction(storyId: string) {
         const userRef = db.collection('users').doc(story.userId)
         const userSnap = await userRef.get()
         const userData = userSnap.data()
-        const customVoiceId = userData?.customVoiceId
+
+        // Only use custom voice if available AND requested (default true if available)
+        const shouldUseCustomVoice = options?.useCustomVoice !== false
+        const customVoiceId = shouldUseCustomVoice ? userData?.customVoiceId : undefined
+
+        console.log(`Audio Logic: HasCustomVoice=${!!userData?.customVoiceId}, Requested=${shouldUseCustomVoice}, Using=${customVoiceId}`)
 
         // 3. Generate Audio with ElevenLabs
         const textToRead = `${story.title}. \n\n ${story.body.filter(b => b.type === 'p').map(b => b.text).join('\n\n')}`
@@ -75,7 +80,8 @@ export async function generateAudioAction(storyId: string) {
                     properties: {
                         story_id: storyId,
                         mood: story.mood,
-                        audio_url: audioUrl
+                        audio_url: audioUrl,
+                        voice_type: customVoiceId ? 'cloned' : 'default'
                     }
                 })
                 await client.shutdown()
