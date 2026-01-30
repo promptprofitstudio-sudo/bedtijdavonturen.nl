@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Card, Chip, Field, Input, SectionTitle } from '@/components/ui'
 import { ProgressDots } from '@/components/ProgressDots'
+import { ProgressiveLoader } from '@/components/ProgressiveLoader'
 import type { StoryMood } from '@/lib/mockData'
 import { generateStoryAction } from '@/app/actions'
 import { useAuth } from '@/context/AuthContext'
@@ -208,12 +209,20 @@ export default function WizardPage() {
                 <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{mood}</span>
                 <span className="bg-white/10 px-3 py-1 rounded-full text-xs font-bold">{minutes} min</span>
               </div>
-              <p className="mt-6 text-sm text-navy-100/80">Klaar om te genereren? Dit duurt ongeveer 10 seconden.</p>
             </div>
 
-            <Button size="lg" variant="teal" onClick={finish} disabled={isGenerating} className="w-full text-lg h-16 shadow-soft">
-              {isGenerating ? '✨ De magie wordt gestart...' : '✨ Maak Verhaal'}
-            </Button>
+            {isGenerating ? (
+              <ProgressiveLoader />
+            ) : (
+              <div className="space-y-4">
+                <Button size="lg" variant="teal" onClick={finish} disabled={isGenerating} className="w-full text-lg h-16 shadow-soft">
+                  ✨ Maak Verhaal
+                </Button>
+                <p className="text-xs text-center text-navy-800/40 px-4 leading-tight">
+                  🔒 Privacy-garantie: Namen en inputs worden versleuteld en nooit gebruikt om AI-modellen te trainen.
+                </p>
+              </div>
+            )}
           </div>
         ) : null}
       </div>

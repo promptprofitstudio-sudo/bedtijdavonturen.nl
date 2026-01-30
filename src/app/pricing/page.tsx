@@ -18,9 +18,9 @@ export default function PricingPage() {
   const plans: Plan[] = [
     {
       name: 'Weekend Bundel',
-      price: '€2,99', // Slightly higher to push sub
+      price: '€1,99', // Updated price
       tagline: '3 losse verhalen om te proberen.',
-      features: ['Geen abonnement', '3 Credits', 'Toegang tot Voice Cloning'],
+      features: ['Geen abonnement', '5 Credits', 'Toegang tot Voice Cloning', 'Direct Beschikbaar'], // Updated features
       variant: 'weekend',
       priceId: STRIPE_CONFIG.prices.weekend,
       intervalLabel: 'eenmalig'

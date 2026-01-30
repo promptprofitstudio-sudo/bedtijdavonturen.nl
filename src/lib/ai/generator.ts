@@ -84,8 +84,9 @@ export async function generateStoryWithAI(
        - Reis/Avontuur (Veilig, zintuiglijk)
        - Afbouw (Tempo vertraagt, zinnen worden rustiger)
        - Einde (Het personage valt in slaap)
-    5. Output MOET valide JSON zijn.
-    6. Gebruik de PEER-methode: genereer 3 vragen voor tijdens het lezen.
+    5. RETENTIE: Het verhaal MOET eindigen met een zachte trigger voor morgen. Voorbeeld: "[Naam] viel in een diepe, rustige slaap. En wat [hij/zij] morgen gaat beleven in [Wereld]? Dat is een avontuur voor de volgende keer..."
+    6. Output MOET valide JSON zijn.
+    7. Gebruik de PEER-methode: genereer 3 vragen voor tijdens het lezen.
 
     JSON Structuur:
     {

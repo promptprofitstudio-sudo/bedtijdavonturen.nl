@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Footer } from '@/components/Footer'
+import { Card } from '@/components/ui'
 
 export default function HomePage() {
   return (
@@ -23,158 +24,99 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="p-4 pt-2">
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-50 to-orange-100 dark:from-purple-900/40 dark:to-indigo-900/40 p-6 min-h-[520px] flex flex-col items-center justify-center text-center gap-8 border border-orange-200/50 dark:border-purple-500/20 shadow-xl shadow-orange-100/50 dark:shadow-none">
-          {/* Decorative Elements */}
-          <div className="absolute top-4 left-4 opacity-30 animate-pulse">
-            <span className="material-symbols-outlined text-orange-400 !text-4xl">star</span>
-          </div>
-          <div className="absolute bottom-10 right-4 opacity-30 animate-pulse">
-            <span className="material-symbols-outlined text-purple-400 !text-5xl">rocket_launch</span>
-          </div>
-          <div className="flex flex-col gap-4 relative z-10">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-amber-50 via-orange-50 to-white dark:from-purple-900/40 dark:to-indigo-900/40 p-8 min-h-[580px] flex flex-col items-center text-center gap-8 border border-orange-100 dark:border-purple-500/20 shadow-xl shadow-orange-100/50 dark:shadow-none">
+
+          <div className="flex flex-col gap-4 relative z-10 max-w-sm mx-auto">
             <div className="inline-flex items-center self-center gap-2 bg-white/80 dark:bg-white/10 px-3 py-1 rounded-full border border-orange-200 dark:border-purple-400/30">
-              <span className="material-symbols-outlined text-primary !text-sm">magic_button</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Nieuw: Ontdek de magie</span>
+              <span className="material-symbols-outlined text-primary !text-sm">verified_user</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">100% Kindvriendelijk & Veilig</span>
             </div>
-            <h1 className="text-[#141118] dark:text-white text-4xl font-black leading-[1.1] tracking-[-0.04em]">
-              Maak van bedtijd het fijnste moment van de dag
+            <h1 className="text-[#141118] dark:text-white text-[2.5rem] font-black leading-[1.1] tracking-[-0.03em]">
+              Jouw rustige avondritueel begint hier.
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-base font-medium leading-relaxed max-w-[280px] mx-auto">
-              Geen strijd, maar samen verdwalen in een avontuur. Geef je kind de hoofdrol in een verhaal dat rust en vertrouwen brengt.
+            <p className="text-gray-600 dark:text-gray-300 text-base font-medium leading-relaxed">
+              Binnen 10 seconden een magisch slaapverhaal. Lees zelf voor, of laat onze rustgevende stemmen het werk doen (scherm uit).
             </p>
           </div>
 
-          {/* Illustration Placeholder Container */}
-          <div className="w-full max-w-[320px] aspect-square rounded-2xl bg-white/40 dark:bg-white/5 backdrop-blur-sm border border-white/60 dark:border-white/10 p-2 shadow-inner overflow-hidden relative group">
-            <img
-              alt="Ouder en kind genieten van een rustig voorleesmoment"
-              className="w-full h-full object-cover rounded-xl"
-              src="/assets/hero-illustration.png"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-orange-200/40 to-transparent pointer-events-none"></div>
+          {/* Audio Player Visual Placeholder */}
+          <div className="w-full max-w-[300px] bg-white dark:bg-white/10 rounded-2xl p-4 shadow-lg border border-gray-100 dark:border-white/10 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
+              <span className="material-symbols-outlined !text-2xl">play_arrow</span>
+            </div>
+            <div className="flex-1 space-y-2">
+              <div className="h-2 w-3/4 bg-gray-200 dark:bg-white/20 rounded-full"></div>
+              <div className="h-2 w-1/2 bg-gray-100 dark:bg-white/10 rounded-full"></div>
+            </div>
           </div>
 
-          <Link href="/wizard" className="w-full max-w-[280px]">
-            <button className="w-full bg-primary text-white h-14 rounded-2xl text-lg font-extrabold shadow-lg shadow-primary/25 active:scale-95 transition-all flex items-center justify-center gap-2">
-              <span>Start het avontuur</span>
-              <span className="material-symbols-outlined">auto_fix_high</span>
-            </button>
-          </Link>
+          <div className="w-full max-w-[280px] space-y-3">
+            <Link href="/wizard">
+              <button className="w-full bg-primary text-white h-14 rounded-2xl text-lg font-extrabold shadow-lg shadow-primary/25 active:scale-95 transition-all flex items-center justify-center gap-2 hover:bg-primary/90">
+                <span>Maak gratis een verhaal</span>
+                <span className="material-symbols-outlined">auto_fix_high</span>
+              </button>
+            </Link>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Geen account nodig • Gratis proberen</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature: Kies je Modus */}
+      <section className="px-4 py-8 max-w-lg mx-auto">
+        <div className="text-center mb-8 space-y-2">
+          <h2 className="text-2xl font-black text-[#141118] dark:text-white">Kies de perfecte toon</h2>
+          <p className="text-gray-500 text-sm">Elke leeftijd vraagt om een ander verhaal.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="hover:border-primary/30 transition-colors border-2 border-transparent">
+            <div className="text-3xl mb-3">🧸</div>
+            <h3 className="font-extrabold text-lg text-[#141118]">2-4 Jaar</h3>
+            <p className="text-sm font-bold text-teal-600 uppercase tracking-wider mb-2">Veilig & Vertrouwd</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Korte zinnen, veel herhaling en herkenbare situaties. Speciaal ontworpen voor peuters.
+            </p>
+          </Card>
+
+          <Card className="hover:border-primary/30 transition-colors border-2 border-transparent">
+            <div className="text-3xl mb-3">🚀</div>
+            <h3 className="font-extrabold text-lg text-[#141118]">4-7 Jaar</h3>
+            <p className="text-sm font-bold text-orange-500 uppercase tracking-wider mb-2">Avontuur & Emotie</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Jouw kind is de held die problemen oplost. Spannend, maar altijd met een goede afloop.
+            </p>
+          </Card>
         </div>
       </section>
 
       {/* Social Proof */}
-      <div className="flex justify-center items-center gap-4 py-6">
-        <div className="flex -space-x-3">
-          <img className="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" alt="Vader avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIsYcGnWkiPtyUEydETugcQEFPz3vudlVP32GCdT4SnxO-bD7C__Blt5sKczk0ueh8ANxPueOHZimRF21qIeycI3g8a-VvCcrGZ9C77H6-VL1YnMs0osfITxDZDYUVj2pqH5baOlTu4bt2OzK5OhqNnbLW59-QA3d5lWHqtN8JfveCBiq8LG0gHeglUQgjhszhwggoyk2NvKhiLtH1r51r5Df9BPJJV4mndOh-9WD71UVFhxLG7EtCEO_frd08K1AEY-tQ2oXf1Zw" />
-          <img className="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" alt="Moeder avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYwbDhnV2muxvEQm-7fDdYMMlwcPMoGGAA5jG_sGlLNPyiDlsAStzer9KuBqBYUiWL80MetJ8gicm0xrvug3DOGovDzWY8G2MwzqlzVkcQQvFOQ0uM42EfSbAAtwXYA2cMLIm5U5OXeeCsxdEJ9D0O7pmdWA1wqiNrQNp1EsWf57_MA6v5JwRHt6hdAwKwbwCepibc1wUk5NVx3iEMquTGO6mXClApYRBmzvjBS-F2rDg6I8Noy0Yx-YPLuXuLaft9GNrBI3Wfenk" />
-          <img className="w-8 h-8 rounded-full border-2 border-white dark:border-background-dark" alt="Ouder avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6bbBVRCAAVnM1UaAZeQBDBgsnQ7TGNQlVFfhKdXKIHEw19jBpO63n5j45H1kC9JSlqab9vLJUL0XhTNI10SHZj59gDn2pwc-c2KlIIOr5r8wI3DnvrK6WZs0iYW2_LPRZU706d9Xy0WOzwvoG7hLksUJXXHpQ77xqUAmzlJ4iHqSSv6zMqrBElx6SG3wKLMAqxaMYsIqspBtc3iDXNh8epHb8FpBnLVvylCyRuceT498w_2kuB1x8yI3IxJIeBizzTDkKdrsPi4s" />
-        </div>
-        <div className="flex flex-col">
-          <div className="flex gap-0.5 text-yellow-400">
-            <span className="material-symbols-outlined !text-[16px]">star</span>
-            <span className="material-symbols-outlined !text-[16px]">star</span>
-            <span className="material-symbols-outlined !text-[16px]">star</span>
-            <span className="material-symbols-outlined !text-[16px]">star</span>
-            <span className="material-symbols-outlined !text-[16px]">star</span>
+      <section className="px-6 py-12 bg-accent-orange/10 dark:bg-white/5 my-8">
+        <div className="max-w-md mx-auto text-center space-y-6">
+          <div className="flex justify-center text-orange-400 gap-1">
+            {'★★★★★'.split('').map((s, i) => <span key={i} className="text-xl">{s}</span>)}
           </div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">1200+ ouders kozen voor rust</p>
-        </div>
-      </div>
-
-      {/* How It Works */}
-      <section className="bg-accent-orange dark:bg-purple-900/10 py-12 px-6 rounded-[2.5rem] my-8 mx-2 border border-orange-100 dark:border-purple-800/20">
-        <h4 className="text-primary text-sm font-black leading-normal tracking-[0.2em] uppercase text-center mb-10">ZO WERKT HET</h4>
-        <div className="flex flex-col gap-10">
-          {/* Step 1 */}
-          <div className="flex gap-5 items-start">
-            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white dark:bg-purple-800 shadow-sm border border-orange-100 dark:border-purple-700 flex items-center justify-center text-primary font-black text-xl">
-              <span className="material-symbols-outlined">palette</span>
+          <p className="text-xl font-bold font-serif italic text-gray-700 dark:text-gray-200 leading-relaxed">
+            &ldquo;Eerst was bedtijd een strijd, nu vraagt Luuk (5) zelf om &apos;de uil&apos;. Binnen 5 minuten is hij vertrokken. Echt een aanrader!&rdquo;
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6bbBVRCAAVnM1UaAZeQBDBgsnQ7TGNQlVFfhKdXKIHEw19jBpO63n5j45H1kC9JSlqab9vLJUL0XhTNI10SHZj59gDn2pwc-c2KlIIOr5r8wI3DnvrK6WZs0iYW2_LPRZU706d9Xy0WOzwvoG7hLksUJXXHpQ77xqUAmzlJ4iHqSSv6zMqrBElx6SG3wKLMAqxaMYsIqspBtc3iDXNh8epHb8FpBnLVvylCyRuceT498w_2kuB1x8yI3IxJIeBizzTDkKdrsPi4s" alt="Sanne" className="object-cover w-full h-full" />
             </div>
-            <div className="flex flex-col">
-              <p className="text-[#141118] dark:text-white text-lg font-extrabold leading-tight mb-1">Kies een wereld</p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Waar wil je kind vandaag naartoe? Van jungle tot ruimtereis.</p>
-            </div>
-          </div>
-          {/* Step 2 */}
-          <div className="flex gap-5 items-start">
-            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white dark:bg-purple-800 shadow-sm border border-orange-100 dark:border-purple-700 flex items-center justify-center text-primary font-black text-xl">
-              <span className="material-symbols-outlined">person_add</span>
-            </div>
-            <div className="flex flex-col">
-              <p className="text-[#141118] dark:text-white text-lg font-extrabold leading-tight mb-1">Jouw kind in de hoofdrol</p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Vul de naam in en zie de ogen gaan stralen van herkenning.</p>
-            </div>
-          </div>
-          {/* Step 3 */}
-          <div className="flex gap-5 items-start">
-            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white dark:bg-purple-800 shadow-sm border border-orange-100 dark:border-purple-700 flex items-center justify-center text-primary font-black text-xl">
-              <span className="material-symbols-outlined">auto_awesome</span>
-            </div>
-            <div className="flex flex-col">
-              <p className="text-[#141118] dark:text-white text-lg font-extrabold leading-tight mb-1">Samen genieten</p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">Binnen 10 seconden een compleet nieuw voorleesverhaal. Klaar om te dromen.</p>
+            <div className="text-left">
+              <p className="text-sm font-extrabold text-[#141118] dark:text-white">Sanne</p>
+              <p className="text-xs text-gray-500 font-bold uppercase">Moeder van Luuk</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why Us */}
-      <section className="px-6 py-12 @container">
-        <div className="flex flex-col gap-4 mb-10">
-          <h2 className="text-[#141118] dark:text-white text-3xl font-black leading-tight tracking-tight">
-            Waarom ouders van ons houden
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-base font-medium">De perfecte mix van verbinding en gemak voor het slapengaan.</p>
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          {/* Feature 1 */}
-          <div className="group flex gap-4 rounded-3xl border-2 border-gray-50 dark:border-gray-800 bg-white dark:bg-background-dark/50 p-6 transition-all hover:border-primary/30 shadow-sm">
-            <div className="bg-orange-50 dark:bg-orange-900/20 text-orange-500 p-3 rounded-2xl h-fit">
-              <span className="material-symbols-outlined">favorite</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-[#141118] dark:text-white text-lg font-extrabold">Vergroot Zelfvertrouwen</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Door zichzelf als held te zien in positieve scenario&apos;s, groeit het zelfbeeld van je kind.</p>
-            </div>
-          </div>
-          {/* Feature 2 */}
-          <div className="group flex gap-4 rounded-3xl border-2 border-gray-50 dark:border-gray-800 bg-white dark:bg-background-dark/50 p-6 transition-all hover:border-primary/30 shadow-sm">
-            <div className="bg-green-50 dark:bg-green-900/20 text-green-500 p-3 rounded-2xl h-fit">
-              <span className="material-symbols-outlined">security</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-[#141118] dark:text-white text-lg font-extrabold">100% Veilige Droomwereld</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Geen nare verrassingen. Onze verhalen zijn speciaal gefilterd op kindvriendelijke thema&apos;s.</p>
-            </div>
-          </div>
-          {/* Feature 3 */}
-          <div className="group flex gap-4 rounded-3xl border-2 border-gray-50 dark:border-gray-800 bg-white dark:bg-background-dark/50 p-6 transition-all hover:border-primary/30 shadow-sm">
-            <div className="bg-purple-50 dark:bg-purple-900/20 text-primary p-3 rounded-2xl h-fit">
-              <span className="material-symbols-outlined">bedtime</span>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-[#141118] dark:text-white text-lg font-extrabold">Echt even samen</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">Geen schermtijd, maar &apos;samen-tijd&apos;. Even ontsnappen aan de dagelijkse drukte.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer CTA */}
-      <section className="p-6 mb-24">
-        <div className="bg-primary rounded-[2rem] p-8 text-center flex flex-col items-center gap-6 relative overflow-hidden shadow-2xl shadow-primary/30">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_60%)]"></div>
-          <div className="relative z-10 flex flex-col gap-3">
-            <h2 className="text-white text-2xl font-black">Klaar voor de eerste reis?</h2>
-            <p className="text-purple-100 text-sm font-medium">Maak vanavond nog onvergetelijk voor je kind.</p>
-          </div>
-          <Link href="/wizard">
-            <button className="relative z-10 bg-white text-primary px-8 h-14 rounded-2xl font-black text-lg active:scale-95 transition-all shadow-xl">
-              Start Nu Gratis
-            </button>
-          </Link>
-        </div>
+      {/* Pricing Teaser */}
+      <section className="px-4 pb-24 text-center">
+        <p className="text-sm text-gray-500 font-medium mb-3">Flexibiliteit staat voorop</p>
+        <Link href="/pricing" className="inline-block text-primary font-bold hover:underline">
+          Kies voor een abonnement of een losse Weekend Bundel (€1,99) &rarr;
+        </Link>
       </section>
 
       {/* Footer Links (Legal) */}

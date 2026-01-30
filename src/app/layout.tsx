@@ -45,6 +45,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
       </head>
       <body className="min-h-dvh bg-moon-50 text-ink-950">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              'name': 'Bedtijdavonturen',
+              'applicationCategory': 'EducationApplication',
+              'offers': {
+                '@type': 'Offer',
+                'price': '1.99',
+                'priceCurrency': 'EUR'
+              }
+            })
+          }}
+        />
         <PostHogProvider>
           <AuthProvider>
             <div className="mx-auto min-h-dvh max-w-md pb-24 relative">
