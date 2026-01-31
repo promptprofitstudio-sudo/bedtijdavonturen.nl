@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbopack: {},
 };
 
 const withPWA = require('@ducanh2912/next-pwa').default({
