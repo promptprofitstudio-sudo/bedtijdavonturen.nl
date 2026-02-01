@@ -16,7 +16,10 @@ const posthogApiKey = defineSecret('POSTHOG_PERSONAL_API_KEY');
 
 // Safety: Dry-run mode (set to 'false' to enable production mode)
 // Default behavior: DRY_RUN unless explicitly set to 'false'
-const DRY_RUN = defineBoolean('PARTNER_HUNTER_DRY_RUN');
+const DRY_RUN = defineBoolean('PARTNER_HUNTER_DRY_RUN', {
+    default: true,
+    description: 'Enable dry-run mode (no actual API calls to Instantly). Set to false for production.'
+});
 
 const CITIES = ['Amsterdam', 'Rotterdam', 'Utrecht', 'Den Haag', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'];
 const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zwangerschapscoach', 'Baby spa'];
