@@ -41,7 +41,26 @@ export async function generateStoryAction(formData: FormData) {
     const { userId, profileId, childName, ageGroup, mood, theme, context } = result.data
 
     try {
-        // 2. Generate Story (AI)
+        // 2. Check User Credits (Admin SDK)
+        if (process.env.TEST_MODE !== 'true') {
+            const { getAdminDb } = await import('@/lib/firebase/admin')
+            const adminDb = await getAdminDb()
+
+            const userRef = adminDb.collection('users').doc(userId)
+            const userSnap = await userRef.get()
+            const userData = userSnap.data() as { credits?: number, subscriptionStatus?: string } | undefined
+
+            const isPremium = userData?.subscriptionStatus === 'premium' || userData?.subscriptionStatus === 'trial' || userData?.subscriptionStatus === 'admin'
+            const credits = userData?.credits ?? 0
+
+            console.log(`[GenerateStory] Credits Check: Credits=${credits}, IsPremium=${isPremium}`)
+
+            if (!isPremium && credits <= 0) {
+                return { error: 'Geen credits meer. Koop een bundel om verder te gaan.' }
+            }
+        }
+
+        // 3. Generate Story (AI)
         const generatedStory = await generateStoryWithAI(childName, ageGroup, mood as StoryMood, theme, context)
 
         const newStory = {
@@ -75,6 +94,21 @@ export async function generateStoryAction(formData: FormData) {
 
         const docRef = await adminDb.collection('stories').add(newStory)
 
+        // 4. Deduct Credit (Only if NOT premium)
+        const userRef = adminDb.collection('users').doc(userId)
+        const userSnap = await userRef.get()
+        const userData = userSnap.data() as { subscriptionStatus?: string } | undefined
+        const isPremium = userData?.subscriptionStatus === 'premium' || userData?.subscriptionStatus === 'trial' || userData?.subscriptionStatus === 'admin'
+
+        if (!isPremium) {
+            const { FieldValue } = await import('firebase-admin/firestore')
+            await userRef.update({
+                credits: FieldValue.increment(-1)
+            })
+            console.log(`[GenerateStory] Deducted 1 credit from user ${userId}`)
+        }
+
+        // 5. Analytics
         try {
             const { PostHog } = await import('posthog-node')
             const { getSecret } = await import('@/lib/secrets')
@@ -104,7 +138,7 @@ export async function generateStoryAction(formData: FormData) {
             console.error('Failed to capture analytics:', e)
         }
 
-        // 4. Return Success
+        // 6. Return Success
         // @ts-ignore
         const currentProject = adminDb.app?.options?.projectId || 'unknown'
         console.log(`[GenerateAction] Success. ID: ${docRef.id}, Project: ${currentProject}`)
