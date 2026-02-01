@@ -3,7 +3,6 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   turbopack: {},
-  serverExternalPackages: ['firebase-admin', '@google-cloud/secret-manager', 'google-auth-library'],
 };
 
 const withPWA = require('@ducanh2912/next-pwa').default({
