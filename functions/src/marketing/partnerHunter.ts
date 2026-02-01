@@ -12,6 +12,7 @@ const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
 const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
 const instantlyCampaignId = defineSecret('INSTANTLY_CAMPAIGN_ID');
+const posthogApiKey = defineSecret('POSTHOG_PERSONAL_API_KEY');
 
 // Safety: Dry-run mode (set to 'false' to enable production mode)
 // Default behavior: DRY_RUN unless explicitly set to 'false'
@@ -25,7 +26,7 @@ const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zw
 export const partnerHunter = onSchedule({
     schedule: "every monday 09:00",
     timeZone: "Europe/Amsterdam",
-    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
+    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId, posthogApiKey],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (event) => {
@@ -200,5 +201,29 @@ export const partnerHunter = onSchedule({
 
     } catch (error) {
         console.error("Hunter Run Failed", error);
+    } finally {
+        // GAP 8: PostHog Monitoring
+        try {
+            const { PostHog } = await import('posthog-node');
+            const phClient = new PostHog(posthogApiKey.value(), {
+                host: 'https://eu.i.posthog.com'
+            });
+
+            phClient.capture({
+                distinctId: 'partner_hunter_system',
+                event: 'partner_hunter_run',
+                properties: {
+                    city,
+                    term,
+                    dry_run: DRY_RUN.value(),
+                    timestamp: new Date().toISOString()
+                }
+            });
+
+            await phClient.shutdown();
+            console.log('📊 Metrics logged to PostHog');
+        } catch (e) {
+            console.error('Failed to log to PostHog:', e);
+        }
     }
 });

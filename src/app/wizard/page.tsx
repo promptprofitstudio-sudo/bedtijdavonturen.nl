@@ -34,16 +34,23 @@ export default function WizardPage() {
 
   React.useEffect(() => {
     if (step === 1 && window.posthog) {
-      window.posthog.capture('wizard_started')
+      window.posthog.capture('wizard_started', {
+        age_group: age,
+        mood: mood
+      })
     }
-  }, [step])
+  }, [step, age, mood])
 
   const canNext = step === 1 ? childName.trim().length > 0 : true
 
   const next = () => {
     if (step < 4) {
       if (window.posthog) {
-        window.posthog.capture('wizard_step_completed', { step_number: step })
+        window.posthog.capture('wizard_step_completed', {
+          step_number: step,
+          age_group: age,
+          mood: mood
+        })
       }
       setStep((s) => s + 1)
     }
