@@ -9,6 +9,7 @@ const dataForSeoApiKey = defineSecret('DATAFORSEO_API_KEY');
 const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
 const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
+const instantlyCampaignId = defineSecret('INSTANTLY_CAMPAIGN_ID');
 
 const CITIES = ['Amsterdam', 'Rotterdam', 'Utrecht', 'Den Haag', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'];
 const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zwangerschapscoach', 'Baby spa'];
@@ -18,7 +19,7 @@ const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zw
 export const partnerHunter = onSchedule({
     schedule: "every monday 09:00",
     timeZone: "Europe/Amsterdam",
-    secrets: [dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey],
+    secrets: [dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (event) => {
@@ -111,7 +112,7 @@ export const partnerHunter = onSchedule({
 
             await axios.post('https://api.instantly.ai/api/v1/lead/add', {
                 api_key: instantlyApiKey.value(),
-                campaign_id: 'YOUR_CAMPAIGN_ID', // Needs to be configured or passed
+                campaign_id: instantlyCampaignId.value(),
                 skip_if_in_workspace: true,
                 leads: [leadPayload]
             });
