@@ -88,3 +88,4 @@ export async function getAdminAuth() {
     const app = await getAdminApp()
     return getAuth(app)
 }
+// Force rebuild - Secret updated Sun Feb  1 20:06:04 CET 2026
