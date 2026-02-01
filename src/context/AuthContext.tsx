@@ -58,14 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 if (!config.apiKey) throw new Error('Failed to load Firebase config from secrets')
 
-                console.log("[DEBUG] AuthContext Mount. URL:", window.location.href);
-                console.log("[DEBUG] Storage Keys:", Object.keys(localStorage));
-                console.log("[DEBUG] Config:", {
-                    authDomain: config.authDomain,
-                    projectId: config.projectId,
-                    apiKeyPrefix: config.apiKey?.substring(0, 5) + '...'
-                });
-
                 const s = initializeFirebaseServices(config)
                 setServices(s)
 
