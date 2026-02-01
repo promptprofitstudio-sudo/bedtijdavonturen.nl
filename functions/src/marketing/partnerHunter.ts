@@ -1,8 +1,9 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { defineSecret } from 'firebase-functions/params';
+import { defineSecret, defineBoolean } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
 import OpenAI from 'openai';
+import { withRetry } from './utils/retry';
 
 // Secrets
 const dataForSeoApiKey = defineSecret('DATAFORSEO_API_KEY');
@@ -10,6 +11,10 @@ const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
 const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
 const instantlyCampaignId = defineSecret('INSTANTLY_CAMPAIGN_ID');
+
+// Safety: Dry-run mode (set to 'false' to enable production mode)
+// Default behavior: DRY_RUN unless explicitly set to 'false'
+const DRY_RUN = defineBoolean('PARTNER_HUNTER_DRY_RUN');
 
 const CITIES = ['Amsterdam', 'Rotterdam', 'Utrecht', 'Den Haag', 'Eindhoven', 'Groningen', 'Tilburg', 'Almere', 'Breda', 'Nijmegen'];
 const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zwangerschapscoach', 'Baby spa'];
@@ -23,7 +28,12 @@ export const partnerHunter = onSchedule({
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (event) => {
-    console.log("🕵️‍♂️ Partner Hunter Started");
+    const runMode = DRY_RUN.value() ? 'DRY-RUN' : 'PRODUCTION';
+    console.log(`🕵️‍♂️ Partner Hunter Started [${runMode}]`);
+
+    if (DRY_RUN.value()) {
+        console.log('⚠️  DRY RUN MODE: Will log actions but not send emails');
+    }
     const db = admin.firestore();
 
     // 1. Random Selection Strategy to avoid same search every week
@@ -69,20 +79,27 @@ export const partnerHunter = onSchedule({
 
             console.log(`🔎 Analyzing: ${domain}`);
 
-            // 4. Hunter.io (Enrichment)
+            // 4. Hunter.io (Enrichment) with Retry
             let emailObj = null;
             try {
-                const hunterRes = await axios.get(`https://api.hunter.io/v2/domain-search?domain=${domain}&api_key=${hunterApiKey.value()}&type=personal`);
-                // Prefer personal, fallback to generic?
+                const hunterRes = await withRetry(
+                    () => axios.get(`https://api.hunter.io/v2/domain-search?domain=${domain}&api_key=${hunterApiKey.value()}&type=personal`),
+                    {
+                        maxRetries: 3,
+                        onRetry: (attempt, error) => {
+                            console.log(`🔄 Hunter.io retry ${attempt} for ${domain}`);
+                        }
+                    }
+                );
                 const emails = hunterRes.data?.data?.emails || [];
                 emailObj = emails.find((e: any) => e.type === 'personal') || emails[0];
             } catch (e) {
-                console.warn(`Hunter failed for ${domain}`);
+                console.warn(`❌ Hunter failed for ${domain} after retries`);
             }
 
             if (!emailObj) continue;
 
-            // 5. OpenAI (Personalization)
+            // 5. OpenAI (Personalization) with Retry
             const openai = new OpenAI({ apiKey: openaiApiKey.value() });
             const prompt = `
         Schrijf een korte, warme ijsbreker (1 zin) voor een koude mail aan ${item.title} in ${city}.
@@ -90,11 +107,20 @@ export const partnerHunter = onSchedule({
         Taal: Nederlands. Tone: Warm, Professioneel.
       `;
 
-            const gptRes = await openai.chat.completions.create({
-                model: "gpt-4-turbo",
-                messages: [{ role: "user", content: prompt }],
-                max_tokens: 60
-            });
+            const gptRes = await withRetry(
+                () => openai.chat.completions.create({
+                    model: "gpt-4-turbo",
+                    messages: [{ role: "user", content: prompt }],
+                    max_tokens: 60
+                }),
+                {
+                    maxRetries: 2,
+                    initialDelay: 2000,
+                    onRetry: (attempt) => {
+                        console.log(`🔄 OpenAI retry ${attempt}`);
+                    }
+                }
+            );
 
             const icebreaker = gptRes.choices[0]?.message?.content?.trim() || "Wat goed dat jullie zo'n mooie score hebben!";
 
@@ -110,12 +136,22 @@ export const partnerHunter = onSchedule({
                 }
             };
 
-            await axios.post('https://api.instantly.ai/api/v1/lead/add', {
-                api_key: instantlyApiKey.value(),
-                campaign_id: instantlyCampaignId.value(),
-                skip_if_in_workspace: true,
-                leads: [leadPayload]
-            });
+            // Apply dry-run conditional
+            if (DRY_RUN.value()) {
+                console.log(`[DRY RUN] Would send to Instantly:`);
+                console.log(`  → Email: ${leadPayload.email}`);
+                console.log(`  → Company: ${leadPayload.companyName}`);
+                console.log(`  → Icebreaker: ${leadPayload.customVariables.icebreaker}`);
+            } else {
+                // Production: Actually send to Instantly
+                await axios.post('https://api.instantly.ai/api/v1/lead/add', {
+                    api_key: instantlyApiKey.value(),
+                    campaign_id: instantlyCampaignId.value(),
+                    skip_if_in_workspace: true,
+                    leads: [leadPayload]
+                });
+                console.log(`✅ Sent to Instantly: ${leadPayload.email}`);
+            }
 
             // 7. Log
             await db.collection('leads').doc(domain.replace(/\./g, '_')).set({
@@ -123,7 +159,8 @@ export const partnerHunter = onSchedule({
                 companyName: item.title,
                 city,
                 email: emailObj.value,
-                status: 'contacted',
+                status: DRY_RUN.value() ? 'dry_run' : 'contacted',
+                dryRun: DRY_RUN.value(),
                 icebreaker,
                 timestamp: admin.firestore.FieldValue.serverTimestamp()
             });

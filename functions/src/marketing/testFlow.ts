@@ -1,7 +1,9 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
+import * as admin from 'firebase-admin';
 import axios from 'axios';
 import OpenAI from 'openai';
+import { withRetry } from './utils/retry';
 
 // Secrets
 const dataForSeoApiKey = defineSecret('DATAFORSEO_API_KEY');
@@ -17,11 +19,17 @@ export const testPartnerFlow = onRequest({
 }, async (req, res) => {
     // Default test email (can be overridden via query param)
     const testEmail = (req.query.testEmail as string) || 'michel@korpershoek-management.nl';
+    const city = (req.query.city as string) || 'Almere';
+    const searchTerm = (req.query.term as string) || 'Kinderopvang';
 
-    console.log(`🧪 Test mode: emails will go to ${testEmail}`);
+    const term = `${searchTerm} ${city}`;
 
+    console.log(`🧪 Test Parameters:`);
+    console.log(`  → Test Email: ${testEmail}`);
+    console.log(`  → Search Term: ${term}`);
+
+    const startTime = Date.now();
     const log: any = { steps: [] };
-    const term = "Kinderopvang Almere";
 
     try {
         // --- STAP A: DataForSEO ---
@@ -124,6 +132,39 @@ export const testPartnerFlow = onRequest({
         log.instantlyStatus = instantlyRes.status;
         log.instantlyData = instantlyRes.data;
         log.steps.push("✅ Instantly Push Complete");
+
+        // Log test run to Firestore for audit trail
+        const db = admin.firestore();
+        await db.collection('partner_test_runs').add({
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            testEmail,
+            searchTerm: term,
+            city,
+
+            // Results
+            dataForSeo: {
+                found: log.items?.length || 0,
+                topResult: log.foundCompany || null
+            },
+            hunter: {
+                domain: log.hunterDomain,
+                emailFound: !!log.foundEmail,
+                email: log.foundEmail
+            },
+            openai: {
+                icebreaker: log.icebreaker
+            },
+            instantly: {
+                success: !!log.instantlyData,
+                response: log.instantlyData
+            },
+
+            // Metadata
+            success: true,
+            duration: Date.now() - startTime
+        });
+
+        console.log('✅ Test run logged to Firestore');
 
         // Response
         res.status(200).json({
