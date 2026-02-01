@@ -57,6 +57,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
 
                 if (!config.apiKey) throw new Error('Failed to load Firebase config from secrets')
+
+                console.log("[DEBUG] AuthContext Mount. URL:", window.location.href);
+                console.log("[DEBUG] Storage Keys:", Object.keys(localStorage));
+                console.log("[DEBUG] Config:", {
+                    authDomain: config.authDomain,
+                    projectId: config.projectId,
+                    apiKeyPrefix: config.apiKey?.substring(0, 5) + '...'
+                });
+
                 const s = initializeFirebaseServices(config)
                 setServices(s)
 
@@ -93,50 +102,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 unsubscribe = onAuthStateChanged(s.auth, async (firebaseUser: FirebaseUser | null) => {
                     console.log("🔐 AuthContext: Auth state changed:", firebaseUser?.uid || 'null')
-                    if (firebaseUser) {
-                        const userRef = doc(s.db, 'users', firebaseUser.uid)
-                        const userSnap = await getDoc(userRef)
+                    try {
+                        if (firebaseUser) {
+                            const userRef = doc(s.db, 'users', firebaseUser.uid)
+                            let userSnap;
 
-                        if (userSnap.exists()) {
-                            setUser(userSnap.data() as UserData)
+                            try {
+                                userSnap = await getDoc(userRef)
+                            } catch (firestoreErr) {
+                                console.error("❌ AuthContext: Firestore Read Failed", firestoreErr);
+                                // Graceful Fallback: Proceed as if new user or use basic auth data
+                                const fallbackUser: UserData = {
+                                    uid: firebaseUser.uid,
+                                    email: firebaseUser.email || '',
+                                    displayName: firebaseUser.displayName || null,
+                                    subscriptionStatus: 'free',
+                                    createdAt: Timestamp.now(),
+                                    credits: 0,
+                                }
+                                setUser(fallbackUser)
+                                return // Exit success path
+                            }
+
+                            if (userSnap.exists()) {
+                                setUser(userSnap.data() as UserData)
+                            } else {
+                                // DEVICE-LEVEL WELCOME CREDIT CHECK
+                                const hasClaimedWelcome = typeof window !== 'undefined' && localStorage.getItem('bedtijd_welcome_claimed') === 'true'
+                                const initialCredits = !hasClaimedWelcome ? 1 : 0
+
+                                const newUser: UserData = {
+                                    uid: firebaseUser.uid,
+                                    email: firebaseUser.email || '',
+                                    displayName: firebaseUser.displayName || null,
+                                    subscriptionStatus: 'free',
+                                    createdAt: Timestamp.now(),
+                                    credits: initialCredits,
+                                }
+
+                                try {
+                                    await setDoc(userRef, newUser)
+                                    if (initialCredits > 0 && typeof window !== 'undefined') {
+                                        localStorage.setItem('bedtijd_welcome_claimed', 'true')
+                                    }
+                                } catch (writeErr) {
+                                    console.error("❌ AuthContext: Firestore Write Failed", writeErr)
+                                }
+                                setUser(newUser)
+                            }
+
+                            // Sub-collection check (independent try/catch)
+                            try {
+                                const profilesRef = collection(s.db, 'users', firebaseUser.uid, 'profiles')
+                                const profilesSnap = await getDocs(profilesRef)
+                                if (profilesSnap.empty) {
+                                    await addDoc(profilesRef, {
+                                        name: 'Mijn Kind',
+                                        ageGroup: '4-7',
+                                        createdAt: Timestamp.now()
+                                    })
+                                }
+                            } catch (profileErr) {
+                                console.warn("⚠️ AuthContext: Profile Init Failed", profileErr)
+                            }
+
                         } else {
-                            // DEVICE-LEVEL WELCOME CREDIT CHECK
-                            // Prevents farming 1 credit by creating new accounts on same device
-                            const hasClaimedWelcome = typeof window !== 'undefined' && localStorage.getItem('bedtijd_welcome_claimed') === 'true'
-                            const initialCredits = !hasClaimedWelcome ? 1 : 0
-
-                            const newUser: UserData = {
-                                uid: firebaseUser.uid,
-                                email: firebaseUser.email || '',
-                                displayName: firebaseUser.displayName || null,
-                                subscriptionStatus: 'free',
-                                createdAt: Timestamp.now(),
-                                credits: initialCredits,
-                            }
-                            await setDoc(userRef, newUser)
-
-                            if (initialCredits > 0 && typeof window !== 'undefined') {
-                                localStorage.setItem('bedtijd_welcome_claimed', 'true')
-                                console.log("🎁 Welcome Credit Granted!")
-                            }
-
-                            setUser(newUser)
+                            setUser(null)
                         }
-
-                        // Check for profiles and create default if none exist
-                        const profilesRef = collection(s.db, 'users', firebaseUser.uid, 'profiles')
-                        const profilesSnap = await getDocs(profilesRef)
-                        if (profilesSnap.empty) {
-                            await addDoc(profilesRef, {
-                                name: 'Mijn Kind',
-                                ageGroup: '4-7',
-                                createdAt: Timestamp.now()
-                            })
-                        }
-                    } else {
+                    } catch (error) {
+                        console.error("❌ Critical Auth State Error:", error)
                         setUser(null)
+                    } finally {
+                        setLoading(false)
                     }
-                    setLoading(false)
                 })
             } catch (error) {
                 console.error('Auth initialization failed:', error)
@@ -161,13 +199,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const provider = new GoogleAuthProvider()
         try {
             // Import persistence explicitly to bundle it
-            const { signInWithRedirect, setPersistence, browserLocalPersistence } = await import('firebase/auth')
+            const { signInWithRedirect, signInWithPopup, setPersistence, browserLocalPersistence } = await import('firebase/auth')
 
             // Force Local Persistence to ensure session survives redirects/refreshes
             await setPersistence(services.auth, browserLocalPersistence)
 
-            console.log("🚀 Starting Google Redirect Flow...");
-            await signInWithRedirect(services.auth, provider)
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+            if (isLocal) {
+                console.log("💻 Localhost detected: Using signInWithPopup to avoid redirect storage issues.");
+                await signInWithPopup(services.auth, provider);
+                // Status change will be handled by onAuthStateChanged
+            } else {
+                console.log("🚀 Production detected: Using signInWithRedirect for better mobile support.");
+                await signInWithRedirect(services.auth, provider)
+            }
         } catch (error: any) {
             console.error('❌ Error signing in with Google', error)
 
@@ -176,6 +222,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 alert("Configuratiefout: Dit domein is niet toegestaan voor Google Login.");
             } else if (error.code === 'auth/configuration-not-found') {
                 console.error("CRITICAL: Firebase Auth is not enabled or configured in the console.");
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                console.warn("User closed the popup.");
+                return;
             }
             throw error
         }
