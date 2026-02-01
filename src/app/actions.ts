@@ -27,7 +27,7 @@ export async function generateStoryAction(formData: FormData) {
         ageGroup: formData.get('ageGroup'),
         mood: formData.get('mood'),
         theme: formData.get('theme'),
-        context: formData.get('context'),
+        context: formData.get('context') || undefined,
     }
 
 

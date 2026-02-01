@@ -2,16 +2,27 @@
 
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 
-const client = new SecretManagerServiceClient()
-const projectId = 'bedtijdavonturen-prod' // Updated for production isolation
+// Lazy initialization to prevent top-level crashes
+let client: SecretManagerServiceClient | null = null
+
+function getClient() {
+    if (!client) {
+        client = new SecretManagerServiceClient()
+    }
+    return client
+}
+
+const projectId = 'bedtijdavonturen-prod'
 
 async function getSecret(name: string, suppressLog = false): Promise<string | undefined> {
     try {
-        const [version] = await client.accessSecretVersion({
+        const secretClient = getClient()
+        const [version] = await secretClient.accessSecretVersion({
             name: `projects/${projectId}/secrets/${name}/versions/latest`,
         })
         return version.payload?.data?.toString()
     } catch (error: any) {
+        // Fallback or Log
         if (!suppressLog) {
             console.error(`Failed to fetch secret ${name}:`, error.message || error)
         }
@@ -20,23 +31,28 @@ async function getSecret(name: string, suppressLog = false): Promise<string | un
 }
 
 export async function getFirebaseClientConfig() {
-    // Retrieve sensitive keys from Secrets Manager
+    try {
+        // Attempt to fetch API Key from GSM
+        // We catch errors here to ensure the hardcoded fallback is ALWAYS returned if GSM fails.
+        const apiKey = await getSecret('FIREBASE_API_KEY', true)
 
-    // Fetch API Key from GSM (Enforced Policy)
-    // We suppress logs here because this key might not exist in GSM yet, and we have a valid hardcoded fallback.
-    const apiKey = await getSecret('FIREBASE_API_KEY', true) || 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q'
-
-    // User requested strict GSM use.
-    // If we strictly fail without it:
-    // const apiKey = await getSecret('FIREBASE_API_KEY');
-    // if (!apiKey) throw new Error("Missing FIREBASE_API_KEY in GSM");
-
-    return {
-        apiKey: apiKey,
-        authDomain: 'bedtijdavonturen-prod.firebaseapp.com',
-        projectId: 'bedtijdavonturen-prod',
-        storageBucket: 'bedtijdavonturen-prod.firebasestorage.app',
-        messagingSenderId: '340393072153',
-        appId: '1:340393072153:web:a58f7ca8d5ac620c41fc88'
+        return {
+            apiKey: apiKey || 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q', // Fallback is public safe key
+            authDomain: 'bedtijdavonturen-prod.firebaseapp.com', // MUST MATCH Firebase Console
+            projectId: 'bedtijdavonturen-prod',
+            storageBucket: 'bedtijdavonturen-prod.firebasestorage.app',
+            messagingSenderId: '340393072153',
+            appId: '1:340393072153:web:a58f7ca8d5ac620c41fc88'
+        }
+    } catch (error) {
+        console.error("Critical: Failed to get/construct Firebase Config. Using Hardcoded Fallback.", error)
+        return {
+            apiKey: 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q',
+            authDomain: 'bedtijdavonturen-prod.firebaseapp.com',
+            projectId: 'bedtijdavonturen-prod',
+            storageBucket: 'bedtijdavonturen-prod.firebasestorage.app',
+            messagingSenderId: '340393072153',
+            appId: '1:340393072153:web:a58f7ca8d5ac620c41fc88'
+        }
     }
 }

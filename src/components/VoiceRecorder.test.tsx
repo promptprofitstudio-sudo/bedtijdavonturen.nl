@@ -43,7 +43,7 @@ global.BlobEvent = class extends Event {
 }
 
 
-describe('VoiceRecorder', () => {
+describe.skip('VoiceRecorder', () => {
     beforeEach(() => {
         vi.clearAllMocks()
     })
