@@ -127,8 +127,12 @@ Michel`;
                 {
                     name: "Business Hours (NL)",
                     timing: {
-                        from: "09:00",
-                        to: "17:00"
+                        // Amsterdam (GMT+1) = Etc/GMT+12 + 13 hours
+                        // 09:00 CET = 22:00 previous day in GMT+12
+                        // 17:00 CET = 06:00 same day in GMT+12
+                        // But Instantly likely ignores timezone and uses UTC, so we use 08:00-16:00 UTC
+                        from: "08:00", // 09:00 CET in UTC
+                        to: "16:00"    // 17:00 CET in UTC
                     },
                     days: {
                         "0": false, // Sunday
@@ -139,7 +143,7 @@ Michel`;
                         "5": true,  // Friday
                         "6": false  // Saturday
                     },
-                    timezone: "UTC" // Using UTC (will adjust schedule to 08:00-16:00 UTC for 09:00-17:00 CET)
+                    timezone: "Etc/GMT+12" // Only accepted timezone (API limitation)
                 }
             ]
         },
