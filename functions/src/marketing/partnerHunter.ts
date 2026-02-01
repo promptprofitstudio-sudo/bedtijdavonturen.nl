@@ -12,7 +12,8 @@ const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
 const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
 const instantlyCampaignId = defineSecret('INSTANTLY_CAMPAIGN_ID');
-const posthogApiKey = defineSecret('POSTHOG_PERSONAL_API_KEY');
+// TODO: Re-enable PostHog monitoring after fixing IAM permissions in CI/CD
+// const posthogApiKey = defineSecret('POSTHOG_PERSONAL_API_KEY');
 
 // Safety: Dry-run mode (set to 'false' to enable production mode)
 // Default behavior: DRY_RUN unless explicitly set to 'false'
@@ -29,7 +30,7 @@ const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zw
 export const partnerHunter = onSchedule({
     schedule: "every monday 09:00",
     timeZone: "Europe/Amsterdam",
-    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId, posthogApiKey],
+    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (event) => {
@@ -206,6 +207,8 @@ export const partnerHunter = onSchedule({
         console.error("Hunter Run Failed", error);
     } finally {
         // GAP 8: PostHog Monitoring
+        // TODO: Re-enable after fixing IAM permissions
+        /*
         try {
             const { PostHog } = await import('posthog-node');
             const phClient = new PostHog(posthogApiKey.value(), {
@@ -228,5 +231,6 @@ export const partnerHunter = onSchedule({
         } catch (e) {
             console.error('Failed to log to PostHog:', e);
         }
+        */
     }
 });
