@@ -3,26 +3,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.testPartnerFlow = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
+const admin = require("firebase-admin");
 const axios_1 = require("axios");
 const openai_1 = require("openai");
 // Secrets
+const dataForSeoLogin = (0, params_1.defineSecret)('DATAFORSEO_LOGIN');
 const dataForSeoApiKey = (0, params_1.defineSecret)('DATAFORSEO_API_KEY');
 const hunterApiKey = (0, params_1.defineSecret)('HUNTER_API_KEY');
 const openaiApiKey = (0, params_1.defineSecret)('OPENAI_API_KEY');
 const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_API_KEY');
+const instantlyCampaignId = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_ID');
 exports.testPartnerFlow = (0, https_1.onRequest)({
-    secrets: [dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey],
+    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (req, res) => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-    const testEmail = req.query.testEmail;
-    if (!testEmail) {
-        res.status(400).json({ error: "Missing 'testEmail' query parameter." });
-        return;
-    }
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    // Default test email (can be overridden via query param)
+    const testEmail = req.query.testEmail || 'michel@korpershoek-management.nl';
+    const city = req.query.city || 'Almere';
+    const searchTerm = req.query.term || 'Kinderopvang';
+    const term = `${searchTerm} ${city}`;
+    console.log(`🧪 Test Parameters:`);
+    console.log(`  → Test Email: ${testEmail}`);
+    console.log(`  → Search Term: ${term}`);
+    const startTime = Date.now();
     const log = { steps: [] };
-    const term = "Kinderopvang Almere";
     try {
         // --- STAP A: DataForSEO ---
         log.steps.push("Starting DataForSEO search...");
@@ -33,7 +39,7 @@ exports.testPartnerFlow = (0, https_1.onRequest)({
                 depth: 20
             }], {
             auth: {
-                username: "system",
+                username: dataForSeoLogin.value(),
                 password: dataForSeoApiKey.value()
             }
         });
@@ -103,13 +109,42 @@ exports.testPartnerFlow = (0, https_1.onRequest)({
         };
         const instantlyRes = await axios_1.default.post('https://api.instantly.ai/api/v1/lead/add', {
             api_key: instantlyApiKey.value(),
-            campaign_id: 'YOUR_CAMPAIGN_ID',
+            campaign_id: instantlyCampaignId.value(),
             skip_if_in_workspace: false,
             leads: [leadPayload]
         });
         log.instantlyStatus = instantlyRes.status;
         log.instantlyData = instantlyRes.data;
         log.steps.push("✅ Instantly Push Complete");
+        // Log test run to Firestore for audit trail
+        const db = admin.firestore();
+        await db.collection('partner_test_runs').add({
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            testEmail,
+            searchTerm: term,
+            city,
+            // Results
+            dataForSeo: {
+                found: ((_l = log.items) === null || _l === void 0 ? void 0 : _l.length) || 0,
+                topResult: log.foundCompany || null
+            },
+            hunter: {
+                domain: log.hunterDomain,
+                emailFound: !!log.foundEmail,
+                email: log.foundEmail
+            },
+            openai: {
+                icebreaker: log.icebreaker
+            },
+            instantly: {
+                success: !!log.instantlyData,
+                response: log.instantlyData
+            },
+            // Metadata
+            success: true,
+            duration: Date.now() - startTime
+        });
+        console.log('✅ Test run logged to Firestore');
         // Response
         res.status(200).json({
             success: true,

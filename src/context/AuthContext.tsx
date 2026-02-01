@@ -9,8 +9,9 @@ import {
     User as FirebaseUser,
     Auth
 } from 'firebase/auth'
-import { initializeFirebaseServices, FirebaseServices } from '@/lib/firebase'
-import { getFirebaseClientConfig } from '@/app/actions/get-client-config'
+import { FirebaseServices } from '@/lib/firebase'
+import { initializeFirebaseServices } from '@/lib/firebase/db'
+import { firebaseClientConfig } from '@/lib/firebase/config'
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, Timestamp, Firestore } from 'firebase/firestore'
 import { UserData } from '@/lib/types'
 
@@ -38,7 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const init = async () => {
             try {
-                const config = await getFirebaseClientConfig()
+                // Use client-side config directly (no server action needed - these are public values)
+                const config = firebaseClientConfig
 
                 // TEST MODE BYPASS
                 if (process.env.NEXT_PUBLIC_TEST_MODE === 'true') {
