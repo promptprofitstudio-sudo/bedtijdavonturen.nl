@@ -37,7 +37,7 @@ export default function AccountPage() {
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center space-y-3">
             <p className="text-red-600 font-bold">⚠️ Initialisatie Fout</p>
             <p className="text-xs text-red-500 font-mono break-all">{initError}</p>
-            <Button variant="secondary" size="sm" onClick={() => retryInit && retryInit()}>
+            <Button variant="secondary" size="md" onClick={() => retryInit && retryInit()}>
               Probeer Opnieuw
             </Button>
           </div>
