@@ -58,3 +58,4 @@ test-key.cjs
 # Playwright
 test-results/
 playwright-report/
+.env.bedtijdavonturen-prod
