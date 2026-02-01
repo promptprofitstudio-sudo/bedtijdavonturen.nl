@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-import { getSecret } from '@/lib/firebase/admin'
+import { getSecret } from '@/lib/secrets'
 
 let stripeInstance: Stripe | null = null
 

@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getSecret } from '../src/lib/firebase/admin';
+import { getSecret } from '../src/lib/secrets';
 
 async function main() {
     console.log('--- STRIPE FRESH START ---');

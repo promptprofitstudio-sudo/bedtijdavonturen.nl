@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
-import { getAdminDb, getSecret } from '@/lib/firebase/admin'
+import { getAdminDb } from '@/lib/firebase/admin'
+import { getSecret } from '@/lib/secrets'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 

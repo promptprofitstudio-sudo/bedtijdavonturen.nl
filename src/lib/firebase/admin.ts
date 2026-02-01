@@ -1,81 +1,39 @@
-import { initializeApp, getApps, getApp, App, cert } from 'firebase-admin/app'
+import { initializeApp, getApps, App } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager'
 
 const ADMIN_APP_NAME = 'bedtijd-admin-v2'
-const secretsClient = new SecretManagerServiceClient()
 
-export async function getSecret(name: string): Promise<string | undefined> {
-    try {
-        console.log(`[Admin] Attempting to fetch secret: ${name}`)
-        const projectId = 'bedtijdavonturen-prod'
-        const [version] = await secretsClient.accessSecretVersion({
-            name: `projects/${projectId}/secrets/${name}/versions/latest`,
-        })
-        const payload = version.payload?.data?.toString()
-        if (payload) {
-            console.log(`[Admin] Successfully fetched secret: ${name} (Length: ${payload.length})`)
-        } else {
-            console.warn(`[Admin] Secret ${name} fetched but payload is empty`)
-        }
-        return payload
-    } catch (error: any) {
-        console.error(`[Admin] FAILED to fetch secret ${name}:`, error)
-        return undefined
-    }
-}
-
+/**
+ * Get or initialize Firebase Admin app using Application Default Credentials (ADC)
+ * 
+ * In production (Cloud Run), the service account is automatically available via ADC.
+ * In local development, use GOOGLE_APPLICATION_CREDENTIALS env var or gcloud auth.
+ * 
+ * No need for Secret Manager - the Cloud Run service account has direct Firestore access.
+ */
 export async function getAdminApp(): Promise<App> {
     // Check if our specific named app is already initialized
     const existingApp = getApps().find(app => app.name === ADMIN_APP_NAME)
 
     if (existingApp) {
-        console.log(`[Admin] Reusing existing app: ${ADMIN_APP_NAME}`)
+        console.log(`[Admin] ✓ Reusing existing app: ${ADMIN_APP_NAME}`)
         return existingApp
     }
 
-    console.log(`[Admin] Initializing new app: ${ADMIN_APP_NAME}...`)
+    console.log(`[Admin] Initializing app: ${ADMIN_APP_NAME} with ADC...`)
 
     const projectId = 'bedtijdavonturen-prod'
 
-    // In TEST_MODE (or local dev), skip secret fetch to avoid crashes if secret is missing
-    let serviceAccountKey: string | undefined = undefined
-    if (process.env.TEST_MODE !== 'true') {
-        serviceAccountKey = await getSecret('FIREBASE_SERVICE_ACCOUNT_KEY')
-    } else {
-        console.log('[Admin] TEST_MODE detected. Skipping Service Account Key fetch, defaulting to ADC.')
-    }
-
-    const options: any = {
-        // projectId, // Remove explicit projectId, let credential handle it if present
+    // Simple configuration - let ADC handle authentication
+    const options = {
+        projectId,
         storageBucket: `${projectId}.firebasestorage.app`
     }
 
-    if (serviceAccountKey) {
-        try {
-            console.log('[Admin] Found explicit service account key! Attempting to parse...')
-            const parsedKey = JSON.parse(serviceAccountKey)
+    const app = initializeApp(options, ADMIN_APP_NAME)
+    console.log(`[Admin] ✓ Initialized with project: ${projectId} (using ADC)`)
 
-            // Security Check: Ensure the key belongs to the correct project
-            if (parsedKey.project_id !== projectId) {
-                console.error(`[Admin] 🚨 CRITICAL MISMATCH: Secret key is for '${parsedKey.project_id}' but expected '${projectId}'. Ignoring key and using ADC.`)
-                options.projectId = projectId
-                // Do NOT set options.credential, checking fall back to ADC
-            } else {
-                options.credential = cert(parsedKey)
-                options.projectId = parsedKey.project_id
-                console.log(`[Admin] Successfully created cert credential. Project: ${options.projectId}`)
-            }
-        } catch (e) {
-            console.error('[Admin] Failed to parse service account key, falling back to ADC', e)
-            options.projectId = projectId // Fallback
-        }
-    } else {
-        console.warn('[Admin] WARNING: No explicit key found in secrets! Falling back to Application Default Credentials (ADC).')
-        options.projectId = projectId
-    }
-
-    return initializeApp(options, ADMIN_APP_NAME)
+    return app
 }
 
 export async function getAdminDb() {
