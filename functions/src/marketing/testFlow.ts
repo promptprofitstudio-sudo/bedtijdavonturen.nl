@@ -3,7 +3,6 @@ import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
 import OpenAI from 'openai';
-import { withRetry } from './utils/retry';
 
 // Secrets
 const dataForSeoLogin = defineSecret('DATAFORSEO_LOGIN');
