@@ -22,6 +22,8 @@ interface AuthContextType {
     registerWithEmail: (email: string, pass: string, name: string) => Promise<void>
     signOut: () => Promise<void>
     db: Firestore | null // Expose DB for other services
+    initError?: string | null
+    retryInit?: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

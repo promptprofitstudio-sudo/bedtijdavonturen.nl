@@ -13,7 +13,7 @@ import { getProfiles, deleteProfile } from '@/lib/firebase/db'
 import { ChildProfile } from '@/lib/types'
 
 export default function AccountPage() {
-  const { user, loading, signInWithGoogle, signOut, db } = useAuth()
+  const { user, loading, signInWithGoogle, signOut, db, initError, retryInit } = useAuth()
   const [profiles, setProfiles] = useState<ChildProfile[]>([])
   /* handleDelete removed, moved to /profiles */
 
@@ -32,6 +32,17 @@ export default function AccountPage() {
           <SectionTitle title="Account" subtitle="Log in om verhalen te bewaren." />
         </header>
 
+        {/* ERROR STATE FOR DEBUGGING MOBILE */}
+        {initError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center space-y-3">
+            <p className="text-red-600 font-bold">⚠️ Initialisatie Fout</p>
+            <p className="text-xs text-red-500 font-mono break-all">{initError}</p>
+            <Button variant="secondary" size="sm" onClick={() => retryInit && retryInit()}>
+              Probeer Opnieuw
+            </Button>
+          </div>
+        )}
+
         <Card className="space-y-6 text-center py-10">
           <div className="space-y-1">
             <h3 className="text-lg font-bold text-navy-900">Welkom Ouders</h3>
@@ -41,7 +52,12 @@ export default function AccountPage() {
           <GoogleSignInButton
             className="w-full h-12 text-base"
             variant="light"
+            disabled={!!initError}
             onClick={async () => {
+              if (initError) {
+                alert("Kan niet inloggen door initialisatiefout: " + initError);
+                return;
+              }
               try {
                 await signInWithGoogle()
               } catch (err: any) {
