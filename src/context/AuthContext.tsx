@@ -152,11 +152,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     const signInWithGoogle = async () => {
-        if (!services) {
-            console.error("Firebase services not initialized");
-            // alert("De inlog-service is nog aan het laden. Probeer het over enkele seconden opnieuw.");
+        if (!services || !services.auth) {
+            console.error("❌ Sign-In Blocked: Firebase Auth service not initialized.");
+            alert("De inlog-service is nog aan het laden of is niet beschikbaar. Probeer het opnieuw.");
             return
         }
+
         const provider = new GoogleAuthProvider()
         try {
             // Import persistence explicitly to bundle it
@@ -165,9 +166,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Force Local Persistence to ensure session survives redirects/refreshes
             await setPersistence(services.auth, browserLocalPersistence)
 
+            console.log("🚀 Starting Google Redirect Flow...");
             await signInWithRedirect(services.auth, provider)
-        } catch (error) {
-            console.error('Error signing in with Google', error)
+        } catch (error: any) {
+            console.error('❌ Error signing in with Google', error)
+
+            if (error.code === 'auth/unauthorized-domain') {
+                console.error("CRITICAL: The current domain is not authorized in Firebase Console -> Auth -> Settings -> Authorized Domains.");
+                alert("Configuratiefout: Dit domein is niet toegestaan voor Google Login.");
+            } else if (error.code === 'auth/configuration-not-found') {
+                console.error("CRITICAL: Firebase Auth is not enabled or configured in the console.");
+            }
             throw error
         }
     }
