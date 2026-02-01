@@ -15,12 +15,10 @@ export const testPartnerFlow = onRequest({
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (req, res) => {
-    const testEmail = req.query.testEmail as string;
+    // Default test email (can be overridden via query param)
+    const testEmail = (req.query.testEmail as string) || 'michel@korpershoek-management.nl';
 
-    if (!testEmail) {
-        res.status(400).json({ error: "Missing 'testEmail' query parameter." });
-        return;
-    }
+    console.log(`🧪 Test mode: emails will go to ${testEmail}`);
 
     const log: any = { steps: [] };
     const term = "Kinderopvang Almere";
