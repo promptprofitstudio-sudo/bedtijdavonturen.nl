@@ -6,6 +6,7 @@ import OpenAI from 'openai';
 import { withRetry } from './utils/retry';
 
 // Secrets
+const dataForSeoLogin = defineSecret('DATAFORSEO_LOGIN');
 const dataForSeoApiKey = defineSecret('DATAFORSEO_API_KEY');
 const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
@@ -13,7 +14,7 @@ const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
 const instantlyCampaignId = defineSecret('INSTANTLY_CAMPAIGN_ID');
 
 export const testPartnerFlow = onRequest({
-    secrets: [dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
+    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (req, res) => {
@@ -41,7 +42,7 @@ export const testPartnerFlow = onRequest({
             depth: 20
         }], {
             auth: {
-                username: "system", // Using placeholder as per existing pattern
+                username: dataForSeoLogin.value(),
                 password: dataForSeoApiKey.value()
             }
         });

@@ -6,6 +6,7 @@ import OpenAI from 'openai';
 import { withRetry } from './utils/retry';
 
 // Secrets
+const dataForSeoLogin = defineSecret('DATAFORSEO_LOGIN');
 const dataForSeoApiKey = defineSecret('DATAFORSEO_API_KEY');
 const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
@@ -24,7 +25,7 @@ const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zw
 export const partnerHunter = onSchedule({
     schedule: "every monday 09:00",
     timeZone: "Europe/Amsterdam",
-    secrets: [dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
+    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (event) => {
@@ -54,7 +55,7 @@ export const partnerHunter = onSchedule({
             depth: 20
         }], {
             auth: {
-                username: "system", // Placeholder
+                username: dataForSeoLogin.value(),
                 password: dataForSeoApiKey.value()
             }
         });
@@ -153,6 +154,34 @@ export const partnerHunter = onSchedule({
                 console.log(`✅ Sent to Instantly: ${leadPayload.email}`);
             }
 
+            // Generate VIP code for partner (GAP 3)
+            const vipCode = `${item.title
+                .replace(/[^a-zA-Z0-9]/g, '-')
+                .replace(/-+/g, '-')
+                .substring(0, 20)
+                .toUpperCase()}-VIP`;
+
+            // Store VIP code in Firestore
+            if (!DRY_RUN.value()) {
+                await db.collection('referral_codes').doc(vipCode).set({
+                    code: vipCode,
+                    partnerName: item.title,
+                    partnerDomain: domain,
+                    partnerEmail: emailObj.value,
+
+                    // Grant family plan equivalent (30 credits)
+                    creditsGranted: 30,
+                    maxRedemptions: 100,
+                    redemptions: 0,
+
+                    // Metadata
+                    createdBy: 'partner_hunter',
+                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: null // Never expires
+                });
+                console.log(`🎟️  VIP Code Created: ${vipCode}`);
+            }
+
             // 7. Log
             await db.collection('leads').doc(domain.replace(/\./g, '_')).set({
                 domain,
@@ -162,6 +191,7 @@ export const partnerHunter = onSchedule({
                 status: DRY_RUN.value() ? 'dry_run' : 'contacted',
                 dryRun: DRY_RUN.value(),
                 icebreaker,
+                vipCode, // Include VIP code reference
                 timestamp: admin.firestore.FieldValue.serverTimestamp()
             });
 
