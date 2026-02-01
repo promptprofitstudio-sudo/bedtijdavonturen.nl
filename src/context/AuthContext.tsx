@@ -9,8 +9,7 @@ import {
     User as FirebaseUser,
     Auth
 } from 'firebase/auth'
-import { FirebaseServices } from '@/lib/firebase'
-import { initializeFirebaseServices } from '@/lib/firebase/db'
+import { FirebaseServices, initializeFirebaseServices } from '@/lib/firebase'
 import { firebaseClientConfig } from '@/lib/firebase/config'
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, Timestamp, Firestore } from 'firebase/firestore'
 import { UserData } from '@/lib/types'
