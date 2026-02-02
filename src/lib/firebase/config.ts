@@ -3,7 +3,7 @@
 
 export const firebaseClientConfig = {
     apiKey: 'AIzaSyD_AuWiMYgDc-JXhwPJu3l_Ilo42a_DX0Q',
-    authDomain: 'bedtijdavonturen-prod.firebaseapp.com',
+    authDomain: 'bedtijdavonturen.nl', // Use custom domain for OAuth redirects
     projectId: 'bedtijdavonturen-prod',
     storageBucket: 'bedtijdavonturen-prod.firebasestorage.app',
     messagingSenderId: '340393072153',
