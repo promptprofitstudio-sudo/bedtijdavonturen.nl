@@ -15,12 +15,15 @@ import {
     Firestore
 } from 'firebase/firestore'
 import { initializeFirebaseServices, FirebaseServices } from '@/lib/firebase'
-import { getFirebaseClientConfig } from '@/app/actions/get-client-config'
+import { firebaseClientConfig } from '@/lib/firebase/config'
 import { UserData, ChildProfile, Story, StorySchema } from '@/lib/types'
 
-// Helper to ensure we have a valid DB instance on the server
+// Helper to ensure we have a valid DB instance on the client
 async function getDb(): Promise<Firestore> {
-    const config = await getFirebaseClientConfig()
+    // Use client-side config directly (no server action needed - these are public values)
+    // This is the same fix as AuthContext.tsx - client code cannot call server actions
+    const config = firebaseClientConfig
+
     if (!config.apiKey) throw new Error('Missing Firebase Config')
     const services = initializeFirebaseServices(config)
     return services.db
