@@ -2,6 +2,10 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbopack: {},
+  // Prevent firebase-admin from being bundled/externalized incorrectly
+  // Let Node.js handle it as a runtime dependency
+  serverExternalPackages: ['firebase-admin'],
 };
 
 const withPWA = require('@ducanh2912/next-pwa').default({
