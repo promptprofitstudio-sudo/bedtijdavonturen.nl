@@ -133,28 +133,35 @@ export const partnerHunter = onSchedule({
             // 6. Instantly.ai (Outreach)
             const leadPayload = {
                 email: emailObj.value,
-                firstName: emailObj.first_name || 'Partner',
-                lastName: emailObj.last_name || '',
-                companyName: item.title,
+                first_name: emailObj.first_name || '',
+                last_name: emailObj.last_name || '',
+                company_name: item.title,
                 website: item.url,
-                customVariables: {
-                    icebreaker: icebreaker
+                custom_variables: {
+                    icebreaker,
+                    city: city,
+                    search_term: term
                 }
             };
 
             // Apply dry-run conditional
             if (DRY_RUN.value()) {
-                console.log(`[DRY RUN] Would send to Instantly:`);
+                console.log(`[DRY RUN] Would send to Instantly:`, leadPayload);
                 console.log(`  → Email: ${leadPayload.email}`);
-                console.log(`  → Company: ${leadPayload.companyName}`);
-                console.log(`  → Icebreaker: ${leadPayload.customVariables.icebreaker}`);
+                console.log(`  → Company: ${leadPayload.company_name}`);
+                console.log(`  → Icebreaker: ${leadPayload.custom_variables.icebreaker}`);
             } else {
                 // Production: Actually send to Instantly
-                await axios.post('https://api.instantly.ai/api/v1/lead/add', {
-                    api_key: instantlyApiKey.value(),
-                    campaign_id: instantlyCampaignId.value(),
+                // Instantly.ai V2 API uses Bearer token and 'campaign' param
+                await axios.post('https://api.instantly.ai/api/v2/leads', {
+                    campaign: instantlyCampaignId.value(), // V2 uses 'campaign' not 'campaign_id'
                     skip_if_in_workspace: true,
                     leads: [leadPayload]
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${instantlyApiKey.value()}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 console.log(`✅ Sent to Instantly: ${leadPayload.email}`);
             }

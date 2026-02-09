@@ -3,9 +3,6 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   turbopack: {},
-  // FORCE firebase-admin to be bundled (not externalized with hashes)
-  // transpilePackages forces bundling, serverExternalPackages externalizes
-  transpilePackages: ['firebase-admin'],
 };
 
 const withPWA = require('@ducanh2912/next-pwa').default({

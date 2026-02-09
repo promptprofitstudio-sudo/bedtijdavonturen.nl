@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Button, Card, SectionTitle, Pill } from '@/components/ui'
 import { EmailLoginForm } from '@/components/EmailLoginForm'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
@@ -15,7 +16,20 @@ import { ChildProfile } from '@/lib/types'
 export default function AccountPage() {
   const { user, loading, signInWithGoogle, signOut, db, initError, retryInit } = useAuth()
   const [profiles, setProfiles] = useState<ChildProfile[]>([])
+  const searchParams = useSearchParams()
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   /* handleDelete removed, moved to /profiles */
+
+  // Check for payment success
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      setShowSuccessMessage(true)
+      // Auto-hide after 5 seconds
+      setTimeout(() => setShowSuccessMessage(false), 5000)
+      // Clean URL
+      window.history.replaceState({}, '', '/account')
+    }
+  }, [searchParams])
 
   if (loading) {
     return (
@@ -83,6 +97,16 @@ export default function AccountPage() {
 
   return (
     <main className="px-4 py-6 space-y-6">
+      {/* Payment Success Banner */}
+      {showSuccessMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-2 animate-in slide-in-from-top-2 fade-in">
+          <p className="text-green-800 font-bold text-lg">🎉 Betaling geslaagd!</p>
+          <p className="text-sm text-green-700">
+            Je hebt nu toegang tot je verhalen. Geniet ervan!
+          </p>
+        </div>
+      )}
+
       <header className="space-y-2">
         <div className="flex justify-between items-start">
           <SectionTitle title="Hallo!" subtitle={user.displayName || 'Ouder'} />

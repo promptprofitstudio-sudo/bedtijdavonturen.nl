@@ -38,27 +38,28 @@ export async function POST(req: Request) {
                 const db = await getAdminDb()
                 const { FieldValue } = await import('firebase-admin/firestore')
 
-                // Determine credits and status
+                // Determine credits and subscription status
                 let creditsToAdd = 0
-                let newStatus = 'free' // Default, upgrade only if specified
+                let statusUpdate: string | null = null
 
-                const { STRIPE_CONFIG } = await import('@/lib/stripe-config') // Import config
+                const { STRIPE_CONFIG } = await import('@/lib/stripe-config')
 
                 const stripe = await getStripe()
                 const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
                 const priceId = lineItems.data[0]?.price?.id
 
                 if (priceId === STRIPE_CONFIG.prices.weekend) {
-                    // Weekend Rust: 3 Credits
+                    // Weekend Rust: 3 Credits (one-time purchase, no subscription)
                     creditsToAdd = 3
+                    // No status change - user remains 'free' but with credits
                 } else if (priceId === STRIPE_CONFIG.prices.monthly) {
-                    // Elke Avond: Basic Subscription (Unlimited Audio)
+                    // Rust & Regelmaat: Basic Subscription (Unlimited for 1 child)
                     creditsToAdd = 10 // Safety buffer
-                    newStatus = 'basic'
+                    statusUpdate = 'premium' // Grant premium access
                 } else if (priceId === STRIPE_CONFIG.prices.annual) {
-                    // Family: Family Subscription (Unlimited + Multi-profile)
+                    // Gezin: Family Subscription (Unlimited + 5 profiles)
                     creditsToAdd = 20 // Safety buffer
-                    newStatus = 'family'
+                    statusUpdate = 'premium' // Grant premium access
                 }
 
                 const updateData: any = {
@@ -68,13 +69,40 @@ export async function POST(req: Request) {
                     updatedAt: new Date()
                 }
 
-                // Only update status if it's a subscription upgrade
-                if (newStatus === 'premium') {
-                    updateData.subscriptionStatus = 'premium'
+                // Update subscription status if this is a subscription purchase
+                if (statusUpdate) {
+                    updateData.subscriptionStatus = statusUpdate
                 }
 
                 await db.collection('users').doc(userId).update(updateData)
-                console.log(`[Stripe] User ${userId} upgraded. Added ${creditsToAdd} credits.`)
+
+                console.log(`[Stripe] User ${userId} upgraded:`, {
+                    priceId,
+                    creditsAdded: creditsToAdd,
+                    newStatus: statusUpdate || 'free',
+                    sessionId: session.id
+                })
+
+                // Track payment success in analytics
+                try {
+                    const { trackServerEvent } = await import('@/lib/server-analytics')
+                    await trackServerEvent({
+                        userId,
+                        event: 'payment_completed',
+                        properties: {
+                            priceId,
+                            amount: (session.amount_total || 0) / 100,
+                            currency: session.currency || 'eur',
+                            subscriptionStatus: statusUpdate || 'free',
+                            creditsAdded: creditsToAdd,
+                            sessionId: session.id,
+                            customerEmail: session.customer_email
+                        }
+                    })
+                } catch (analyticsErr) {
+                    // Don't fail payment processing if analytics fails
+                    console.error('[Stripe] Analytics tracking failed:', analyticsErr)
+                }
             } catch (dbErr) {
                 console.error('[Stripe] DB Update Failed:', dbErr)
                 return new NextResponse('Database Error', { status: 500 })

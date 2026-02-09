@@ -10,13 +10,31 @@ export async function createCheckoutSession(priceId: string, userId: string) {
         return
     }
 
-    // Determine domain
-    // Determine domain (Fix for Production)
-    let origin = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    if (process.env.VERCEL_URL) origin = `https://${process.env.VERCEL_URL}` // Fallback for Vercel
-    if (process.env.FIREBASE_APP_HOSTING_URL) origin = process.env.FIREBASE_APP_HOSTING_URL; // Fallback for Firebase
+    // Determine domain for success/cancel URLs
+    let origin = 'http://localhost:3000'
+
+    // Production: Firebase App Hosting
+    if (process.env.FIREBASE_APP_HOSTING_URL) {
+        origin = process.env.FIREBASE_APP_HOSTING_URL
+    }
+    // Fallback: Next.js on Vercel
+    else if (process.env.VERCEL_URL) {
+        origin = `https://${process.env.VERCEL_URL}`
+    }
+    // Manual override (set in Secret Manager or GitHub Secrets)
+    else if (process.env.NEXT_PUBLIC_BASE_URL) {
+        origin = process.env.NEXT_PUBLIC_BASE_URL
+    }
 
     const mode = getCheckoutMode(priceId)
+
+    console.log('[Stripe] Creating checkout session:', {
+        origin,
+        success_url: `${origin}/account?success=true`,
+        cancel_url: `${origin}/pricing?canceled=true`,
+        mode,
+        priceId
+    })
 
     try {
         const stripe = await getStripe()

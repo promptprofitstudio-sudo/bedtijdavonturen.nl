@@ -219,12 +219,59 @@ email1.variants.forEach(variant => {
 
 ---
 
+## 🔒 Safety Controls
+
+### DRY_RUN Mode
+
+Partner Hunter V4 has a safety gate to prevent accidental sends during testing and warmup:
+
+**Environment Variable:** `PARTNER_HUNTER_DRY_RUN`  
+**Default:** `true` (safe)  
+**Current Status:** `true` (warmup phase until Feb 24)  
+
+#### What DRY_RUN Does
+- ✅ Discovers leads via DataForSEO
+- ✅ Calculates FitScores  
+- ✅ Generates 3-Rail enrichment data
+- ✅ Creates AI message kits
+- ✅ Logs all actions to Firestore
+- ❌ **Does NOT** send leads to Instantly.ai
+
+#### Monitoring
+
+```bash
+# Check last executions and campaign status
+./scripts/monitor-partner-hunter.sh
+
+# Manual check of function logs
+gcloud functions logs read partnerHunterV4 --project=bedtijdavonturen-prod --limit=20
+```
+
+Look for `🧪 DRY-RUN MODE` in logs (safe) vs `🚀 PRODUCTION MODE` (live sends).
+
+#### Activation Procedure (Feb 24)
+
+1. Update `.github/workflows/deploy.yml` line 45:
+   ```yaml
+   # Change from:
+   echo "PARTNER_HUNTER_DRY_RUN=true" > functions/.env.bedtijdavonturen-prod
+   # To:
+   echo "PARTNER_HUNTER_DRY_RUN=false" > functions/.env.bedtijdavonturen-prod
+   ```
+
+2. Commit and push to trigger deployment
+3. Wait for next Monday run (Mar 3 at 09:00 CET)
+4. Monitor using `./scripts/monitor-partner-hunter.sh`
+
+---
+
 ## 📁 File Locations
 
 ### Scripts
 - `scripts/validate-instantly-sequence.ts` - Validation script
 - `scripts/update-kdv-sequence.sh` - Update automation
 - `scripts/sequences/kdv_v10_1_sequence.json` - V10.1 payload
+- `scripts/monitor-partner-hunter.sh` - Status monitoring (NEW)
 
 ### Documentation
 - `docs/ADR/0007-instantly-v2-api.md` - API integration ADR
@@ -232,7 +279,7 @@ email1.variants.forEach(variant => {
 - `docs/marketing_email_scripts_v1.md` - Email copy
 
 ### Source Code
-- `functions/src/marketing/partnerHunterV4.ts` - Main workflow
+- `functions/src/marketing/partnerHunterV4.ts` - Main workflow with DRY_RUN safety
 - `functions/src/marketing/skills/makeMessageKit.ts` - AI content generation
 
 ---

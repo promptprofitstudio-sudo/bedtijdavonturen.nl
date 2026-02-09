@@ -74,9 +74,56 @@ export type StoryMood = z.infer<typeof StoryMoodSchema>
 
 // --- App State Interfaces ---
 
-
 export interface AuthState {
     user: UserData | null
     loading: boolean
     error: Error | null
+}
+
+// --- Partner Growth Engine v4.0 ---
+
+export interface Lead {
+    // Identity
+    id: string
+    email?: string
+    firstName?: string
+    lastName?: string
+    companyName: string
+    domain: string
+    city: string
+    searchTerm: string
+
+    // Status Management
+    status: 'new' | 'enriching' | 'ready_for_email' | 'manual_check' |
+    'form_only' | 'dm_creator' | 'contacted' | 'rejected'
+
+    // Quality Score
+    fitScore: number // 0-100
+    segment: 'kdv_bso' | 'school' | 'pro' | 'creator'
+
+    // Enrichment Data
+    enrichmentData: {
+        source: 'hunter' | 'scrape' | 'manual'
+        contactType: 'personal' | 'role_based' | 'generic' | 'form_only'
+        facts: string[] // The "Fact Pack" from website
+        rating?: number
+        reviewCount?: number
+        snippet?: string
+    }
+
+    // AI-Generated Message Kit
+    messageKit?: {
+        subjectA: string
+        subjectB: string
+        opening: string
+        body: string
+        ps?: string
+        angle: string
+        cta: string
+    }
+
+    // Timestamps
+    createdAt: Timestamp
+    updatedAt: Timestamp
+    contactedAt?: Timestamp
 }

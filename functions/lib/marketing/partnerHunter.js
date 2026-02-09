@@ -14,7 +14,8 @@ const hunterApiKey = (0, params_1.defineSecret)('HUNTER_API_KEY');
 const openaiApiKey = (0, params_1.defineSecret)('OPENAI_API_KEY');
 const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_API_KEY');
 const instantlyCampaignId = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_ID');
-const posthogApiKey = (0, params_1.defineSecret)('POSTHOG_PERSONAL_API_KEY');
+// TODO: Re-enable PostHog monitoring after fixing IAM permissions in CI/CD
+// const posthogApiKey = defineSecret('POSTHOG_PERSONAL_API_KEY');
 // Safety: Dry-run mode (set to 'false' to enable production mode)
 // Default behavior: DRY_RUN unless explicitly set to 'false'
 const DRY_RUN = (0, params_1.defineBoolean)('PARTNER_HUNTER_DRY_RUN', {
@@ -27,7 +28,7 @@ const TERMS = ['Slaapcoach kind', 'Kinderopvang', 'Mommy blogger Nederland', 'Zw
 exports.partnerHunter = (0, scheduler_1.onSchedule)({
     schedule: "every monday 09:00",
     timeZone: "Europe/Amsterdam",
-    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId, posthogApiKey],
+    secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignId],
     timeoutSeconds: 300,
     memory: "512MiB",
 }, async (event) => {
@@ -113,28 +114,35 @@ exports.partnerHunter = (0, scheduler_1.onSchedule)({
             // 6. Instantly.ai (Outreach)
             const leadPayload = {
                 email: emailObj.value,
-                firstName: emailObj.first_name || 'Partner',
-                lastName: emailObj.last_name || '',
-                companyName: item.title,
+                first_name: emailObj.first_name || '',
+                last_name: emailObj.last_name || '',
+                company_name: item.title,
                 website: item.url,
-                customVariables: {
-                    icebreaker: icebreaker
+                custom_variables: {
+                    icebreaker,
+                    city: city,
+                    search_term: term
                 }
             };
             // Apply dry-run conditional
             if (DRY_RUN.value()) {
-                console.log(`[DRY RUN] Would send to Instantly:`);
+                console.log(`[DRY RUN] Would send to Instantly:`, leadPayload);
                 console.log(`  → Email: ${leadPayload.email}`);
-                console.log(`  → Company: ${leadPayload.companyName}`);
-                console.log(`  → Icebreaker: ${leadPayload.customVariables.icebreaker}`);
+                console.log(`  → Company: ${leadPayload.company_name}`);
+                console.log(`  → Icebreaker: ${leadPayload.custom_variables.icebreaker}`);
             }
             else {
                 // Production: Actually send to Instantly
-                await axios_1.default.post('https://api.instantly.ai/api/v1/lead/add', {
-                    api_key: instantlyApiKey.value(),
-                    campaign_id: instantlyCampaignId.value(),
+                // Instantly.ai V2 API uses Bearer token and 'campaign' param
+                await axios_1.default.post('https://api.instantly.ai/api/v2/leads', {
+                    campaign: instantlyCampaignId.value(),
                     skip_if_in_workspace: true,
                     leads: [leadPayload]
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${instantlyApiKey.value()}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 console.log(`✅ Sent to Instantly: ${leadPayload.email}`);
             }
@@ -182,11 +190,14 @@ exports.partnerHunter = (0, scheduler_1.onSchedule)({
     }
     finally {
         // GAP 8: PostHog Monitoring
+        // TODO: Re-enable after fixing IAM permissions
+        /*
         try {
-            const { PostHog } = await Promise.resolve().then(() => require('posthog-node'));
+            const { PostHog } = await import('posthog-node');
             const phClient = new PostHog(posthogApiKey.value(), {
                 host: 'https://eu.i.posthog.com'
             });
+
             phClient.capture({
                 distinctId: 'partner_hunter_system',
                 event: 'partner_hunter_run',
@@ -197,12 +208,13 @@ exports.partnerHunter = (0, scheduler_1.onSchedule)({
                     timestamp: new Date().toISOString()
                 }
             });
+
             await phClient.shutdown();
             console.log('📊 Metrics logged to PostHog');
-        }
-        catch (e) {
+        } catch (e) {
             console.error('Failed to log to PostHog:', e);
         }
+        */
     }
 });
 //# sourceMappingURL=partnerHunter.js.map
