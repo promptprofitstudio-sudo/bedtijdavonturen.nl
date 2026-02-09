@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Button, Card, SectionTitle, Pill } from '@/components/ui'
@@ -13,7 +13,8 @@ import { RedeemCouponForm } from '@/components/RedeemCouponForm'
 import { getProfiles, deleteProfile } from '@/lib/firebase/db'
 import { ChildProfile } from '@/lib/types'
 
-export default function AccountPage() {
+// Component that uses searchParams - must be in Suspense
+function AccountPageContent() {
   const { user, loading, signInWithGoogle, signOut, db, initError, retryInit } = useAuth()
   const [profiles, setProfiles] = useState<ChildProfile[]>([])
   const searchParams = useSearchParams()
@@ -207,5 +208,18 @@ export default function AccountPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+// Wrap in Suspense to handle useSearchParams
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <main className="px-4 py-6 space-y-6">
+        <p className="text-center text-sm text-ink-500">Laden...</p>
+      </main>
+    }>
+      <AccountPageContent />
+    </Suspense>
   )
 }
