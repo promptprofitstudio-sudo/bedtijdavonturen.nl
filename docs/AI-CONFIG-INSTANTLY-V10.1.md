@@ -1,6 +1,6 @@
 # AI Context Configuration - Instantly.ai V10.1 Integration
 
-**Last Updated:** 2026-02-03  
+**Last Updated:** 2026-02-09  
 **Version:** V10.1  
 **Owner:** Michel Korpershoek / Antigravity AI
 
@@ -33,19 +33,32 @@ This document provides AI agents with critical context for working with the Inst
 
 ## 🔑 Campaign Details
 
-### Production Campaign
-- **Name:** `KDV_Outreach`
-- **ID Secret:** `INSTANTLY_CAMPAIGN_KDV` (Google Secret Manager)
+### Production Campaigns (All V10.1 Compliant)
+
+#### 1. KDV_Outreach
+- **ID Secret:** `INSTANTLY_CAMPAIGN_KDV`
 - **Campaign ID:** `fa2c0cdc-1147-4750-a74c-904b4b39e26f`
-- **Status:** ✅ V10.1 Compliant (validated Feb 3, 2026)
-- **Warmup Start:** Feb 2, 2026
-- **Warmup End:** Feb 24, 2026
-- **First Sends:** Feb 24, 2026
+- **Status:** ✅ V10.1 Compliant (audited Feb 9, 2026)
+- **Segment:** kdv_bso
+- **Warmup:** Feb 2 - Feb 24, 2026
 - **Daily Limit:** 30 leads
+
+#### 2. Pro_Outreach
+- **ID Secret:** `INSTANTLY_CAMPAIGN_PRO`
+- **Campaign ID:** `66361665-6bae-491e-b041-c64403e90f14`
+- **Status:** ✅ V10.1 Compliant (audited Feb 9, 2026)
+- **Segment:** pro, creator
+
+#### 3. School_Outreach
+- **ID Secret:** `INSTANTLY_CAMPAIGN_SCHOOL`
+- **Campaign ID:** `c73329c9-a7eb-4e86-b1ad-8d658815b057`
+- **Status:** ✅ V10.1 Compliant (audited Feb 9, 2026)
+- **Segment:** school
 
 ### Target Audience
 - Kinderopvangorganisaties (KDV)
 - Basisscholen  
+- Professionele partners
 - Locatie: Nederland
 - Contact: Directeuren, Pedagogisch medewerkers
 
@@ -296,13 +309,64 @@ A campaign is V10.1 compliant when:
 
 ---
 
+## ⚠️ Known Limitations
+
+### Timezone Restriction (As of Feb 9, 2026)
+
+**Issue:** Instantly.ai account restricted to `Etc/GMT+12` (UTC-12) timezone only.
+
+**Root Cause:** API rejects all standard Europe timezone formats:
+- `Europe/Amsterdam` ❌ Rejected
+- `Etc/GMT-1` (CET equivalent) ❌ Rejected
+- `CET` ❌ Rejected
+
+**Impact:** 13-hour offset from Netherlands (GMT+1)
+
+**Workaround Applied:** Business hours adjusted to compensate
+```
+Configured: 20:00-04:00 Etc/GMT+12
+Effective:  09:00-17:00 CET (correct NL business hours) ✅
+```
+
+**All Campaigns Updated (Feb 9, 2026):**
+- KDV_Outreach: 20:00-04:00 UTC-12 → 09:00-17:00 CET
+- Pro_Outreach: 20:00-04:00 UTC-12 → 09:00-17:00 CET
+- School_Outreach: 20:00-04:00 UTC-12 → 09:00-17:00 CET
+
+**Long-term Resolution Options:**
+1. Contact Instantly support to enable Europe timezones
+2. Upgrade account tier (if timezone is tier-restricted)
+3. Continue with current workaround (functional)
+
+**Script:** `scripts/apply-timezone-workaround.ts`
+
+---
+
+## 🎯 Success Criteria
+
+A campaign is V10.1 compliant when:
+- [x] 5 emails total
+- [x] Intervals: 0, 3, 6, 9, 14 days
+- [x] 7/7 custom variables present
+- [x] Stop on Reply enabled
+- [x] Email #1 has 2 A/B variants
+- [x] Follow-ups reference `{{subject_a}}` in subject
+- [x] Sends during NL business hours (09:00-17:00 CET)
+
+---
+
 ## 🔮 Future Enhancements
 
+### Completed (Feb 9, 2026)
+- ✅ School campaign (`INSTANTLY_CAMPAIGN_SCHOOL`) - V10.1 compliant
+- ✅ Pro campaign (`INSTANTLY_CAMPAIGN_PRO`) - V10.1 compliant
+- ✅ Timezone workaround for NL business hours
+- ✅ Legacy campaign cleanup
+
 ### Planned
-- School campaign (`INSTANTLY_CAMPAIGN_SCHOOL`)
-- Pro campaign (`INSTANTLY_CAMPAIGN_PRO`)
 - Reply tracking & CRM integration
 - UTM tracking for website clicks
+- Proper Europe timezone (pending Instantly support)
 
 ### Under Consideration
 - Dynamic interval adjustment based on engagement
