@@ -1,0 +1,63 @@
+{
+    "stop_on_reply": true,
+    "sequences": [
+        {
+            "steps": [
+                {
+                    "type": "email",
+                    "delay": 0,
+                    "variants": [
+                        {
+                            "subject": "{{subject_a}}",
+                            "body": "{{greeting}}\n\n{{body}}\n\n{{cta}}\n\n{{closing}}\n\n{{optout}}"
+                        },
+                        {
+                            "subject": "{{subject_b}}",
+                            "body": "{{greeting}}\n\n{{body}}\n\n{{cta}}\n\n{{closing}}\n\n{{optout}}"
+                        }
+                    ]
+                },
+                {
+                    "type": "email",
+                    "delay": 3,
+                    "variants": [
+                        {
+                            "subject": "Re: {{subject_a}}",
+                            "body": "Hoi,\n\nStuurde vorige week een korte vraag over oudercommunicatie.\n\nIk werk o.a. met KDV De Kleine Wereld en Basisschool 't Kompas—zij gebruiken de verhalen als avondritueel-tip voor ouders.\n\nZal ik 2 korte voorbeelden sturen?\n\nMichel"
+                        }
+                    ]
+                },
+                {
+                    "type": "email",
+                    "delay": 6,
+                    "variants": [
+                        {
+                            "subject": "Re: {{subject_a}}",
+                            "body": "Hoi,\n\nNog steeds geïnteresseerd in oudercommunicatie-tools?\n\nVeel scholen en KDV's sturen wekelijks een tip aan ouders via hun nieuwsbrief. Een gepersonaliseerd bedtijdverhaal werkt daar goed voor.\n\nInteresse?\n\nMichel"
+                        }
+                    ]
+                },
+                {
+                    "type": "email",
+                    "delay": 9,
+                    "variants": [
+                        {
+                            "subject": "Re: {{subject_a}}",
+                            "body": "Hoi,\n\nLaatste reminder over Bedtijdavonturen.\n\nAls het niet relevant is, helemaal prima—laat het me even weten, dan stop ik.\n\nAnders: zal ik voorbeelden sturen?\n\nMichel"
+                        }
+                    ]
+                },
+                {
+                    "type": "email",
+                    "delay": 14,
+                    "variants": [
+                        {
+                            "subject": "Re: {{subject_a}}",
+                            "body": "Hoi,\n\nIk stop met mailen—waarschijnlijk geen match op dit moment.\n\nMocht het in de toekomst wel interessant worden: michel@bedtijdavonturen.nl.\n\nSucces!\nMichel"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
