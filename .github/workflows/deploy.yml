@@ -43,5 +43,5 @@ jobs:
           export FIREBASE_CLI_EXPERIMENTS=webframeworks
           # Create .env file for Firebase Functions parameters (non-interactive mode)
           echo "PARTNER_HUNTER_DRY_RUN=true" > functions/.env.bedtijdavonturen-prod
-          npx firebase-tools deploy --project bedtijdavonturen-prod --non-interactive
+          npx firebase-tools deploy --project bedtijdavonturen-prod --non-interactive --force
 
