@@ -12,7 +12,7 @@
  */
 
 import * as functions from 'firebase-functions/v2';
-import { defineSecret } from 'firebase-functions/params';
+import { defineSecret, defineBoolean } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -25,7 +25,7 @@ const openaiApiKey = defineSecret('OPENAI_API_KEY');
 const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
 const instantlyCampaignRealtors = defineSecret('INSTANTLY_CAMPAIGN_REALTORS');
 
-const DRY_RUN = { value: () => false }; // FORCED PRODUCTION
+const DRY_RUN = defineBoolean('REALTOR_HUNTER_DRY_RUN', { default: true });
 
 export const realtorHunterV1 = functions.scheduler.onSchedule({
     schedule: 'every day 09:00',
@@ -154,7 +154,7 @@ async function phase1_discover(city: string, state: string, searchTerm: string) 
         'NC': 'North Carolina', 'TN': 'Tennessee', 'CO': 'Colorado',
         'NV': 'Nevada', 'ID': 'Idaho', 'UT': 'Utah', 'CA': 'California',
         'NY': 'New York', 'IL': 'Illinois', 'WA': 'Washington', 'OR': 'Oregon',
-        'SC': 'South Carolina'
+        'SC': 'South Carolina', 'NM': 'New Mexico', 'VA': 'Virginia', 'KY': 'Kentucky'
     };
     const fullState = STATE_NAMES[state] || state;
     
@@ -238,6 +238,15 @@ async function phase3_enrich(lead: any) {
         if (emails?.length > 0) {
             const personal = emails.find((e: any) => e.type === 'personal');
             const email = personal || emails[0];
+            
+            // Validate Hunter.io email score
+            const hunterScore = email.score || 0;
+            if (hunterScore < 70) {
+                // Skip low-quality emails
+                enriched.status = 'low_quality_email';
+                return enriched;
+            }
+            
             enriched.email = email.value;
             enriched.firstName = email.first_name;
             enriched.lastName = email.last_name;
@@ -255,6 +264,21 @@ async function phase3_enrich(lead: any) {
         if (mailto) {
             const email = mailto.replace('mailto:', '').split('?')[0];
             if (email?.includes('@')) {
+                // Verify scraped email with Hunter.io
+                try {
+                    const verifyResult = await axios.get(`https://api.hunter.io/v2/email-verifier?email=${email}&api_key=${hunterApiKey.value()}`);
+                    const verifyData = verifyResult.data;
+                    if (verifyData.data.status !== 'valid' || (verifyData.data.score || 0) < 70) {
+                        // Skip unverified or low-quality scraped emails
+                        enriched.status = 'unverified_email';
+                        return enriched;
+                    }
+                } catch {
+                    // If verification fails, skip this email
+                    enriched.status = 'verification_failed';
+                    return enriched;
+                }
+                
                 enriched.email = email;
                 enriched.enrichmentData.source = 'scrape';
                 enriched.enrichmentData.contactType = 'generic';
