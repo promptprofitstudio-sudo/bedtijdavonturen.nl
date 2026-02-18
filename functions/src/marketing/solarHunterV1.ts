@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions/v2';
-import { defineSecret } from 'firebase-functions/params';
+import { defineSecret, defineBoolean } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -14,15 +14,16 @@ const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
 const instantlyCampaignSolar = defineSecret('INSTANTLY_CAMPAIGN_SOLAR');
 
 // Safety Gate: Default to DRY_RUN unless explicitly disabled
-const DRY_RUN = { value: () => process.env.SOLAR_HUNTER_DRY_RUN !== 'false' };
+const DRY_RUN = defineBoolean('SOLAR_HUNTER_DRY_RUN', { 
+    description: 'Enable dry-run mode (no emails sent)',
+    default: true 
+});
 
 export const solarHunterV1 = functions.scheduler.onSchedule({
     schedule: '0 10 * * *',
     timeZone: 'UTC',
     secrets: [dataForSeoLogin, dataForSeoApiKey, hunterApiKey, openaiApiKey, instantlyApiKey, instantlyCampaignSolar],
     memory: '1GiB',
-    timeoutSeconds: 900
-}, async (event) => {
     timeoutSeconds: 900
 }, async (event) => {
     const db = admin.firestore();
@@ -135,7 +136,7 @@ async function processSearch(
                 console.log(`✍️  Personalized: ${personalized.messageKit?.subjectA}`);
 
                 // FASE 5: SEQUENCE
-                await fase5_sequence(personalized);
+                await fase5_sequence(personalized, db);
                 log.contacted++;
                 personalized.status = 'contacted';
                 personalized.contactedAt = admin.firestore.Timestamp.now();
@@ -165,20 +166,20 @@ async function fase1_discover(location: string, searchQuery: string) {
 
     // DataForSEO location codes for US states and cities
     const LOCATION_CODES: Record<string, number> = {
-        'California, USA': 2840,
+        'California, USA': 1023191,  // California state code
         'Los Angeles, California, USA': 1023191,
         'San Diego, California, USA': 1023768,
         'San Jose, California, USA': 1023782,
-        'Arizona, USA': 2840,
+        'Arizona, USA': 21148,  // Arizona state code
         'Phoenix, Arizona, USA': 1023511,
         'Tucson, Arizona, USA': 1026044,
-        'Texas, USA': 2840,
+        'Texas, USA': 21176,  // Texas state code
         'Houston, Texas, USA': 1023815,
-        'Dallas, Texas, USA': 1023191,
+        'Dallas, Texas, USA': 1023191,  // Dallas city code
         'Austin, Texas, USA': 1023108,
-        'Nevada, USA': 2840,
+        'Nevada, USA': 21140,  // Nevada state code
         'Las Vegas, Nevada, USA': 1023829,
-        'Florida, USA': 2840,
+        'Florida, USA': 21122,  // Florida state code
         'Miami, Florida, USA': 1015164,
         'Orlando, Florida, USA': 1023509
     };
@@ -206,7 +207,7 @@ async function fase1_discover(location: string, searchQuery: string) {
 }
 
 /**
- * FASE 2: Verify with Solar-Specific FitScore calculation (Threshold: 60)
+ * FASE 2: Verify with Solar-Specific FitScore calculation (Threshold: 70)
  */
 function fase2_verify(item: any, searchQuery: string) {
     const url = item.url || '';
@@ -233,7 +234,7 @@ function fase2_verify(item: any, searchQuery: string) {
         };
     }
 
-    // SOLAR FITSCORE CALCULATION (0-110 possible, threshold 60)
+    // SOLAR FITSCORE CALCULATION (0-110 possible, threshold 70)
     let fitScore = 0;
 
     // +30: Personal email (will be checked in enrichment phase, placeholder here)
@@ -276,7 +277,7 @@ function fase2_verify(item: any, searchQuery: string) {
         domain: extractDomain(url),
         url,
         fitScore,
-        status: fitScore >= 60 ? ('new' as const) : ('rejected' as const),
+        status: fitScore >= 70 ? ('new' as const) : ('rejected' as const),
         enrichmentData: {
             source: 'hunter' as const,
             contactType: 'form_only' as const,
@@ -350,6 +351,14 @@ async function fase3_enrich(lead: any) {
         if (hunterRes.data.data.emails && hunterRes.data.data.emails.length > 0) {
             const email = hunterRes.data.data.emails[0];
             
+            // Check Hunter.io score from domain search first
+            const domainSearchScore = email.score || 0;
+            if (domainSearchScore < 70) {
+                enriched.status = 'low_quality_email';
+                console.log(`  [Rail A] Hunter.io email score too low from domain search: ${domainSearchScore}`);
+                return enriched;
+            }
+            
             // Verify email quality via Hunter
             const verifyRes = await axios.get(
                 `https://api.hunter.io/v2/email-verifier?email=${email.value}&api_key=${hunterApiKey.value()}`
@@ -376,7 +385,7 @@ async function fase3_enrich(lead: any) {
                 console.log(`  [Rail A] Hunter.io: ${enriched.email} (score: ${hunterScore})`);
                 
                 // Re-check threshold after personal email bonus
-                if (enriched.fitScore < 60) {
+                if (enriched.fitScore < 70) {
                     enriched.status = 'rejected';
                     console.log(`  ⚠️  FitScore ${enriched.fitScore} below threshold after enrichment`);
                 }
@@ -417,7 +426,7 @@ async function fase3_enrich(lead: any) {
                         console.log(`  [Rail B] Scraped: ${enriched.email} (verified score: ${hunterScore})`);
                         
                         // Re-check threshold
-                        if (enriched.fitScore < 60) {
+                        if (enriched.fitScore < 70) {
                             enriched.status = 'rejected';
                             console.log(`  ⚠️  FitScore ${enriched.fitScore} below threshold after enrichment`);
                         }
@@ -605,7 +614,20 @@ REMINDERS
 /**
  * FASE 5: Sequence to Instantly.ai Solar Campaign
  */
-async function fase5_sequence(lead: any) {
+async function fase5_sequence(lead: any, db?: admin.firestore.Firestore) {
+    // Check for duplicate by domain
+    if (db) {
+        const existingLead = await db.collection('solar_leads')
+            .where('domain', '==', lead.domain)
+            .where('status', '==', 'contacted')
+            .limit(1)
+            .get();
+        
+        if (!existingLead.empty) {
+            console.log(`⚠️  Duplicate lead detected for domain ${lead.domain}, skipping Instantly push`);
+            throw new Error(`Duplicate lead: ${lead.domain} already contacted`);
+        }
+    }
     const payload = {
         campaign_id: instantlyCampaignSolar.value(),
         skip_if_in_workspace: true,
