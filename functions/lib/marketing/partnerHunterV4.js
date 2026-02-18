@@ -28,6 +28,11 @@ const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_API_KEY');
 const instantlyCampaignKdv = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_KDV'); // New: segment-specific campaigns
 const instantlyCampaignSchool = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_SCHOOL');
 const instantlyCampaignPro = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_PRO');
+// Safety Gate: Default to DRY_RUN unless explicitly disabled
+const DRY_RUN = (0, params_1.defineBoolean)('PARTNER_HUNTER_DRY_RUN', {
+    description: 'Enable dry-run mode (no actual API calls to Instantly)',
+    default: true // SAFE DEFAULT: prevents accidental sends
+});
 exports.partnerHunterV4 = functions.scheduler.onSchedule({
     schedule: 'every monday 09:00',
     timeZone: 'Europe/Amsterdam',
@@ -45,9 +50,11 @@ exports.partnerHunterV4 = functions.scheduler.onSchedule({
         personalized: 0,
         contacted: 0,
         rejected: 0,
-        errors: []
+        errors: [],
+        dryRun: DRY_RUN.value()
     };
-    console.log('🚀 Partner Growth Engine v4.0 - STARTING');
+    const runMode = DRY_RUN.value() ? '🧪 DRY-RUN' : '🚀 PRODUCTION';
+    console.log(`🚀 Partner Growth Engine v4.0 - ${runMode} MODE - STARTING`);
     // Configuration
     const SEARCH_CONFIGS = [
         { city: 'Amsterdam', term: 'Kinderopvang' },
@@ -554,23 +561,35 @@ async function fase5_sequence(lead) {
                 }
             }]
     };
-    try {
-        await axios_1.default.post('https://api.instantly.ai/api/v2/leads/add', payload, {
-            headers: {
-                'Authorization': `Bearer ${instantlyApiKey.value()}`,
-                'Content-Type': 'application/json'
-            }
-        });
+    // FASE 5: SEQUENCE - Add to Instantly.ai campaign
+    if (DRY_RUN.value()) {
+        // DRY-RUN MODE: Log what would be sent without actual API call
+        console.log(`🧪 DRY-RUN: Would add lead to campaign (segment: ${lead.segment})`);
+        console.log(`   📧 Email: ${lead.email}`);
+        console.log(`   🏢 Company: ${lead.companyName}`);
+        console.log(`   📝 Variables:`, Object.keys(payload.leads[0].custom_variables));
     }
-    catch (err) {
-        // Log full error for debugging
-        if (err.response) {
-            console.error('Instantly API Error:', {
-                status: err.response.status,
-                data: err.response.data
+    else {
+        // PRODUCTION MODE: Actual API call to Instantly.ai
+        try {
+            await axios_1.default.post('https://api.instantly.ai/api/v2/leads/add', payload, {
+                headers: {
+                    'Authorization': `Bearer ${instantlyApiKey.value()}`,
+                    'Content-Type': 'application/json'
+                }
             });
+            console.log(`✅ Lead added to segment ${lead.segment}: ${lead.email}`);
         }
-        throw new Error(`Instantly.ai push failed: ${err.message}`);
+        catch (err) {
+            // Log full error for debugging
+            if (err.response) {
+                console.error('Instantly API Error:', {
+                    status: err.response.status,
+                    data: err.response.data
+                });
+            }
+            throw new Error(`Instantly.ai push failed: ${err.message}`);
+        }
     }
 }
 /**
