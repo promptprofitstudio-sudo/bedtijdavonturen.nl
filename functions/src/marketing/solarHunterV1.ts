@@ -153,22 +153,68 @@ async function fase3_enrich(lead: any) {
     let fitScore = 0;
     const content = html.toLowerCase();
     const snippet = enriched.enrichmentData.snippet.toLowerCase();
+    const combined = content + ' ' + snippet;
     
+    // +15: HTTPS website (legitimate business)
     if (lead.url.startsWith('https://') && !lead.url.includes('facebook.com')) fitScore += 15;
-    if (enriched.enrichmentData.reviewCount >= 5) fitScore += 10;
-    if (content.includes('nabcep')) fitScore += 20;
     
-    const yearMatch = content.match(/since\s*(19|20)\d{2}|established\s*(19|20)\d{2}/i);
-    if (yearMatch) {
-        const year = parseInt(yearMatch[0].replace(/[^0-9]/g, ''));
-        if (new Date().getFullYear() - year >= 5) fitScore += 15;
+    // +10: Has reviews (active business)
+    if (enriched.enrichmentData.reviewCount >= 5) fitScore += 10;
+    
+    // +20: Certified/Licensed (NABCEP or general certification)
+    const certPatterns = ['nabcep', 'certified installer', 'licensed contractor', 'accredited', 'bonded and insured'];
+    if (certPatterns.some(p => combined.includes(p))) fitScore += 20;
+    
+    // +15: Years in business (5+ years) - LOOSER patterns
+    const yearPatterns = [
+        /since\s*(19|20)\d{2}/i,
+        /established\s*(19|20)\d{2}/i,
+        /founded\s*(19|20)\d{2}/i,
+        /(\d{1,2})\+?\s*years\s*(of\s*)?(experience|in business)/i,
+        /over\s*(\d{1,2})\s*years/i,
+        /family\s*owned\s*since\s*(19|20)\d{2}/i
+    ];
+    
+    for (const pattern of yearPatterns) {
+        const match = combined.match(pattern);
+        if (match) {
+            const yearOrDuration = match[1];
+            let years = 0;
+            
+            if (yearOrDuration && yearOrDuration.length === 4) {
+                // It's a year (e.g., 2010)
+                years = new Date().getFullYear() - parseInt(yearOrDuration);
+            } else if (yearOrDuration) {
+                // It's a duration (e.g., "15 years")
+                years = parseInt(yearOrDuration);
+            }
+            
+            if (years >= 5) {
+                fitScore += 15;
+                break;
+            }
+        }
     }
     
-    const solarKeywords = ['residential solar', 'home solar', 'rooftop solar', 'panel installation'];
-    if (solarKeywords.some(kw => content.includes(kw) || snippet.includes(kw))) fitScore += 15;
+    // +15: Solar focus (LOOSER - any solar installation/service mention)
+    const solarPatterns = [
+        'residential solar', 'home solar', 'rooftop solar', 'panel installation',
+        'solar installer', 'solar installation', 'solar panels', 'solar energy',
+        'solar system', 'solar power', 'photovoltaic', 'pv system'
+    ];
+    if (solarPatterns.some(kw => combined.includes(kw))) fitScore += 15;
     
-    if (snippet.includes('serving') || snippet.includes('service area')) fitScore += 10;
+    // +10: Service area mentioned (LOCAL business indicator)
+    const servicePatterns = [
+        'serving', 'service area', 'we serve', 'areas served',
+        'counties', 'cities', 'locations', 'coverage area'
+    ];
+    if (servicePatterns.some(p => combined.includes(p))) fitScore += 10;
+    
+    // +10: High rating (quality indicator)
     if (enriched.enrichmentData.rating >= 4.5) fitScore += 10;
+    
+    // +10: Personal email found (decision-maker access)
     if (isPersonalEmail) fitScore += 10;
 
     enriched.fitScore = fitScore;
