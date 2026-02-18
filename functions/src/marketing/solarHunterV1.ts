@@ -277,7 +277,7 @@ function fase2_verify(item: any, searchQuery: string) {
         domain: extractDomain(url),
         url,
         fitScore,
-        status: fitScore >= 70 ? ('new' as const) : ('rejected' as const),
+        status: fitScore >= 35 ? ('new' as const) : ('rejected' as const),
         enrichmentData: {
             source: 'hunter' as const,
             contactType: 'form_only' as const,
