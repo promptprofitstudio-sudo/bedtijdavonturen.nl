@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions/v2';
-import { defineSecret, defineBoolean } from 'firebase-functions/params';
+import { defineSecret, defineBoolean, defineNumber } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -17,6 +17,12 @@ const instantlyCampaignSolar = defineSecret('INSTANTLY_CAMPAIGN_SOLAR');
 const DRY_RUN = defineBoolean('SOLAR_HUNTER_DRY_RUN', { 
     description: 'Enable dry-run mode (no emails sent)',
     default: true 
+});
+
+// FitScore threshold - centralized configuration
+const FIT_SCORE_THRESHOLD = defineNumber('SOLAR_HUNTER_FIT_SCORE_THRESHOLD', {
+    description: 'Minimum FitScore for a lead to be considered (0-100)',
+    default: 35
 });
 
 export const solarHunterV1 = functions.scheduler.onSchedule({
@@ -277,7 +283,7 @@ function fase2_verify(item: any, searchQuery: string) {
         domain: extractDomain(url),
         url,
         fitScore,
-        status: fitScore >= 35 ? ('new' as const) : ('rejected' as const),
+        status: fitScore >= FIT_SCORE_THRESHOLD.value() ? ('new' as const) : ('rejected' as const),
         enrichmentData: {
             source: 'hunter' as const,
             contactType: 'form_only' as const,
@@ -385,7 +391,7 @@ async function fase3_enrich(lead: any) {
                 console.log(`  [Rail A] Hunter.io: ${enriched.email} (score: ${hunterScore})`);
                 
                 // Re-check threshold after personal email bonus
-                if (enriched.fitScore < 70) {
+                if (enriched.fitScore < FIT_SCORE_THRESHOLD.value()) {
                     enriched.status = 'rejected';
                     console.log(`  ⚠️  FitScore ${enriched.fitScore} below threshold after enrichment`);
                 }
@@ -426,7 +432,7 @@ async function fase3_enrich(lead: any) {
                         console.log(`  [Rail B] Scraped: ${enriched.email} (verified score: ${hunterScore})`);
                         
                         // Re-check threshold
-                        if (enriched.fitScore < 70) {
+                        if (enriched.fitScore < FIT_SCORE_THRESHOLD.value()) {
                             enriched.status = 'rejected';
                             console.log(`  ⚠️  FitScore ${enriched.fitScore} below threshold after enrichment`);
                         }
