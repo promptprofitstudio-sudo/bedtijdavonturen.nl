@@ -36,25 +36,25 @@ exports.solarHunterV1 = functions.scheduler.onSchedule({
     };
     console.log(`☀️ Solar Hunter V1 - ${DRY_RUN.value() ? 'DRY-RUN' : 'PRODUCTION'} MODE - STARTING`);
     const SEARCH_CONFIGS = [
-        { state: 'California', location: 'California, USA', query: 'solar installer' },
-        { state: 'Texas', location: 'Texas, USA', query: 'solar installer' },
-        { state: 'Arizona', location: 'Arizona, USA', query: 'solar installer' },
-        { state: 'Florida', location: 'Florida, USA', query: 'solar installer' },
+        { state: 'California', locationCode: 21137, query: 'solar installer' },
+        { state: 'Texas', locationCode: 21176, query: 'solar installer' },
+        { state: 'Arizona', locationCode: 21136, query: 'solar installer' },
+        { state: 'Florida', locationCode: 21142, query: 'solar installer' },
     ];
     for (const config of SEARCH_CONFIGS) {
         try {
-            await processSearch(config.location, config.query, config.state, db, log);
+            await processSearch(config.locationCode, config.query, config.state, db, log);
         }
         catch (err) {
-            log.errors.push(`${config.location}: ${err.message}`);
+            log.errors.push(`${config.state}: ${err.message}`);
         }
     }
     await db.collection('solar_hunter_runs').add(Object.assign(Object.assign({}, log), { completedAt: admin.firestore.FieldValue.serverTimestamp() }));
     console.log('✅ Solar Hunter V1 - COMPLETE', log);
 });
-async function processSearch(location, searchQuery, state, db, log) {
-    console.log(`\n=== Processing: ${location} - ${searchQuery} ===`);
-    const discoveries = await fase1_discover(location, searchQuery);
+async function processSearch(locationCode, searchQuery, state, db, log) {
+    console.log(`\n=== Processing: ${state} (${locationCode}) - ${searchQuery} ===`);
+    const discoveries = await fase1_discover(locationCode, searchQuery);
     log.discovered += discoveries.length;
     console.log(`📍 Discovered ${discoveries.length} businesses`);
     for (const item of discoveries) {
@@ -63,14 +63,14 @@ async function processSearch(location, searchQuery, state, db, log) {
             if (verification.status === 'rejected') {
                 log.rejected++;
                 console.log(`❌ Rejected (Excluded Domain): ${item.title}`);
-                await saveLead(db, Object.assign(Object.assign({}, verification), { location, state, searchQuery }));
+                await saveLead(db, Object.assign(Object.assign({}, verification), { state, searchQuery }));
                 continue;
             }
             const enriched = await fase3_enrich(verification);
             if (enriched.status === 'rejected') {
                 log.rejected++;
                 console.log(`❌ Rejected (Low FitScore): ${enriched.companyName} (FitScore: ${enriched.fitScore})`);
-                await saveLead(db, Object.assign(Object.assign({}, enriched), { location, state, searchQuery }));
+                await saveLead(db, Object.assign(Object.assign({}, enriched), { state, searchQuery }));
                 continue;
             }
             log.verified++;
@@ -93,11 +93,10 @@ async function processSearch(location, searchQuery, state, db, log) {
         }
     }
 }
-async function fase1_discover(location, searchQuery) {
+async function fase1_discover(locationCode, searchQuery) {
     var _a, _b, _c, _d, _e;
     const auth = Buffer.from(`${dataForSeoLogin.value()}:${dataForSeoApiKey.value()}`).toString('base64');
-    const response = await axios_1.default.post('https://api.dataforseo.com/v3/serp/google/maps/live/advanced', [{ location_name: location, keyword: searchQuery, language_code: "en" }], // Use full location string
-    { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } });
+    const response = await axios_1.default.post('https://api.dataforseo.com/v3/serp/google/maps/live/advanced', [{ location_code: locationCode, keyword: searchQuery, language_code: "en" }], { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } });
     return ((_e = (_d = (_c = (_b = (_a = response.data.tasks) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.result) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.items) === null || _e === void 0 ? void 0 : _e.filter((item) => item.url && item.title)) || [];
 }
 function fase2_verify(item) {

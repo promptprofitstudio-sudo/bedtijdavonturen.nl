@@ -37,17 +37,17 @@ export const solarHunterV1 = functions.scheduler.onSchedule({
     console.log(`☀️ Solar Hunter V1 - ${DRY_RUN.value() ? 'DRY-RUN' : 'PRODUCTION'} MODE - STARTING`);
     
     const SEARCH_CONFIGS = [
-        { state: 'California', location: 'California, USA', query: 'solar installer' },
-        { state: 'Texas', location: 'Texas, USA', query: 'solar installer' },
-        { state: 'Arizona', location: 'Arizona, USA', query: 'solar installer' },
-        { state: 'Florida', location: 'Florida, USA', query: 'solar installer' },
+        { state: 'California', locationCode: 21137, query: 'solar installer' },
+        { state: 'Texas', locationCode: 21176, query: 'solar installer' },
+        { state: 'Arizona', locationCode: 21136, query: 'solar installer' },
+        { state: 'Florida', locationCode: 21142, query: 'solar installer' },
     ];
 
     for (const config of SEARCH_CONFIGS) {
         try {
-            await processSearch(config.location, config.query, config.state, db, log);
+            await processSearch(config.locationCode, config.query, config.state, db, log);
         } catch (err: any) {
-            log.errors.push(`${config.location}: ${err.message}`);
+            log.errors.push(`${config.state}: ${err.message}`);
         }
     }
 
@@ -55,9 +55,9 @@ export const solarHunterV1 = functions.scheduler.onSchedule({
     console.log('✅ Solar Hunter V1 - COMPLETE', log);
 });
 
-async function processSearch(location: string, searchQuery: string, state: string, db: admin.firestore.Firestore, log: any) {
-    console.log(`\n=== Processing: ${location} - ${searchQuery} ===`);
-    const discoveries = await fase1_discover(location, searchQuery);
+async function processSearch(locationCode: number, searchQuery: string, state: string, db: admin.firestore.Firestore, log: any) {
+    console.log(`\n=== Processing: ${state} (${locationCode}) - ${searchQuery} ===`);
+    const discoveries = await fase1_discover(locationCode, searchQuery);
     log.discovered += discoveries.length;
     console.log(`📍 Discovered ${discoveries.length} businesses`);
 
@@ -67,7 +67,7 @@ async function processSearch(location: string, searchQuery: string, state: strin
             if (verification.status === 'rejected') {
                 log.rejected++;
                 console.log(`❌ Rejected (Excluded Domain): ${item.title}`);
-                await saveLead(db, { ...verification, location, state, searchQuery });
+                await saveLead(db, { ...verification, state, searchQuery });
                 continue;
             }
 
@@ -75,7 +75,7 @@ async function processSearch(location: string, searchQuery: string, state: strin
             if (enriched.status === 'rejected') {
                 log.rejected++;
                 console.log(`❌ Rejected (Low FitScore): ${enriched.companyName} (FitScore: ${enriched.fitScore})`);
-                await saveLead(db, { ...enriched, location, state, searchQuery });
+                await saveLead(db, { ...enriched, state, searchQuery });
                 continue;
             }
 
@@ -99,10 +99,10 @@ async function processSearch(location: string, searchQuery: string, state: strin
     }
 }
 
-async function fase1_discover(location: string, searchQuery: string) {
+async function fase1_discover(locationCode: number, searchQuery: string) {
     const auth = Buffer.from(`${dataForSeoLogin.value()}:${dataForSeoApiKey.value()}`).toString('base64');
     const response = await axios.post('https://api.dataforseo.com/v3/serp/google/maps/live/advanced',
-        [{ location_name: location, keyword: searchQuery, language_code: "en" }],  // Use full location string
+        [{ location_code: locationCode, keyword: searchQuery, language_code: "en" }],
         { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } }
     );
     return response.data.tasks?.[0]?.result?.[0]?.items?.filter((item: any) => item.url && item.title) || [];
