@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'app/**'
+      - 'functions/src/cron/**'
+      - 'functions/package*.json'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   build_and_deploy:
@@ -36,12 +41,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase (Everything)
+      - name: Deploy to Firebase (Product Only)
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BEDTIJDAVONTUREN_PROD }}' > "$HOME/gcp-key.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gcp-key.json"
           export FIREBASE_CLI_EXPERIMENTS=webframeworks
-          # Create .env file for Firebase Functions parameters (non-interactive mode)
-          echo "PARTNER_HUNTER_DRY_RUN=true" > functions/.env.bedtijdavonturen-prod
-          npx firebase-tools deploy --project bedtijdavonturen-prod --non-interactive --force
+          # Deploy ONLY hosting and product-specific functions (checkExpiredTrials)
+          npx firebase-tools deploy \
+            --project bedtijdavonturen-prod \
+            --only hosting,functions:checkExpiredTrials \
+            --non-interactive
 
