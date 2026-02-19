@@ -20,8 +20,8 @@ export default function PricingPage() {
       name: 'Weekend Pakket',
       price: '€2,99',
       period: 'eenmalig',
-      tagline: 'Ideaal voor logeren of oppas.',
-      features: ['3x Audio Generatie (Scherm uit)', 'Onbeperkt geldig', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
+      tagline: '3 bedtime stories — enough to get through sleepover drama',
+      features: ['3 Verhalen die niet verlopen', 'Perfect voor logeerpartijtjes of oppas', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
       variant: 'weekend',
       highlighted: false,
       buttonText: 'Start Now — 3 Stories for €2.99',
@@ -31,8 +31,8 @@ export default function PricingPage() {
       name: 'Rust & Regelmaat',
       price: '€7,99',
       period: '/ maand',
-      tagline: 'Elke dag een nieuw avontuur.',
-      features: ['Onbeperkt Audio 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Maandelijks opzegbaar'],
+      tagline: 'A new story every night — never use the same bedtime script twice',
+      features: ['Onbeperkt Audio 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Cancel anytime. No questions. No auto-renewal surprises.'],
       variant: 'default',
       highlighted: true,
       buttonText: 'Try Free for 7 Days',
@@ -42,8 +42,8 @@ export default function PricingPage() {
       name: 'Family',
       price: '€9,99',
       period: '/ maand',
-      tagline: 'Voor het hele gezin.',
-      features: ['Onbeperkt Audio 🎧', '5 Kindprofielen', 'Premium Stemmen', 'Opa & Oma luisteren mee'],
+      tagline: 'Bedtime peace for your whole house — even Grandma\'s got a story ready',
+      features: ['Onbeperkt Audio 🎧', '5 Kindprofielen', 'Premium Stemmen', 'Grandparents can listen & read along from their own home — bonding made easy'],
       variant: 'default',
       highlighted: false,
       buttonText: 'Unlock Family Plan',
@@ -87,7 +87,7 @@ export default function PricingPage() {
   return (
     <main className="px-4 py-6 space-y-6">
       <header className="space-y-2">
-        <SectionTitle title="Kies je plan" subtitle="Investeer in magische momenten." />
+        <SectionTitle title="Kies je plan" subtitle="Stop fighting bedtime. Start enjoying it." />
       </header>
 
       {/* [NEW] Trial Status Banner */}

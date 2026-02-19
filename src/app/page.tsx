@@ -29,7 +29,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-4 relative z-10 max-w-sm mx-auto">
             <div className="inline-flex items-center self-center gap-2 bg-white/80 dark:bg-white/10 px-3 py-1 rounded-full border border-orange-200 dark:border-purple-400/30">
               <span className="material-symbols-outlined text-primary !text-sm">verified_user</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">100% Kindvriendelijk & Veilig</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">No Ads. No Tracking. No Surprises.</span>
             </div>
             <h1 className="text-[#141118] dark:text-white text-[2.5rem] font-black leading-[1.1] tracking-[-0.03em]">
               Jouw rustige avondritueel begint hier.
@@ -92,20 +92,59 @@ export default function HomePage() {
 
       {/* Social Proof */}
       <section className="px-6 py-12 bg-accent-orange/10 dark:bg-white/5 my-8">
-        <div className="max-w-md mx-auto text-center space-y-6">
-          <div className="flex justify-center text-orange-400 gap-1">
-            {'★★★★★'.split('').map((s, i) => <span key={i} className="text-xl">{s}</span>)}
-          </div>
-          <p className="text-xl font-bold font-serif italic text-gray-700 dark:text-gray-200 leading-relaxed">
-            &ldquo;Eerst was bedtijd een strijd, nu vraagt Luuk (5) zelf om &apos;de uil&apos;. Binnen 5 minuten is hij vertrokken. Echt een aanrader!&rdquo;
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6bbBVRCAAVnM1UaAZeQBDBgsnQ7TGNQlVFfhKdXKIHEw19jBpO63n5j45H1kC9JSlqab9vLJUL0XhTNI10SHZj59gDn2pwc-c2KlIIOr5r8wI3DnvrK6WZs0iYW2_LPRZU706d9Xy0WOzwvoG7hLksUJXXHpQ77xqUAmzlJ4iHqSSv6zMqrBElx6SG3wKLMAqxaMYsIqspBtc3iDXNh8epHb8FpBnLVvylCyRuceT498w_2kuB1x8yI3IxJIeBizzTDkKdrsPi4s" alt="Sanne" className="object-cover w-full h-full" />
+        <div className="max-w-2xl mx-auto space-y-8">
+          <h2 className="text-center text-2xl font-bold text-[#141118] dark:text-white mb-8">Ouders vertrouwen ons</h2>
+          
+          {/* Testimonial 1 */}
+          <div className="text-center space-y-6">
+            <div className="flex justify-center text-orange-400 gap-1">
+              {'★★★★★'.split('').map((s, i) => <span key={i} className="text-xl">{s}</span>)}
             </div>
-            <div className="text-left">
-              <p className="text-sm font-extrabold text-[#141118] dark:text-white">Sanne</p>
-              <p className="text-xs text-gray-500 font-bold uppercase">Moeder van Luuk</p>
+            <p className="text-lg font-bold font-serif italic text-gray-700 dark:text-gray-200 leading-relaxed max-w-sm mx-auto">
+              &ldquo;Eerst was bedtijd een strijd (45 minuten!), nu vraagt Luuk (5) zelf om &apos;de uil&apos;. Binnen 10 minuten ligt hij te slapen. Echt een aanrader!&rdquo;
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6bbBVRCAAVnM1UaAZeQBDBgsnQ7TGNQlVFfhKdXKIHEw19jBpO63n5j45H1kC9JSlqab9vLJUL0XhTNI10SHZj59gDn2pwc-c2KlIIOr5r8wI3DnvrK6WZs0iYW2_LPRZU706d9Xy0WOzwvoG7hLksUJXXHpQ77xqUAmzlJ4iHqSSv6zMqrBElx6SG3wKLMAqxaMYsIqspBtc3iDXNh8epHb8FpBnLVvylCyRuceT498w_2kuB1x8yI3IxJIeBizzTDkKdrsPi4s" alt="Sanne" className="object-cover w-full h-full" />
+              </div>
+              <div className="text-left">
+                <p className="text-sm font-extrabold text-[#141118] dark:text-white">Sanne Amsterdam</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">Moeder van Luuk (5)</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testimonial 2 */}
+          <div className="text-center space-y-6">
+            <div className="flex justify-center text-orange-400 gap-1">
+              {'★★★★★'.split('').map((s, i) => <span key={i} className="text-xl">{s}</span>)}
+            </div>
+            <p className="text-lg font-bold font-serif italic text-gray-700 dark:text-gray-200 leading-relaxed max-w-sm mx-auto">
+              &ldquo;Ik voelde me schuldig omdat ik niet altijd zelf kon voorlezen. Met Bedtijdavonturen heb ik die druk van mezelf afgenomen. De verhalen zijn echt mooi geschreven en mijn kinderen houden ervan.&rdquo;
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-300"></div>
+              <div className="text-left">
+                <p className="text-sm font-extrabold text-[#141118] dark:text-white">Maria Rotterdam</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">Moeder van 2</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Testimonial 3 */}
+          <div className="text-center space-y-6">
+            <div className="flex justify-center text-orange-400 gap-1">
+              {'★★★★★'.split('').map((s, i) => <span key={i} className="text-xl">{s}</span>)}
+            </div>
+            <p className="text-lg font-bold font-serif italic text-gray-700 dark:text-gray-200 leading-relaxed max-w-sm mx-auto">
+              &ldquo;Als opa, vind ik het geweldig dat ik via Bedtijdavonturen uit het buitenland mijn kleinzonen nog kan voorlezen. Het voelt als een echte bedtijdgebeurtenis, ook al zijn we niet in dezelfde kamer.&rdquo;
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-300"></div>
+              <div className="text-left">
+                <p className="text-sm font-extrabold text-[#141118] dark:text-white">Thomas</p>
+                <p className="text-xs text-gray-500 font-bold uppercase">Großvater aus Hamburg</p>
+              </div>
             </div>
           </div>
         </div>
