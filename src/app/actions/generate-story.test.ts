@@ -26,15 +26,23 @@ vi.mock('posthog-node', () => ({
 }))
 
 vi.mock('@/lib/firebase/admin', () => ({
+    FIREBASE_PROJECT_ID: 'bedtijdavonturen-prod',
     getAdminDb: vi.fn(async () => ({
         collection: (name: string) => {
             if (name === 'stories') {
                 return { add: mockAdd }
             }
+            if (name === 'users') {
+                return {
+                    doc: (userId: string) => ({
+                        get: vi.fn().mockResolvedValue({
+                            data: () => ({ credits: 10, subscriptionStatus: 'active' })
+                        }),
+                        update: vi.fn().mockResolvedValue(undefined)
+                    })
+                }
+            }
             return {}
-        },
-        app: {
-            options: { projectId: 'test-project' }
         }
     }))
 }))
@@ -47,6 +55,8 @@ vi.mock('@/lib/secrets', () => ({
 describe('generateStoryAction', () => {
     beforeEach(() => {
         vi.clearAllMocks()
+        // Ensure TEST_MODE is off so mocks are actually used
+        delete process.env.TEST_MODE
     })
 
     it('validates input and generates a story', async () => {
@@ -62,6 +72,7 @@ describe('generateStoryAction', () => {
 
         expect(result.success).toBe(true)
         expect(result.storyId).toBe('new-story-id')
+        expect(result.debugProject).toBe('bedtijdavonturen-prod')
         expect(mockAdd).toHaveBeenCalledTimes(1)
 
         // precise verification of storage

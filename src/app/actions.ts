@@ -139,10 +139,9 @@ export async function generateStoryAction(formData: FormData) {
         }
 
         // 6. Return Success
-        // @ts-ignore
-        const currentProject = adminDb.app?.options?.projectId || 'unknown'
-        console.log(`[GenerateAction] Success. ID: ${docRef.id}, Project: ${currentProject}`)
-        return { success: true, storyId: docRef.id, debugProject: currentProject }
+        const { FIREBASE_PROJECT_ID } = await import('@/lib/firebase/admin')
+        console.log(`[GenerateAction] Success. ID: ${docRef.id}, Project: ${FIREBASE_PROJECT_ID}`)
+        return { success: true, storyId: docRef.id, debugProject: FIREBASE_PROJECT_ID }
     } catch (error) {
         console.error('Story generation failed:', error)
         const message = error instanceof Error ? error.message : 'Onbekende fout'

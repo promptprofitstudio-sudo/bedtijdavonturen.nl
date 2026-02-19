@@ -4,6 +4,13 @@ import { getFirestore } from 'firebase-admin/firestore'
 const ADMIN_APP_NAME = 'bedtijd-admin-v2'
 
 /**
+ * Firebase project ID - exported as constant to ensure consistency across the app
+ * This should match the FIREBASE_PROJECT_ID env var in production, but we hardcode
+ * it here as a fallback since ADC handles authentication automatically.
+ */
+export const FIREBASE_PROJECT_ID = 'bedtijdavonturen-prod'
+
+/**
  * Get or initialize Firebase Admin app using Application Default Credentials (ADC)
  * 
  * In production (Cloud Run), the service account is automatically available via ADC.
@@ -22,7 +29,7 @@ export async function getAdminApp(): Promise<App> {
 
     console.log(`[Admin] Initializing app: ${ADMIN_APP_NAME} with ADC...`)
 
-    const projectId = 'bedtijdavonturen-prod'
+    const projectId = FIREBASE_PROJECT_ID
 
     // Simple configuration - let ADC handle authentication
     const options = {
@@ -31,7 +38,7 @@ export async function getAdminApp(): Promise<App> {
     }
 
     const app = initializeApp(options, ADMIN_APP_NAME)
-    console.log(`[Admin] ✓ Initialized with project: ${projectId} (using ADC)`)
+    console.log(`[Admin] ✓ Initialized with project: ${FIREBASE_PROJECT_ID} (using ADC)`)
 
     return app
 }
