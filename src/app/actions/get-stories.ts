@@ -25,11 +25,12 @@ export async function getUserStories(userId: string): Promise<Story[]> {
 
         return snapshot.docs.map(doc => {
             const data = doc.data()
+            // Convert Firestore Timestamp to ISO string for JSON serialization
+            const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt)
             return {
                 id: doc.id,
                 ...data,
-                // Ensure dates are serializable
-                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt),
+                createdAt: createdAt.toISOString(),
             } as Story
         })
     } catch (error) {
