@@ -12,7 +12,7 @@ const dataForSeoLogin = (0, params_1.defineSecret)('DATAFORSEO_LOGIN');
 const dataForSeoApiKey = (0, params_1.defineSecret)('DATAFORSEO_API_KEY');
 const hunterApiKey = (0, params_1.defineSecret)('HUNTER_API_KEY');
 const openaiApiKey = (0, params_1.defineSecret)('OPENAI_API_KEY');
-const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_API_KEY');
+const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_KEY');
 const instantlyCampaignId = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_ID');
 // TODO: Re-enable PostHog monitoring after fixing IAM permissions in CI/CD
 // const posthogApiKey = defineSecret('POSTHOG_PERSONAL_API_KEY');

@@ -12,7 +12,7 @@ const dataForSeoLogin = (0, params_1.defineSecret)('DATAFORSEO_LOGIN');
 const dataForSeoApiKey = (0, params_1.defineSecret)('DATAFORSEO_API_KEY');
 const hunterApiKey = (0, params_1.defineSecret)('HUNTER_API_KEY');
 const openaiApiKey = (0, params_1.defineSecret)('OPENAI_API_KEY');
-const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_API_KEY');
+const instantlyApiKey = (0, params_1.defineSecret)('INSTANTLY_KEY');
 const instantlyCampaignSolar = (0, params_1.defineSecret)('INSTANTLY_CAMPAIGN_SOLAR');
 // Config
 const DRY_RUN = (0, params_1.defineBoolean)('SOLAR_HUNTER_DRY_RUN', { default: true });

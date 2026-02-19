@@ -10,7 +10,7 @@ const dataForSeoLogin = defineSecret('DATAFORSEO_LOGIN');
 const dataForSeoApiKey = defineSecret('DATAFORSEO_API_KEY');
 const hunterApiKey = defineSecret('HUNTER_API_KEY');
 const openaiApiKey = defineSecret('OPENAI_API_KEY');
-const instantlyApiKey = defineSecret('INSTANTLY_API_KEY');
+const instantlyApiKey = defineSecret('INSTANTLY_KEY');
 const instantlyCampaignSolar = defineSecret('INSTANTLY_CAMPAIGN_SOLAR');
 
 // Config
