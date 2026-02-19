@@ -1,5 +1,5 @@
 import * as functions from 'firebase-functions/v2';
-import { defineSecret, defineBoolean, defineNumber } from 'firebase-functions/params';
+import { defineSecret, defineBoolean } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -15,7 +15,7 @@ const instantlyCampaignSolar = defineSecret('INSTANTLY_CAMPAIGN_SOLAR');
 
 // Config
 const DRY_RUN = defineBoolean('SOLAR_HUNTER_DRY_RUN', { default: true });
-const FIT_SCORE_THRESHOLD = defineNumber('SOLAR_HUNTER_FIT_SCORE_THRESHOLD', { default: 25 });
+const FIT_SCORE_THRESHOLD = 25; // Lowered from 35 to match actual legitimate installer scores
 
 export const solarHunterV1 = functions.scheduler.onSchedule({
     schedule: '0 10 * * *',
@@ -192,7 +192,6 @@ async function fase3_enrich(lead: any) {
         /family\s*owned\s*since\s*(19|20)\d{2}/i
     ];
     
-    let yearsMatched = false;
     for (const pattern of yearPatterns) {
         const match = combined.match(pattern);
         if (match) {
@@ -210,7 +209,6 @@ async function fase3_enrich(lead: any) {
             if (years >= 5) {
                 fitScore += 15;
                 scoreBreakdown.push(`+15 Years (${years}y)`);
-                yearsMatched = true;
                 break;
             }
         }
@@ -252,16 +250,17 @@ async function fase3_enrich(lead: any) {
     }
 
     // Log final score breakdown
-    const passStatus = fitScore >= FIT_SCORE_THRESHOLD.value() ? '✅ PASS' : '❌ FAIL';
-    console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - FitScore: ${fitScore}/${FIT_SCORE_THRESHOLD.value()} ${passStatus}`);
+    const passStatus = fitScore >= FIT_SCORE_THRESHOLD ? '✅ PASS' : '❌ FAIL';
+    console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - FitScore: ${fitScore}/${FIT_SCORE_THRESHOLD} ${passStatus}`);
     console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - Breakdown: ${scoreBreakdown.length > 0 ? scoreBreakdown.join(', ') : 'NO POINTS AWARDED'}`);
 
     enriched.fitScore = fitScore;
-    enriched.status = fitScore >= FIT_SCORE_THRESHOLD.value() ? 'enriched' : 'rejected';
+    enriched.status = fitScore >= FIT_SCORE_THRESHOLD ? 'enriched' : 'rejected';
     return enriched;
 }
 
-function extractSolarFactPack(html: string): string[] {
+// @ts-ignore - Reserved for future use
+function _extractSolarFactPack(html: string): string[] {
     const $ = cheerio.load(html);
     const facts: string[] = [];
     const SOLAR_KEYWORDS = ['residential solar', 'home solar', 'rooftop', 'panel installation', 'solar financing', 'tax credit', 'warranty', 'monitoring', 'battery storage', 'powerwall', 'nabcep', 'certified', 'licensed', 'insured'];
