@@ -78,7 +78,7 @@ export function EmailLoginForm() {
                     variant="ghost"
                     size="md"
                     onClick={() => setIsRegister(!isRegister)}
-                    className="ml-1 text-teal-600 font-bold underline hover:bg-transparent hover:text-teal-700 h-auto px-1 py-0"
+                    className="ml-1 text-teal-600 font-bold underline hover:bg-transparent hover:text-teal-700"
                     type="button"
                 >
                     {isRegister ? 'Log in' : 'Maak account'}

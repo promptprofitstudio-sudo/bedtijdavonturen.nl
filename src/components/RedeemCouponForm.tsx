@@ -49,7 +49,7 @@ export function RedeemCouponForm() {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     placeholder="Bijv. KDV-ZON"
-                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 outline-none uppercase"
+                    className="flex-1 rounded-lg border border-slate-300 px-3 py-3 text-sm focus:ring-2 focus:ring-teal-500 outline-none uppercase min-h-12"
                     disabled={loading}
                 />
                 <Button

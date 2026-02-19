@@ -59,9 +59,11 @@ export function GenerateAudioButton({
                     <span className="text-sm text-navy-200">Gebruik mijn stem</span>
                     <button
                         onClick={() => setUseCustomVoice(!useCustomVoice)}
-                        className={`w-12 h-6 rounded-full transition-colors relative ${useCustomVoice ? 'bg-teal-500' : 'bg-navy-600'}`}
+                        className={`w-14 h-8 rounded-full transition-colors relative min-h-12 flex items-center px-1 ${useCustomVoice ? 'bg-teal-500' : 'bg-navy-600'}`}
+                        aria-pressed={useCustomVoice}
+                        aria-label="Schakel tussen mijn stem en standaard stem"
                     >
-                        <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${useCustomVoice ? 'translate-x-6' : 'translate-x-0'}`} />
+                        <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${useCustomVoice ? 'translate-x-6' : 'translate-x-0'}`} />
                     </button>
                 </div>
             )}

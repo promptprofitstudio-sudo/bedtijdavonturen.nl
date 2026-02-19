@@ -12,7 +12,7 @@ export function GoogleSignInButton({ className, variant = 'light', ...props }: G
         <button
             type="button"
             className={cn(
-                "flex items-center justify-center gap-3 w-full rounded-md px-1 py-1 transition-all duration-200 group relative overflow-hidden",
+                "flex items-center justify-center gap-3 w-full rounded-md px-4 py-3 transition-all duration-200 group relative overflow-hidden min-h-12",
                 variant === 'light'
                     ? "bg-white text-gray-500 hover:bg-gray-50 border border-gray-200 shadow-sm"
                     : "bg-[#4285F4] text-white hover:bg-[#3367D6] shadow-md",

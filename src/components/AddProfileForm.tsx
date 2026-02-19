@@ -111,7 +111,7 @@ export function ProfileForm({ onSuccess, onCancel, initialData }: ProfileFormPro
                             key={a}
                             type="button"
                             onClick={() => setAvatar(a)}
-                            className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-transform ${avatar === a
+                            className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-transform ${avatar === a
                                 ? 'bg-primary-100 ring-2 ring-primary-500 scale-110'
                                 : 'bg-moon-50 hover:bg-moon-100'
                                 }`}

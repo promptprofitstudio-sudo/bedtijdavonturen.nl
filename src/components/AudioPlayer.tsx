@@ -138,7 +138,7 @@ export function AudioPlayer({ title, src }: { title: string; src?: string }) {
           <Button
             variant="ghost"
             onClick={() => setScreenOff(true)}
-            className="flex items-center gap-2 px-4 h-10 py-2 text-sm font-medium text-navy-600 bg-navy-50 rounded-full hover:bg-navy-100"
+            className="flex items-center gap-2 px-4 h-12 py-2 text-sm font-medium text-navy-600 bg-navy-50 rounded-full hover:bg-navy-100"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" /><path d="M8.5 8.5a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5Z" /></svg>
             Scherm uit
