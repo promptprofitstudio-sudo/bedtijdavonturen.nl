@@ -19,7 +19,7 @@
     "@ducanh2912/next-pwa": "^10.2.9",
     "@google-cloud/secret-manager": "^6.1.1",
     "@types/canvas-confetti": "^1.9.0",
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
     "canvas-confetti": "^1.9.4",
     "dotenv": "^17.2.3",
     "elevenlabs": "^1.59.0",
