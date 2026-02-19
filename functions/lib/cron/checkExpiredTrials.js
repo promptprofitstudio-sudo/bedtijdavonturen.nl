@@ -4,7 +4,7 @@ exports.checkExpiredTrials = void 0;
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 exports.checkExpiredTrials = (0, scheduler_1.onSchedule)({
-    schedule: "every day 04:00",
+    schedule: "every day 04:00", // Run at 4 AM
     timeZone: "Europe/Amsterdam",
     timeoutSeconds: 300,
     memory: "256MiB",
