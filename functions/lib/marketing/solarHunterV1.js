@@ -96,7 +96,8 @@ async function processSearch(location, searchQuery, state, db, log) {
 async function fase1_discover(location, searchQuery) {
     var _a, _b, _c, _d, _e;
     const auth = Buffer.from(`${dataForSeoLogin.value()}:${dataForSeoApiKey.value()}`).toString('base64');
-    const response = await axios_1.default.post('https://api.dataforseo.com/v3/serp/google/maps/live/advanced', [{ location_name: location.split(',')[0], keyword: searchQuery, language_code: "en" }], { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } });
+    const response = await axios_1.default.post('https://api.dataforseo.com/v3/serp/google/maps/live/advanced', [{ location_name: location, keyword: searchQuery, language_code: "en" }], // Use full location string
+    { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } });
     return ((_e = (_d = (_c = (_b = (_a = response.data.tasks) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.result) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.items) === null || _e === void 0 ? void 0 : _e.filter((item) => item.url && item.title)) || [];
 }
 function fase2_verify(item) {

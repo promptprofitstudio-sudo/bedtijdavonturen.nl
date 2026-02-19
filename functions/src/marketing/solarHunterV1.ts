@@ -102,7 +102,7 @@ async function processSearch(location: string, searchQuery: string, state: strin
 async function fase1_discover(location: string, searchQuery: string) {
     const auth = Buffer.from(`${dataForSeoLogin.value()}:${dataForSeoApiKey.value()}`).toString('base64');
     const response = await axios.post('https://api.dataforseo.com/v3/serp/google/maps/live/advanced',
-        [{ location_name: location.split(',')[0], keyword: searchQuery, language_code: "en" }],
+        [{ location_name: location, keyword: searchQuery, language_code: "en" }],  // Use full location string
         { headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/json' } }
     );
     return response.data.tasks?.[0]?.result?.[0]?.items?.filter((item: any) => item.url && item.title) || [];
