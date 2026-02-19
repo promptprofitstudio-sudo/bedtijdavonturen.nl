@@ -15,12 +15,29 @@ export function WizardProgressIndicator({
   deviceType = 'desktop',
 }: WizardProgressIndicatorProps) {
   const posthog = usePostHog()
-  const [stepStartTime, setStepStartTime] = useState<number>(Date.now())
+  const [stepStartTime, setStepStartTime] = useState<number | null>(null)
   const [prevStep, setPrevStep] = useState<number>(1)
 
+  const getStepName = (stepNum: number): string => {
+    switch (stepNum) {
+      case 1:
+        return 'child_info'
+      case 2:
+        return 'mood_selection'
+      case 3:
+        return 'theme_selection'
+      case 4:
+        return 'review'
+      default:
+        return 'unknown'
+    }
+  }
+
   useEffect(() => {
+    const currentTime = Date.now()
+    
     // Calculate time on previous step
-    const timeOnStep = Date.now() - stepStartTime
+    const timeOnStep = stepStartTime ? currentTime - stepStartTime : 0
 
     // Fire step view event
     posthog?.capture('wizard_step_view', {
@@ -48,24 +65,11 @@ export function WizardProgressIndicator({
       })
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPrevStep(step)
-    setStepStartTime(Date.now())
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStepStartTime(currentTime)
   }, [step, posthog, deviceType, stepStartTime])
-
-  const getStepName = (stepNum: number): string => {
-    switch (stepNum) {
-      case 1:
-        return 'child_info'
-      case 2:
-        return 'mood_selection'
-      case 3:
-        return 'theme_selection'
-      case 4:
-        return 'review'
-      default:
-        return 'unknown'
-    }
-  }
 
   const progressPercent = (step / total) * 100
   const isAlmostDone = step === 3

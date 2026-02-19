@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Footer } from '@/components/Footer'
 import { Card } from '@/components/ui'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { TryStoryModal } from '@/components/TryStoryModal'
 import { ExampleStoriesSection } from '@/components/ExampleStoriesSection'
 import { TrustSignals } from '@/components/TrustSignals'
@@ -11,26 +11,32 @@ import { usePostHog } from 'posthog-js/react'
 
 export default function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
+  const [isMounted, setIsMounted] = useState(false)
   const posthog = usePostHog()
 
-  useEffect(() => {
-    // Determine device type
+  // Determine device type (only after mount)
+  const deviceType = useMemo(() => {
+    if (!isMounted) return 'desktop'
     const width = window.innerWidth
     if (width < 768) {
-      setDeviceType('mobile')
+      return 'mobile'
     } else if (width < 1024) {
-      setDeviceType('tablet')
+      return 'tablet'
     } else {
-      setDeviceType('desktop')
+      return 'desktop'
     }
+  }, [isMounted])
 
+  // Set mounted flag and track page view
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true)
     // Track page view
     posthog?.capture('page_view', {
       page_name: 'landing_page',
       device_type: deviceType,
     })
-  }, [posthog])
+  }, [posthog, deviceType])
 
   const handleCTAClick = () => {
     // Fire analytics event

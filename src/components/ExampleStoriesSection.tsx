@@ -102,7 +102,7 @@ export function ExampleStoriesSection({
                 <div className="space-y-3">
                   {/* Story Snippet */}
                   <p className="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">
-                    "{story.snippet}"
+                    &quot;{story.snippet}&quot;
                   </p>
 
                   {/* Age Badge & Tone Tags */}

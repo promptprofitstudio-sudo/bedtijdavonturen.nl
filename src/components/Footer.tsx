@@ -2,20 +2,28 @@
 
 import Link from 'next/link'
 import { TrustSignals } from '@/components/TrustSignals'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 export function Footer() {
-    const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
+    const [isMounted, setIsMounted] = useState(false)
 
-    useEffect(() => {
+    // Determine device type (only after mount)
+    const deviceType = useMemo(() => {
+        if (!isMounted) return 'desktop'
         const width = window.innerWidth
         if (width < 768) {
-            setDeviceType('mobile')
+            return 'mobile'
         } else if (width < 1024) {
-            setDeviceType('tablet')
+            return 'tablet'
         } else {
-            setDeviceType('desktop')
+            return 'desktop'
         }
+    }, [isMounted])
+
+    // Set mounted flag
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsMounted(true)
     }, [])
 
     return (

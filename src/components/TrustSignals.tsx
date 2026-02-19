@@ -15,10 +15,11 @@ export function TrustSignals({
   const posthog = usePostHog()
   const [parentCount, setParentCount] = useState<number | null>(null)
   const [storiesCount, setStoriesCount] = useState<number | null>(null)
-  const [lastUpdateTime, setLastUpdateTime] = useState<number>(Date.now())
 
   // Load counters on mount and set up polling
   useEffect(() => {
+    const startTime = Date.now()
+    
     const loadCounters = async () => {
       try {
         // Load parent count
@@ -34,7 +35,7 @@ export function TrustSignals({
             counter_type: 'parents',
             initial_value: data.count || 2341,
             device_type: deviceType,
-            api_response_time_ms: Date.now() - lastUpdateTime,
+            api_response_time_ms: Date.now() - startTime,
           })
         } else {
           // Fallback
@@ -59,7 +60,7 @@ export function TrustSignals({
             counter_type: 'daily_stories',
             initial_value: data.count || 1243,
             device_type: deviceType,
-            api_response_time_ms: Date.now() - lastUpdateTime,
+            api_response_time_ms: Date.now() - startTime,
           })
         } else {
           // Fallback
