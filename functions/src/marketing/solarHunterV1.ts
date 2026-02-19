@@ -15,7 +15,7 @@ const instantlyCampaignSolar = defineSecret('INSTANTLY_CAMPAIGN_SOLAR');
 
 // Config
 const DRY_RUN = defineBoolean('SOLAR_HUNTER_DRY_RUN', { default: true });
-const FIT_SCORE_THRESHOLD = defineNumber('SOLAR_HUNTER_FIT_SCORE_THRESHOLD', { default: 35 });
+const FIT_SCORE_THRESHOLD = defineNumber('SOLAR_HUNTER_FIT_SCORE_THRESHOLD', { default: 25 });
 
 export const solarHunterV1 = functions.scheduler.onSchedule({
     schedule: '0 10 * * *',
@@ -135,7 +135,11 @@ async function fase3_enrich(lead: any) {
     try {
         const response = await axios.get(lead.url, { timeout: 10000, headers: { 'User-Agent': 'Mozilla/5.0' } });
         html = response.data;
-    } catch (err) { console.warn(`Scraping failed for ${lead.domain}`); }
+        console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - HTML length: ${html.length} chars`);
+    } catch (err) { 
+        console.warn(`Scraping failed for ${lead.domain}`); 
+        console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - Scraping FAILED, HTML length: 0`);
+    }
 
     try {
         const hunterRes = await axios.get(`https://api.hunter.io/v2/domain-search?domain=${lead.domain}&api_key=${hunterApiKey.value()}`);
@@ -151,19 +155,32 @@ async function fase3_enrich(lead: any) {
     } catch (err) { console.warn(`Hunter.io failed for ${lead.domain}`); }
 
     let fitScore = 0;
+    const scoreBreakdown: string[] = [];
     const content = html.toLowerCase();
     const snippet = enriched.enrichmentData.snippet.toLowerCase();
     const combined = content + ' ' + snippet;
     
+    console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - Snippet length: ${snippet.length} chars, Combined length: ${combined.length} chars`);
+    
     // +15: HTTPS website (legitimate business)
-    if (lead.url.startsWith('https://') && !lead.url.includes('facebook.com')) fitScore += 15;
+    if (lead.url.startsWith('https://') && !lead.url.includes('facebook.com')) {
+        fitScore += 15;
+        scoreBreakdown.push('+15 HTTPS');
+    }
     
     // +10: Has reviews (active business)
-    if (enriched.enrichmentData.reviewCount >= 5) fitScore += 10;
+    if (enriched.enrichmentData.reviewCount >= 5) {
+        fitScore += 10;
+        scoreBreakdown.push(`+10 Reviews (${enriched.enrichmentData.reviewCount})`);
+    }
     
     // +20: Certified/Licensed (NABCEP or general certification)
     const certPatterns = ['nabcep', 'certified installer', 'licensed contractor', 'accredited', 'bonded and insured'];
-    if (certPatterns.some(p => combined.includes(p))) fitScore += 20;
+    const certMatch = certPatterns.find(p => combined.includes(p));
+    if (certMatch) {
+        fitScore += 20;
+        scoreBreakdown.push(`+20 Cert (${certMatch})`);
+    }
     
     // +15: Years in business (5+ years) - LOOSER patterns
     const yearPatterns = [
@@ -175,6 +192,7 @@ async function fase3_enrich(lead: any) {
         /family\s*owned\s*since\s*(19|20)\d{2}/i
     ];
     
+    let yearsMatched = false;
     for (const pattern of yearPatterns) {
         const match = combined.match(pattern);
         if (match) {
@@ -191,6 +209,8 @@ async function fase3_enrich(lead: any) {
             
             if (years >= 5) {
                 fitScore += 15;
+                scoreBreakdown.push(`+15 Years (${years}y)`);
+                yearsMatched = true;
                 break;
             }
         }
@@ -202,20 +222,39 @@ async function fase3_enrich(lead: any) {
         'solar installer', 'solar installation', 'solar panels', 'solar energy',
         'solar system', 'solar power', 'photovoltaic', 'pv system'
     ];
-    if (solarPatterns.some(kw => combined.includes(kw))) fitScore += 15;
+    const solarMatch = solarPatterns.find(kw => combined.includes(kw));
+    if (solarMatch) {
+        fitScore += 15;
+        scoreBreakdown.push(`+15 Solar (${solarMatch})`);
+    }
     
     // +10: Service area mentioned (LOCAL business indicator)
     const servicePatterns = [
         'serving', 'service area', 'we serve', 'areas served',
         'counties', 'cities', 'locations', 'coverage area'
     ];
-    if (servicePatterns.some(p => combined.includes(p))) fitScore += 10;
+    const serviceMatch = servicePatterns.find(p => combined.includes(p));
+    if (serviceMatch) {
+        fitScore += 10;
+        scoreBreakdown.push(`+10 Service (${serviceMatch})`);
+    }
     
     // +10: High rating (quality indicator)
-    if (enriched.enrichmentData.rating >= 4.5) fitScore += 10;
+    if (enriched.enrichmentData.rating >= 4.5) {
+        fitScore += 10;
+        scoreBreakdown.push(`+10 Rating (${enriched.enrichmentData.rating})`);
+    }
     
     // +10: Personal email found (decision-maker access)
-    if (isPersonalEmail) fitScore += 10;
+    if (isPersonalEmail) {
+        fitScore += 10;
+        scoreBreakdown.push('+10 Personal Email');
+    }
+
+    // Log final score breakdown
+    const passStatus = fitScore >= FIT_SCORE_THRESHOLD.value() ? '✅ PASS' : '❌ FAIL';
+    console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - FitScore: ${fitScore}/${FIT_SCORE_THRESHOLD.value()} ${passStatus}`);
+    console.log(`🔍 [DIAGNOSTIC] ${lead.domain} - Breakdown: ${scoreBreakdown.length > 0 ? scoreBreakdown.join(', ') : 'NO POINTS AWARDED'}`);
 
     enriched.fitScore = fitScore;
     enriched.status = fitScore >= FIT_SCORE_THRESHOLD.value() ? 'enriched' : 'rejected';
