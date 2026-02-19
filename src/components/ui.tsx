@@ -10,20 +10,22 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 export function Button({ variant = 'primary', size = 'md', className, ...props }: ButtonProps) {
-  const base = 'inline-flex items-center justify-center rounded-xl font-bold outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none'
+  // V-003: Standardized button states (hover scale 0.98, active scale 0.95, 150ms transition with easing)
+  const base = 'inline-flex items-center justify-center rounded-xl font-bold outline-none transition-all duration-[150ms] ease-out focus-visible:outline-2 focus-visible:outline-teal-500 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none hover:scale-[0.98] active:scale-[0.95]'
   const sizes = size === 'lg'
     ? 'h-14 px-6 text-lg' // Larger tap targets per mockup
     : size === 'icon'
-      ? 'h-12 w-12 p-0' // Square icon button
+      ? 'h-12 w-12 p-0' // Square icon button (48x48px)
       : 'h-12 px-4 text-base'
 
+  // V-003: Shadow hierarchy applied (default → hover → active)
   const variants: Record<string, string> = {
-    primary: 'bg-navy-900 text-white shadow-soft hover:bg-navy-800 active:scale-[0.98]',
-    teal: 'bg-teal-500 text-white shadow-soft hover:bg-teal-400 active:scale-[0.98]',
-    secondary: 'bg-white border-2 border-moon-200 text-navy-900 hover:border-navy-200 hover:bg-moon-50',
+    primary: 'bg-navy-900 text-white shadow-[0_2px_4px_rgba(5,10,30,0.08)] hover:bg-navy-800 hover:shadow-[0_4px_12px_rgba(5,10,30,0.15)] active:shadow-[0_1px_2px_rgba(5,10,30,0.06)]',
+    teal: 'bg-teal-500 text-white shadow-[0_2px_4px_rgba(5,10,30,0.08)] hover:bg-teal-400 hover:shadow-[0_4px_12px_rgba(5,10,30,0.15)] active:shadow-[0_1px_2px_rgba(5,10,30,0.06)]',
+    secondary: 'bg-white border-2 border-moon-200 text-navy-900 shadow-[0_2px_4px_rgba(5,10,30,0.08)] hover:border-navy-200 hover:bg-moon-50 hover:shadow-[0_4px_12px_rgba(5,10,30,0.15)] active:shadow-[0_1px_2px_rgba(5,10,30,0.06)]',
     ghost: 'bg-transparent text-navy-800 hover:bg-navy-50',
-    danger: 'bg-danger-500 text-white hover:opacity-95',
-    soft: 'bg-moon-100 text-navy-900 hover:bg-moon-200 active:scale-[0.98]',
+    danger: 'bg-danger-500 text-white shadow-[0_2px_4px_rgba(5,10,30,0.08)] hover:shadow-[0_4px_12px_rgba(5,10,30,0.15)] active:shadow-[0_1px_2px_rgba(5,10,30,0.06)]',
+    soft: 'bg-moon-100 text-navy-900 shadow-[0_2px_4px_rgba(5,10,30,0.08)] hover:bg-moon-200 hover:shadow-[0_4px_12px_rgba(5,10,30,0.15)] active:shadow-[0_1px_2px_rgba(5,10,30,0.06)]',
   }
 
   return (
@@ -54,11 +56,13 @@ export function Chip({ selected, children, onClick, variant = 'teal' }: ChipProp
       type="button"
       onClick={onClick}
       className={cn(
-        'h-10 min-w-[48px] rounded-full border border-moon-200 px-4 text-sm font-bold transition-all focus-visible:ring-2 focus-visible:ring-teal-400',
+        // V-003: Standard button states (hover 0.98, active 0.95, 150ms transition, outline focus)
+        // V-006: Touch target minimum 48px height (changed from h-10 to h-12)
+        'h-12 min-w-[48px] rounded-full border border-moon-200 px-4 text-sm font-bold transition-all duration-[150ms] ease-out hover:scale-[0.98] active:scale-[0.95] focus-visible:outline-2 focus-visible:outline-teal-500 focus-visible:outline-offset-2',
         selected
           // eslint-disable-next-line security/detect-object-injection
           ? selectedStyles[variant]
-          : 'bg-white text-navy-800 hover:bg-moon-50 hover:border-moon-300'
+          : 'bg-white text-navy-800 shadow-[0_2px_4px_rgba(5,10,30,0.08)] hover:bg-moon-50 hover:border-moon-300 hover:shadow-[0_4px_12px_rgba(5,10,30,0.15)] active:shadow-[0_1px_2px_rgba(5,10,30,0.06)]'
       )}
       aria-pressed={selected}
     >

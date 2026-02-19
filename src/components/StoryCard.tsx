@@ -21,10 +21,12 @@ export function StoryCard({ story, className }: { story: Story; className?: stri
 
       <div className="grid grid-cols-3 gap-2">
         <Link href={`/story/${story.id}`}>
-          <Button variant="soft" className="w-full h-10 text-sm">Lees</Button>
+          {/* V-006: Changed h-10 (40px) → h-12 (48px) for WCAG AAA touch target minimum */}
+          <Button variant="soft" className="w-full h-12 text-sm">Lees</Button>
         </Link>
         <Link href={story.audioUrl ? `/story/${story.id}?mode=audio` : `/story/${story.id}/generate-audio`}>
-          <Button variant="soft" className="w-full h-10 text-sm">Luister</Button>
+          {/* V-006: Changed h-10 (40px) → h-12 (48px) for WCAG AAA touch target minimum */}
+          <Button variant="soft" className="w-full h-12 text-sm">Luister</Button>
         </Link>
         <ShareButton storyId={story.id} userId={story.userId} title={story.title} />
       </div>
