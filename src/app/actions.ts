@@ -108,34 +108,24 @@ export async function generateStoryAction(formData: FormData) {
             console.log(`[GenerateStory] Deducted 1 credit from user ${userId}`)
         }
 
-        // 5. Analytics
+        // 5. Analytics (async, non-blocking)
         try {
-            const { PostHog } = await import('posthog-node')
-            const { getSecret } = await import('@/lib/secrets')
+            const { trackServerEventAsync } = await import('@/lib/analytics-async')
 
-            const phKey = await getSecret('NEXT_PUBLIC_POSTHOG_KEY')
-            const phHost = (await getSecret('NEXT_PUBLIC_POSTHOG_HOST')) || 'https://app.posthog.com'
-
-            if (!phKey) {
-                console.warn('⚠️ PostHog Key not found, skipping analytics.')
-            } else {
-                const client = new PostHog(phKey, { host: phHost })
-
-                client.capture({
-                    distinctId: userId,
-                    event: 'story_generated',
-                    properties: {
-                        story_id: docRef.id,
-                        mood: mood,
-                        age_group: ageGroup,
-                        has_theme: !!theme,
-                        child_name_length: childName.length
-                    }
-                })
-                await client.shutdown()
-            }
+            trackServerEventAsync({
+                userId,
+                event: 'story_generated',
+                properties: {
+                    story_id: docRef.id,
+                    mood: mood,
+                    age_group: ageGroup,
+                    has_theme: !!theme,
+                    child_name_length: childName.length
+                }
+            })
+            // Don't await - this is fire-and-forget!
         } catch (e) {
-            console.error('Failed to capture analytics:', e)
+            console.error('Failed to queue analytics:', e)
         }
 
         // 6. Return Success

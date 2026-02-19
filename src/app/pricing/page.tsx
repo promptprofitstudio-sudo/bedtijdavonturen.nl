@@ -3,18 +3,29 @@
 import * as React from 'react'
 import { SectionTitle, Card } from '@/components/ui'
 import { PlanCard, type Plan } from '@/components/PlanCard'
+import { PricingFAQ } from '@/components/PricingFAQ'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { createCheckoutSession } from '@/app/actions/stripe'
 import { STRIPE_CONFIG } from '@/lib/stripe-config'
+import { usePostHog } from 'posthog-js/react'
 
 export default function PricingPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const posthog = usePostHog()
   const [isPending, startTransition] = React.useTransition()
   const [toast, setToast] = React.useState<string | null>(null)
 
-  /* Refined Packages (v2.2) */
+  // Track pricing page load
+  React.useEffect(() => {
+    posthog?.capture('pricing_page_loaded', {
+      referrer: document.referrer || 'direct',
+      device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
+    })
+  }, [posthog])
+
+  /* Refined Packages (v2.2) with AU-004 badges */
   const plans: Plan[] = [
     {
       name: 'Weekend Pakket',
@@ -37,6 +48,7 @@ export default function PricingPage() {
       highlighted: true,
       buttonText: 'Try Free for 7 Days',
       priceId: STRIPE_CONFIG.prices.monthly,
+      badge: { text: 'Aanbevolen', color: 'orange' }, // AU-004
     },
     {
       name: 'Family',
@@ -48,6 +60,7 @@ export default function PricingPage() {
       highlighted: false,
       buttonText: 'Unlock Family Plan',
       priceId: STRIPE_CONFIG.prices.annual,
+      badge: { text: 'Beste Waarde', color: 'green' }, // AU-004
     },
   ]
 
@@ -60,6 +73,22 @@ export default function PricingPage() {
       setTimeout(() => router.push('/account'), 1500)
       return
     }
+
+    // AU-004: Fire analytics events
+    posthog?.capture('plan_selected', {
+      plan_name: plan.name,
+      plan_price_eur: parseFloat(plan.price.replace('€', '')),
+      device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
+      from_faq_context: false,
+    })
+
+    posthog?.capture('payment_initiated', {
+      plan_name: plan.name,
+      plan_price_eur: parseFloat(plan.price.replace('€', '')),
+      payment_method: 'card', // Default
+      device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
+      total_amount_eur: parseFloat(plan.price.replace('€', '')),
+    })
 
     /* Checkbox Validation */
     if (!agreedToTerms) {
@@ -130,6 +159,11 @@ export default function PricingPage() {
         <p className="text-sm font-extrabold">Niet goed? Geld terug.</p>
         <p className="text-xs text-ink-800/70">Abonnementen zijn op elk moment met 1 klik te stoppen in je account.</p>
       </Card>
+
+      {/* AU-004: Pricing FAQ Section */}
+      <div className="mt-8">
+        <PricingFAQ deviceType={window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'} />
+      </div>
 
       {toast && (
         <div className="fixed left-0 right-0 bottom-20 z-50 animate-in fade-in slide-in-from-bottom-4">

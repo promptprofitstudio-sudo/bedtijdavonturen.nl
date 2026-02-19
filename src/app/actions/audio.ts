@@ -79,33 +79,22 @@ export async function generateAudioAction(storyId: string, options?: { useCustom
 
         revalidatePath(`/listen/${storyId}`)
 
-        // Capture Analytics
+        // Capture Analytics (async, non-blocking)
         try {
-            const { PostHog } = await import('posthog-node')
-            const { getSecret } = await import('@/lib/secrets')
-
-            const phKey = await getSecret('NEXT_PUBLIC_POSTHOG_KEY')
-            const phHost = (await getSecret('NEXT_PUBLIC_POSTHOG_HOST')) || 'https://app.posthog.com'
-
-            if (!phKey) {
-                console.warn('⚠️ PostHog Key not found, skipping analytics.')
-            } else {
-                const client = new PostHog(phKey, { host: phHost })
-
-                client.capture({
-                    distinctId: story.userId,
-                    event: 'audio_generated',
-                    properties: {
-                        story_id: storyId,
-                        mood: story.mood,
-                        audio_url: audioUrl,
-                        voice_type: customVoiceId ? 'cloned' : 'default'
-                    }
-                })
-                await client.shutdown()
-            }
+            const { trackServerEventAsync } = await import('@/lib/analytics-async')
+            trackServerEventAsync({
+                userId: story.userId,
+                event: 'audio_generated',
+                properties: {
+                    story_id: storyId,
+                    mood: story.mood,
+                    audio_url: audioUrl,
+                    voice_type: customVoiceId ? 'cloned' : 'default'
+                }
+            })
+            // Don't await - fire-and-forget!
         } catch (e) {
-            console.error('Failed to capture analytics:', e)
+            console.error('Failed to queue analytics:', e)
         }
 
         return { success: true, audioUrl }

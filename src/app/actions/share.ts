@@ -26,12 +26,13 @@ export async function generateShareToken(storyId: string, userId: string): Promi
         const newToken = randomUUID()
         await storyRef.update({ shareToken: newToken })
 
-        const { trackServerEvent } = await import('@/lib/server-analytics')
-        await trackServerEvent({
+        const { trackServerEventAsync } = await import('@/lib/analytics-async')
+        trackServerEventAsync({
             userId: data.userId, // use data.userId from doc to be safe, or arg userId
             event: 'share_link_created',
             properties: { story_id: storyId }
         })
+        // Don't await - fire-and-forget!
 
         revalidatePath(`/listen/${storyId}`)
         return { success: true, token: newToken }

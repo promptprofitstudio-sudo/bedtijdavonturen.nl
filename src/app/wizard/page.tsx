@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button, Card, Chip, Field, Input, SectionTitle } from '@/components/ui'
 import { ProgressDots } from '@/components/ProgressDots'
 import { ProgressiveLoader } from '@/components/ProgressiveLoader'
+import { WizardProgressIndicator } from '@/components/WizardProgressIndicator'
 import type { StoryMood } from '@/lib/mockData'
 import { generateStoryAction } from '@/app/actions'
 import { useAuth } from '@/context/AuthContext'
@@ -31,6 +32,25 @@ export default function WizardPage() {
   const [contextInput, setContextInput] = React.useState('')
 
   const [isGenerating, setIsGenerating] = React.useState(false)
+  const [wizardStartTime] = React.useState(Date.now())
+
+  // Load temp story data from modal (AU-001)
+  React.useEffect(() => {
+    const tempData = localStorage.getItem('tempStoryData')
+    if (tempData) {
+      try {
+        const parsed = JSON.parse(tempData)
+        setChildName(parsed.childName || '')
+        if (parsed.childAge) {
+          setAge(parsed.childAge <= 4 ? '2-4' : '4-7')
+        }
+        // Clear temp data after use
+        localStorage.removeItem('tempStoryData')
+      } catch (e) {
+        console.warn('Failed to parse temp story data:', e)
+      }
+    }
+  }, [])
 
   React.useEffect(() => {
     if (step === 1 && window.posthog) {
@@ -67,6 +87,17 @@ export default function WizardPage() {
 
     setIsGenerating(true)
 
+    const totalTime = Date.now() - wizardStartTime
+
+    // Fire wizard_completed event
+    if (window.posthog) {
+      window.posthog.capture('wizard_completed', {
+        total_time_ms: totalTime,
+        device_type: 'desktop',
+        story_generated_successfully: true,
+      })
+    }
+
     // Construct FormData for the Server Action
     const formData = new FormData()
     formData.append('userId', user.uid)
@@ -100,6 +131,14 @@ export default function WizardPage() {
 
       if (result.error) {
         alert(result.error)
+        // Fire wizard completed event with error
+        if (window.posthog) {
+          window.posthog.capture('wizard_completed', {
+            total_time_ms: totalTime,
+            device_type: 'desktop',
+            story_generated_successfully: false,
+          })
+        }
       } else if (result.success && result.storyId) {
         if (result.debugProject && result.debugProject !== 'bedtijdavonturen-prod') {
           alert(`⚠️ CRITICAL: Wrote to wrong project: ${result.debugProject}`)
@@ -109,21 +148,27 @@ export default function WizardPage() {
     } catch (e) {
       console.error(e)
       alert('Er ging iets mis.')
+      // Fire wizard completed event with error
+      if (window.posthog) {
+        window.posthog.capture('wizard_completed', {
+          total_time_ms: totalTime,
+          device_type: 'desktop',
+          story_generated_successfully: false,
+        })
+      }
     } finally {
       setIsGenerating(false)
     }
   }
 
   return (
-    <main className="px-5 py-6 space-y-8 pb-40">
+    <main className="px-5 py-6 space-y-6 pb-40">
       <header className="space-y-4">
         <div className="flex items-center justify-between">
           <SectionTitle title="Maak verhaal" subtitle="60 seconden — rustig, persoonlijk, klaar." />
-          <div className="flex items-center gap-2">
-            <div className="text-xs font-bold text-navy-800/60 uppercase tracking-widest">Stap {step}/4</div>
-            <ProgressDots step={step} total={4} />
-          </div>
         </div>
+        {/* AU-002: Wizard Progress Indicator */}
+        <WizardProgressIndicator step={step} total={4} deviceType="desktop" />
       </header>
 
       {/* Step Container with Animation */}

@@ -55,12 +55,13 @@ export async function createCheckoutSession(priceId: string, userId: string) {
             cancel_url: `${origin}/pricing?canceled=true`,
         })
 
-        const { trackServerEvent } = await import('@/lib/server-analytics')
-        await trackServerEvent({
+        const { trackServerEventAsync } = await import('@/lib/analytics-async')
+        trackServerEventAsync({
             userId,
             event: 'checkout_started',
             properties: { price_id: priceId, mode }
         })
+        // Don't await - fire-and-forget!
 
         if (session.url) {
             redirect(session.url)

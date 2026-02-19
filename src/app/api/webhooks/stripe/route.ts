@@ -83,10 +83,10 @@ export async function POST(req: Request) {
                     sessionId: session.id
                 })
 
-                // Track payment success in analytics
+                // Track payment success in analytics (async, non-blocking)
                 try {
-                    const { trackServerEvent } = await import('@/lib/server-analytics')
-                    await trackServerEvent({
+                    const { trackServerEventAsync } = await import('@/lib/analytics-async')
+                    trackServerEventAsync({
                         userId,
                         event: 'payment_completed',
                         properties: {
@@ -99,9 +99,10 @@ export async function POST(req: Request) {
                             customerEmail: session.customer_email
                         }
                     })
+                    // Don't await - fire-and-forget!
                 } catch (analyticsErr) {
                     // Don't fail payment processing if analytics fails
-                    console.error('[Stripe] Analytics tracking failed:', analyticsErr)
+                    console.error('[Stripe] Analytics queueing failed:', analyticsErr)
                 }
             } catch (dbErr) {
                 console.error('[Stripe] DB Update Failed:', dbErr)

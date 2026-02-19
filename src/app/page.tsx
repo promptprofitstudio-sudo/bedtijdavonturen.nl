@@ -1,8 +1,54 @@
+'use client'
+
 import Link from 'next/link'
 import { Footer } from '@/components/Footer'
 import { Card } from '@/components/ui'
+import { useState, useEffect } from 'react'
+import { TryStoryModal } from '@/components/TryStoryModal'
+import { ExampleStoriesSection } from '@/components/ExampleStoriesSection'
+import { TrustSignals } from '@/components/TrustSignals'
+import { usePostHog } from 'posthog-js/react'
 
 export default function HomePage() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
+  const posthog = usePostHog()
+
+  useEffect(() => {
+    // Determine device type
+    const width = window.innerWidth
+    if (width < 768) {
+      setDeviceType('mobile')
+    } else if (width < 1024) {
+      setDeviceType('tablet')
+    } else {
+      setDeviceType('desktop')
+    }
+
+    // Track page view
+    posthog?.capture('page_view', {
+      page_name: 'landing_page',
+      device_type: deviceType,
+    })
+  }, [posthog])
+
+  const handleCTAClick = () => {
+    // Fire analytics event
+    posthog?.capture('click_create_story_cta', {
+      origin: 'landing_page',
+      device_type: deviceType,
+      button_variant: 'A', // Default variant
+    })
+
+    // Fire form opened event
+    posthog?.capture('create_story_form_opened', {
+      form_type: 'minimal_signup',
+      device_type: deviceType,
+    })
+
+    setIsModalOpen(true)
+  }
+
   return (
     <main className="bg-background-light dark:bg-background-dark text-[#141118] dark:text-white transition-colors duration-300 overflow-x-hidden min-h-screen font-display">
       {/* Top Navigation */}
@@ -51,16 +97,25 @@ export default function HomePage() {
           </div>
 
           <div className="w-full max-w-[280px] space-y-3">
-            <Link href="/wizard">
-              <button className="w-full bg-primary text-white h-14 rounded-2xl text-lg font-extrabold shadow-lg shadow-primary/25 active:scale-95 transition-all flex items-center justify-center gap-2 hover:bg-primary/90">
-                <span>Maak gratis een verhaal</span>
-                <span className="material-symbols-outlined">auto_fix_high</span>
-              </button>
-            </Link>
+            <button
+              onClick={handleCTAClick}
+              className="w-full bg-primary text-white h-14 rounded-2xl text-lg font-extrabold shadow-lg shadow-primary/25 active:scale-95 transition-all flex items-center justify-center gap-2 hover:bg-primary/90"
+            >
+              <span>Jouw eerste verhaal — Gratis</span>
+              <span className="material-symbols-outlined">auto_fix_high</span>
+            </button>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Geen account nodig • Gratis proberen</p>
+          </div>
+
+          {/* AU-005: Trust Signals (Hero Section) */}
+          <div className="w-full max-w-[300px] mt-4">
+            <TrustSignals location="hero" deviceType={deviceType} />
           </div>
         </div>
       </section>
+
+      {/* AU-001: Try Story Now CTA Modal */}
+      <TryStoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       {/* Feature: Kies je Modus */}
       <section className="px-4 py-8 max-w-lg mx-auto">
@@ -150,8 +205,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* AU-003: Example Stories Section */}
+      <ExampleStoriesSection deviceType={deviceType} />
+
       {/* Pricing Teaser */}
-      <section className="px-4 pb-24 text-center">
+      <section className="px-4 py-12 text-center">
         <p className="text-sm text-gray-500 font-medium mb-3">Flexibiliteit staat voorop</p>
         <Link href="/pricing" className="inline-block text-primary font-bold hover:underline">
           Kies voor een abonnement of een losse Weekend Bundel (€1,99) &rarr;

@@ -62,13 +62,14 @@ export async function cloneVoiceAction(formData: FormData): Promise<{ success: b
             isVoiceCloned: true
         })
 
-        // Track Event
-        const { trackServerEvent } = await import('@/lib/server-analytics')
-        await trackServerEvent({
+        // Track Event (async, non-blocking)
+        const { trackServerEventAsync } = await import('@/lib/analytics-async')
+        trackServerEventAsync({
             userId,
             event: 'voice_cloned',
             properties: { voice_id: voiceId }
         })
+        // Don't await - fire-and-forget!
 
         revalidatePath('/account') // Update UI
         return { success: true }

@@ -11,6 +11,10 @@ export type Plan = {
   period?: string
   buttonText?: string
   highlighted?: boolean
+  badge?: {
+    text: string
+    color: 'orange' | 'green' | 'blue'
+  }
 }
 
 export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?: () => void; isLoading?: boolean }) {
@@ -26,13 +30,25 @@ export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?:
         isWeekend && 'border-teal-200 bg-teal-50'
       )}
     >
-      {isHighlighted && (
+      {/* AU-004: Plan Badges */}
+      {plan.badge && (
+        <div className={cn(
+          "absolute top-0 right-0 text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider",
+          plan.badge.color === 'orange' && "bg-orange-100 text-orange-700",
+          plan.badge.color === 'green' && "bg-green-100 text-green-700",
+          plan.badge.color === 'blue' && "bg-blue-100 text-blue-700"
+        )}>
+          {plan.badge.text}
+        </div>
+      )}
+
+      {isHighlighted && !plan.badge && (
         <div className="absolute top-0 right-0 bg-lavender-100 text-lavender-700 text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">
           Meest Gekozen
         </div>
       )}
 
-      {isWeekend && (
+      {isWeekend && !plan.badge && (
         <div className="absolute top-0 right-0 bg-teal-100 text-teal-700 text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">
           Flexibel
         </div>
