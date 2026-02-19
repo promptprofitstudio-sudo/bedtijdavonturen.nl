@@ -5,7 +5,7 @@ import * as React from 'react'
 import { Card, SectionTitle, Button } from '@/components/ui'
 import { StoryCard } from '@/components/StoryCard'
 import { useAuth } from '@/context/AuthContext'
-import { getUserStories } from '@/lib/firebase/db'
+import { getUserStories } from '@/app/actions/get-stories'
 import { Story } from '@/lib/types'
 
 export default function LibraryPage() {
