@@ -75,7 +75,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-4 relative z-10 max-w-sm mx-auto">
             <div className="inline-flex items-center self-center gap-2 bg-white/80 dark:bg-white/10 px-3 py-1 rounded-full border border-orange-200 dark:border-purple-400/30">
               <span className="material-symbols-outlined text-primary !text-sm">verified_user</span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">No Ads. No Tracking. No Surprises.</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">GEEN ADVERTENTIES. GEEN TRACKING. GEEN VERRASSINGEN.</span>
             </div>
             <h1 className="text-[#141118] dark:text-white text-[2.5rem] font-black leading-[1.1] tracking-[-0.03em]">
               Jouw rustige avondritueel begint hier.
@@ -126,7 +126,9 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="hover:border-primary/30 transition-colors border-2 border-transparent">
-            <div className="text-3xl mb-3">🧸</div>
+            <div className="flex justify-center mb-3">
+              <span className="material-symbols-outlined !text-[40px] text-amber-600">toys</span>
+            </div>
             <h3 className="font-extrabold text-lg text-[#141118]">2-4 Jaar</h3>
             <p className="text-sm font-bold text-teal-600 uppercase tracking-wider mb-2">Veilig & Vertrouwd</p>
             <p className="text-sm text-gray-500 leading-relaxed">
@@ -135,7 +137,9 @@ export default function HomePage() {
           </Card>
 
           <Card className="hover:border-primary/30 transition-colors border-2 border-transparent">
-            <div className="text-3xl mb-3">🚀</div>
+            <div className="flex justify-center mb-3">
+              <span className="material-symbols-outlined !text-[40px] text-orange-600">rocket_launch</span>
+            </div>
             <h3 className="font-extrabold text-lg text-[#141118]">4-7 Jaar</h3>
             <p className="text-sm font-bold text-orange-500 uppercase tracking-wider mb-2">Avontuur & Emotie</p>
             <p className="text-sm text-gray-500 leading-relaxed">
