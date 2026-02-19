@@ -23,7 +23,7 @@ export function ProgressiveLoader() {
             <p className="text-lg font-bold text-navy-900 animate-pulse transition-all duration-500">
                 {messages[index]}
             </p>
-            <p className="text-xs text-navy-800/50">Dit duurt ongeveer 10 seconden</p>
+            <p className="text-xs text-navy-800/50">Dit duurt ongeveer 60 seconden</p>
         </div>
     )
 }

@@ -24,7 +24,7 @@ export default function PricingPage() {
       features: ['3x Audio Generatie (Scherm uit)', 'Onbeperkt geldig', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
       variant: 'weekend',
       highlighted: false,
-      buttonText: 'Koop 3x Rust',
+      buttonText: 'Start Now — 3 Stories for €2.99',
       priceId: STRIPE_CONFIG.prices.weekend,
     },
     {
@@ -35,7 +35,7 @@ export default function PricingPage() {
       features: ['Onbeperkt Audio 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Maandelijks opzegbaar'],
       variant: 'default',
       highlighted: true,
-      buttonText: 'Kies Basis',
+      buttonText: 'Try Free for 7 Days',
       priceId: STRIPE_CONFIG.prices.monthly,
     },
     {
@@ -46,7 +46,7 @@ export default function PricingPage() {
       features: ['Onbeperkt Audio 🎧', '5 Kindprofielen', 'Premium Stemmen', 'Opa & Oma luisteren mee'],
       variant: 'default',
       highlighted: false,
-      buttonText: 'Kies Family',
+      buttonText: 'Unlock Family Plan',
       priceId: STRIPE_CONFIG.prices.annual,
     },
   ]

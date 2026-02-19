@@ -35,7 +35,7 @@ export default function HomePage() {
               Jouw rustige avondritueel begint hier.
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-base font-medium leading-relaxed">
-              Binnen 10 seconden een magisch slaapverhaal. Lees zelf voor, of laat onze rustgevende stemmen het werk doen (scherm uit).
+              Een nieuw slaapverhaal, klaar voordat je koffie afkoelt. Echt.
             </p>
           </div>
 
