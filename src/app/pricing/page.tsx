@@ -10,6 +10,8 @@ import { createCheckoutSession } from '@/app/actions/stripe'
 import { STRIPE_CONFIG } from '@/lib/stripe-config'
 import { usePostHog } from 'posthog-js/react'
 
+export const dynamic = 'force-dynamic'
+
 export default function PricingPage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -67,6 +69,11 @@ export default function PricingPage() {
   /* New State for Waiver Checkbox */
   const [agreedToTerms, setAgreedToTerms] = React.useState(false)
 
+  const getDeviceType = () => {
+    if (typeof window === 'undefined') return 'desktop'
+    return window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'
+  }
+
   const handleSelect = (plan: Plan) => {
     if (!user) {
       setToast('Log eerst in om te abonneren.')
@@ -74,11 +81,13 @@ export default function PricingPage() {
       return
     }
 
+    const deviceType = getDeviceType()
+
     // AU-004: Fire analytics events
     posthog?.capture('plan_selected', {
       plan_name: plan.name,
       plan_price_eur: parseFloat(plan.price.replace('€', '')),
-      device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
+      device_type: deviceType,
       from_faq_context: false,
     })
 
@@ -86,7 +95,7 @@ export default function PricingPage() {
       plan_name: plan.name,
       plan_price_eur: parseFloat(plan.price.replace('€', '')),
       payment_method: 'card', // Default
-      device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
+      device_type: deviceType,
       total_amount_eur: parseFloat(plan.price.replace('€', '')),
     })
 
@@ -162,7 +171,7 @@ export default function PricingPage() {
 
       {/* AU-004: Pricing FAQ Section */}
       <div className="mt-8">
-        <PricingFAQ deviceType={window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'} />
+        <PricingFAQ deviceType={getDeviceType()} />
       </div>
 
       {toast && (

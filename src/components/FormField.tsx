@@ -47,13 +47,13 @@ export function FormField({
       {/* Input Wrapper with State Indicator */}
       <div className="relative">
         {/* Render children with proper props */}
-        {React.cloneElement(children as React.ReactElement, {
+        {React.cloneElement(children as React.ReactElement<any>, {
           id,
           'aria-invalid': !!error,
           'aria-describedby': error ? errorId : undefined,
           disabled: isLoading,
           className: cn(
-            (children as React.ReactElement).props.className,
+            (children as React.ReactElement<any>).props?.className,
             // Base input styling
             'transition-all duration-150 ease-out',
             // State styling
@@ -63,7 +63,7 @@ export function FormField({
             // Disabled state
             isLoading && 'opacity-75 cursor-not-allowed'
           )
-        })}
+        } as any)}
 
         {/* Valid Indicator */}
         {isValid && !error && (

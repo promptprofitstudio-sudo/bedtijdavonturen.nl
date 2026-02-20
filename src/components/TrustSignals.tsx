@@ -87,7 +87,7 @@ export function TrustSignals({
       clearInterval(parentInterval)
       clearInterval(storiesInterval)
     }
-  }, [posthog, deviceType, lastUpdateTime])
+  }, [posthog, deviceType])
 
   const handleBadgeClick = (badgeType: string) => {
     posthog?.capture('trust_badge_clicked', {

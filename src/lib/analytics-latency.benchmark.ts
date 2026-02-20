@@ -100,7 +100,7 @@ async function benchmarkOldBlockingAnalytics(): Promise<BenchmarkResult> {
  */
 export async function runBenchmarks(): Promise<void> {
     console.log('\n📊 Analytics Performance Benchmark')
-    console.log('=' * 60)
+    console.log('='.repeat(60))
 
     const oldResult = await benchmarkOldBlockingAnalytics()
     const newResult = await benchmarkNonBlockingAnalytics()

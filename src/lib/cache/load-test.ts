@@ -46,6 +46,7 @@ class LoadTester {
      * Simulates repeated cache accesses to measure hit rates
      */
     async testCacheHitRate(): Promise<LoadTestResults> {
+        console.log("RUNNING testCacheHitRate()");
         const cache = getCacheManager()
         const monitor = getCacheMonitor()
 
@@ -132,6 +133,7 @@ class LoadTester {
      * Fills the cache to measure memory behavior under load
      */
     async testMemoryBehavior(): Promise<LoadTestResults> {
+        console.log("RUNNING testMemoryBehavior()");
         const cache = getCacheManager()
         const monitor = getCacheMonitor()
 
@@ -193,6 +195,7 @@ class LoadTester {
      * Run concurrent access test to find race conditions
      */
     async testConcurrentAccess(): Promise<LoadTestResults> {
+        console.log("RUNNING testConcurrentAccess()");
         const cache = getCacheManager()
         const monitor = getCacheMonitor()
 
@@ -204,6 +207,7 @@ class LoadTester {
         let successfulRequests = 0
         let failedRequests = 0
         const responseTimes: number[] = []
+        const memorySnapshots: number[] = []
 
         const promises: Promise<void>[] = []
 
@@ -226,6 +230,7 @@ class LoadTester {
 
                             successfulRequests++
                             responseTimes.push(Date.now() - reqStart)
+                            memorySnapshots.push(cache.getMemoryUsage())
                         } catch (error) {
                             failedRequests++
                         }
@@ -248,8 +253,8 @@ class LoadTester {
             minResponseTime: Math.min(...responseTimes),
             maxResponseTime: Math.max(...responseTimes),
             cacheHitRate: stats.cache_hit_rate,
-            peakMemoryUsage: stats.memoryUsage,
-            avgMemoryUsage: stats.memoryUsage,
+            peakMemoryUsage: Math.max(...memorySnapshots),
+            avgMemoryUsage: this.average(memorySnapshots),
         }
 
         if (this.config.verbose) {
