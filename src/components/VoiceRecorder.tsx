@@ -80,7 +80,7 @@ export function VoiceRecorder({ userId, onUploadComplete }: VoiceRecorderProps) 
             {(state === 'idle' || state === 'recording') && (
                 <div className="bg-moon-50 p-6 rounded-2xl border border-moon-100 text-left space-y-3 mb-6">
                     <h3 className="text-navy-900 font-bold flex items-center gap-2">
-                        📖 Lees deze tekst hardop voor:
+                        <span className="material-symbols-outlined">auto_stories</span> Lees deze tekst hardop voor:
                     </h3>
                     <p className="text-ink-700 leading-relaxed text-lg font-medium">
                         &quot;Hallo! Dit is mijn stem voor Bedtijd Avonturen. Ik lees dit verhaaltje voor om mijn eigen stem te klonen.
@@ -92,8 +92,9 @@ export function VoiceRecorder({ userId, onUploadComplete }: VoiceRecorderProps) 
             )}
 
             {state === 'idle' && (
-                <Button onClick={startRecording} className="w-full bg-teal-500 hover:bg-teal-600 h-16 text-lg rounded-2xl shadow-soft">
-                    🎤 Start Opname (30s)
+                <Button onClick={startRecording} className="w-full bg-teal-500 hover:bg-teal-600 h-16 text-lg rounded-2xl shadow-soft flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined">mic</span>
+                    <span>Start Opname (30s)</span>
                 </Button>
             )}
 
@@ -120,8 +121,9 @@ export function VoiceRecorder({ userId, onUploadComplete }: VoiceRecorderProps) 
                         <Button onClick={reset} variant="ghost" className="border-2 border-navy-100">
                             Opnieuw
                         </Button>
-                        <Button onClick={handleUpload} variant="primary">
-                            Verstuur 🚀
+                        <Button onClick={handleUpload} variant="primary" className="flex items-center justify-center gap-2">
+                            <span>Verstuur</span>
+                            <span className="material-symbols-outlined">send</span>
                         </Button>
                     </div>
                 </div>

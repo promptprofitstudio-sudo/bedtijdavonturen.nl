@@ -71,11 +71,18 @@ export function GenerateAudioButton({
             {canGenerate ? (
                 <Button
                     variant="primary"
-                    className="w-full h-12 text-lg shadow-soft"
+                    className="w-full h-12 text-lg shadow-soft flex items-center justify-center gap-2"
                     onClick={handleGenerate}
                     disabled={loading}
                 >
-                    {loading ? 'Bezig met genereren...' : `✨ Genereer Audio (Luisterpunten: ${credits})`}
+                    {loading ? (
+                        'Bezig met genereren...'
+                    ) : (
+                        <>
+                            <span className="material-symbols-outlined">music_note</span>
+                            <span>Genereer Audio (Luisterpunten: {credits})</span>
+                        </>
+                    )}
                 </Button>
             ) : (
                 <div className="space-y-3">

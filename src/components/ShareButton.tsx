@@ -47,8 +47,9 @@ export function ShareButton({ storyId, userId, currentShareToken, title = 'Bedti
                 className="w-full h-12 text-sm"
             >
                 {loading ? '...' : (
-                    <div className="flex items-center gap-1">
-                        <span>🔗</span> <span>Deel</span>
+                    <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined">link</span>
+                        <span>Deel</span>
                     </div>
                 )}
             </Button>

@@ -5,6 +5,8 @@ import { Button, Chip } from '@/components/ui'
 import { AgeGroup, ChildProfile } from '@/lib/types'
 import { createProfile, updateProfile } from '@/lib/firebase/db'
 import { useAuth } from '@/context/AuthContext'
+import { AvatarGallery } from '@/components/avatars/AvatarSystem'
+import { type AvatarType } from '@/lib/avatars'
 
 interface ProfileFormProps {
     onSuccess: () => void
@@ -17,11 +19,10 @@ export function ProfileForm({ onSuccess, onCancel, initialData }: ProfileFormPro
     const [name, setName] = useState(initialData?.name || '')
     const [ageGroup, setAgeGroup] = useState<AgeGroup>(initialData?.ageGroup || '2-4')
     const [themePreference, setThemePreference] = useState<'fantasy' | 'adventure' | 'calm' | 'animals'>(initialData?.themePreference || 'fantasy')
-    const [avatar, setAvatar] = useState(initialData?.avatar || '🐻')
+    const [avatar, setAvatar] = useState<AvatarType>((initialData?.avatar as AvatarType) || 'bear')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const avatars = ['🐻', '🦊', '🦁', '🐰', '🚀', '👸', '🧙‍♂️', '🦖', '🦄', '🤖']
     const isEditing = !!initialData
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -105,21 +106,11 @@ export function ProfileForm({ onSuccess, onCancel, initialData }: ProfileFormPro
 
             <div>
                 <label className="block text-sm font-bold text-ink-700 mb-2">Kies een avatar</label>
-                <div className="flex flex-wrap gap-2">
-                    {avatars.map((a) => (
-                        <button
-                            key={a}
-                            type="button"
-                            onClick={() => setAvatar(a)}
-                            className={`w-12 h-12 rounded-full flex items-center justify-center text-xl transition-transform ${avatar === a
-                                ? 'bg-primary-100 ring-2 ring-primary-500 scale-110'
-                                : 'bg-moon-50 hover:bg-moon-100'
-                                }`}
-                        >
-                            {a}
-                        </button>
-                    ))}
-                </div>
+                <AvatarGallery
+                    selectedAvatar={avatar}
+                    onSelect={setAvatar}
+                    columns={5}
+                />
             </div>
 
             {error && <p className="text-red-500 text-sm">{error}</p>}

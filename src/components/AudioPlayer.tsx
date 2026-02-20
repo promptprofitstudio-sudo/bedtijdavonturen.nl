@@ -103,7 +103,7 @@ export function AudioPlayer({ title, src }: { title: string; src?: string }) {
               className="text-navy-400 hover:text-navy-700"
               aria-label="10 seconden terug"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /><path d="M9 13.5l3-4 3 4" /></svg>
+              <span className="material-symbols-outlined text-2xl">replay_10</span>
               <span className="sr-only">-10s</span>
             </Button>
 
@@ -113,9 +113,9 @@ export function AudioPlayer({ title, src }: { title: string; src?: string }) {
               className="w-16 h-16 rounded-full p-0 flex items-center justify-center shadow-lg shadow-teal-600/30 hover:scale-105 active:scale-95"
             >
               {isPlaying ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
+                <span className="material-symbols-outlined text-4xl">pause</span>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><path d="M8 5v14l11-7z" /></svg>
+                <span className="material-symbols-outlined text-4xl">play_arrow</span>
               )}
             </Button>
 
@@ -126,7 +126,7 @@ export function AudioPlayer({ title, src }: { title: string; src?: string }) {
               className="text-navy-400 hover:text-navy-700"
               aria-label="10 seconden vooruit"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M9 13.5l3-4 3 4" /></svg>
+              <span className="material-symbols-outlined text-2xl">forward_10</span>
               <span className="sr-only">+10s</span>
             </Button>
           </div>
@@ -140,7 +140,7 @@ export function AudioPlayer({ title, src }: { title: string; src?: string }) {
             onClick={() => setScreenOff(true)}
             className="flex items-center gap-2 px-4 h-12 py-2 text-sm font-medium text-navy-600 bg-navy-50 rounded-full hover:bg-navy-100"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" /><path d="M8.5 8.5a2.5 2.5 0 0 0 0 5 2.5 2.5 0 0 0 0-5Z" /></svg>
+            <span className="material-symbols-outlined text-base">brightness_low</span>
             Scherm uit
           </Button>
         </div>

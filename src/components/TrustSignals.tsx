@@ -111,11 +111,12 @@ export function TrustSignals({
       <div className="text-center space-y-3">
         {parentCount !== null && (
           <div
-            className="text-sm font-bold text-gray-700 dark:text-gray-300"
+            className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center justify-center gap-2"
             role="status"
             aria-live="polite"
           >
-            👨‍👩‍👧 Vertrouwd door {parentCount.toLocaleString('nl-NL')} ouders
+            <span className="material-symbols-outlined">family_restroom</span>
+            <span>Vertrouwd door {parentCount.toLocaleString('nl-NL')} ouders</span>
           </div>
         )}
       </div>
@@ -128,11 +129,12 @@ export function TrustSignals({
       <div className="text-center space-y-3 py-6 px-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl">
         {storiesCount !== null && (
           <div
-            className="text-sm font-bold text-primary"
+            className="text-sm font-bold text-primary flex items-center justify-center gap-2"
             role="status"
             aria-live="polite"
           >
-            📖 {storiesCount.toLocaleString('nl-NL')} verhalen gemaakt vandaag
+            <span className="material-symbols-outlined">auto_stories</span>
+            <span>{storiesCount.toLocaleString('nl-NL')} verhalen gemaakt vandaag</span>
           </div>
         )}
       </div>
@@ -153,7 +155,8 @@ export function TrustSignals({
           className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-primary transition-colors flex items-center gap-1"
           title="SSL Encrypted"
         >
-          🔒 SSL Encrypted
+          <span className="material-symbols-outlined text-base">lock</span>
+          <span>SSL Encrypted</span>
         </a>
 
         <a
@@ -165,7 +168,8 @@ export function TrustSignals({
           className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-primary transition-colors flex items-center gap-1"
           title="PCI DSS Compliant"
         >
-          💳 PCI DSS Compliant
+          <span className="material-symbols-outlined text-base">credit_card</span>
+          <span>PCI DSS Compliant</span>
         </a>
 
         <a
@@ -177,7 +181,8 @@ export function TrustSignals({
           className="text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-primary transition-colors flex items-center gap-1"
           title="GDPR & CCPA Compliant"
         >
-          🛡️ GDPR & CCPA
+          <span className="material-symbols-outlined text-base">shield</span>
+          <span>GDPR & CCPA</span>
         </a>
       </div>
 
@@ -194,7 +199,7 @@ export function TrustSignals({
             })
           }}
         >
-          <div className="text-2xl cursor-help">👶</div>
+          <span className="material-symbols-outlined text-4xl cursor-help text-pink-500">child_care</span>
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             Geverifieerd als Veilig voor Kinderen
           </div>
@@ -211,7 +216,7 @@ export function TrustSignals({
             })
           }}
         >
-          <div className="text-2xl cursor-help">🇪🇺</div>
+          <span className="material-symbols-outlined text-4xl cursor-help text-blue-500">verified_user</span>
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             Voldoet aan Europese Normen
           </div>

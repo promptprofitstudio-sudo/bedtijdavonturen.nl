@@ -78,7 +78,7 @@ export function PlanCard({ plan, onSelect, isLoading }: { plan: Plan; onSelect?:
       <ul className="space-y-2 text-sm">
         {plan.features.map((f) => (
           <li key={f} className="flex gap-2">
-            <span aria-hidden className={isWeekend ? "text-teal-500" : "text-ink-300"}>✓</span>
+            <span className={`material-symbols-outlined text-lg leading-none ${isWeekend ? "text-teal-500" : "text-ink-300"}`} aria-hidden>check_circle</span>
             <span className="text-ink-900/90">{f}</span>
           </li>
         ))}

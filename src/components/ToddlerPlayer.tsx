@@ -55,9 +55,9 @@ export function ToddlerPlayer({ audioUrl }: { audioUrl?: string }) {
                     isPlaying && "scale-95 bg-teal-600"
                 )}>
                     {isPlaying ? (
-                        <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                        <span className="material-symbols-outlined text-white text-5xl">pause</span>
                     ) : (
-                        <svg className="w-10 h-10 text-white ml-2" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                        <span className="material-symbols-outlined text-white text-5xl ml-1">play_arrow</span>
                     )}
                 </div>
             </button>
