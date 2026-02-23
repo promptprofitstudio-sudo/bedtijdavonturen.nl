@@ -44,11 +44,13 @@ const exampleStories: ExampleStory[] = [
 
 interface ExampleStoriesProps {
   onStoryOpen?: (storyId: string) => void
+  onCTAClick?: () => void
   deviceType?: 'mobile' | 'tablet' | 'desktop'
 }
 
 export function ExampleStoriesSection({
   onStoryOpen,
+  onCTAClick,
   deviceType = 'desktop',
 }: ExampleStoriesProps) {
   const [selectedStory, setSelectedStory] = useState<ExampleStory | null>(null)
@@ -145,7 +147,16 @@ export function ExampleStoriesSection({
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Klaar voor meer? Maak een uniek verhaal voor jouw kind.
             </p>
-            <button className="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-full hover:bg-primary/90 transition-all active:scale-95">
+            <button
+              onClick={() => {
+                posthog?.capture('example_stories_cta_click', {
+                  button: 'begin_eerste_verhaal',
+                  device_type: deviceType,
+                })
+                onCTAClick?.()
+              }}
+              className="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-full hover:bg-primary/90 transition-all active:scale-95"
+            >
               <span>Begin je eerste verhaal</span>
               <span className="material-symbols-outlined">auto_fix_high</span>
             </button>
@@ -203,7 +214,15 @@ export function ExampleStoriesSection({
 
                 {/* CTA Button in Modal */}
                 <button
-                  onClick={() => setSelectedStory(null)}
+                  onClick={() => {
+                    posthog?.capture('example_stories_cta_click', {
+                      button: 'maak_eigen_verhaal',
+                      story_id: selectedStory.id,
+                      device_type: deviceType,
+                    })
+                    setSelectedStory(null)
+                    onCTAClick?.()
+                  }}
                   className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 transition-all mt-6"
                 >
                   Maak jouw eigen verhaal

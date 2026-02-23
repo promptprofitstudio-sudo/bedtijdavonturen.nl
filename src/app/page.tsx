@@ -216,7 +216,7 @@ export default function HomePage() {
       </section>
 
       {/* AU-003: Example Stories Section */}
-      <ExampleStoriesSection deviceType={deviceType} />
+      <ExampleStoriesSection deviceType={deviceType} onCTAClick={handleCTAClick} />
 
       {/* Pricing Teaser */}
       <section className="px-4 py-12 text-center">
