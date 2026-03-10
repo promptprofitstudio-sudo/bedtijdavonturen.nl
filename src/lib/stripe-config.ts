@@ -12,3 +12,4 @@ export function getCheckoutMode(priceId: string): 'payment' | 'subscription' {
     }
     return 'subscription'
 }
+
