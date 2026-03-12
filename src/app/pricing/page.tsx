@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { Suspense } from 'react'
 import { SectionTitle, Card } from '@/components/ui'
 import { PlanCard, type Plan } from '@/components/PlanCard'
 import { PricingFAQ } from '@/components/PricingFAQ'
@@ -12,7 +13,7 @@ import { usePostHog } from 'posthog-js/react'
 
 export const dynamic = 'force-dynamic'
 
-export default function PricingPage() {
+function PricingPageInner() {
   const { user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -194,5 +195,13 @@ export default function PricingPage() {
         </div>
       )}
     </main>
+  )
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense>
+      <PricingPageInner />
+    </Suspense>
   )
 }
