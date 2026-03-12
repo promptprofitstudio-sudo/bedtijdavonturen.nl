@@ -125,7 +125,7 @@ export default function PricingPage() {
 
     startTransition(async () => {
       try {
-        await createCheckoutSession(plan.priceId, user.uid)
+        await createCheckoutSession(plan.priceId!, user.uid)
       } catch (err: any) {
         console.error(err)
         setToast('Er ging iets mis: ' + err.message)
