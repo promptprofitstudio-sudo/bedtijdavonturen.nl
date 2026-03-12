@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button, Card, SectionTitle, Pill } from '@/components/ui'
 import { EmailLoginForm } from '@/components/EmailLoginForm'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
@@ -18,8 +18,16 @@ function AccountPageContent() {
   const { user, loading, signInWithGoogle, signOut, db, initError, retryInit } = useAuth()
   const [profiles, setProfiles] = useState<ChildProfile[]>([])
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   /* handleDelete removed, moved to /profiles */
+
+  useEffect(() => {
+    const nextPath = searchParams.get('next')
+    if (user && nextPath === '/pricing') {
+      router.push('/pricing')
+    }
+  }, [user, searchParams, router])
 
   // Check for payment success
   useEffect(() => {

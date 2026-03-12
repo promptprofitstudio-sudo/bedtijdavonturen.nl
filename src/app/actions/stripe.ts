@@ -1,46 +1,77 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
 import { redirect } from 'next/navigation'
-import { getCheckoutMode } from '@/lib/stripe-config'
+import { resolvePlanFromPriceId } from '@/lib/stripe-config'
+
+function normalizeOrigin(value: string) {
+    const trimmed = value.trim().replace(/\/$/, '')
+    if (!trimmed) return ''
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed
+    return `https://${trimmed}`
+}
+
+async function resolveOrigin() {
+    if (process.env.FIREBASE_APP_HOSTING_URL) {
+        return normalizeOrigin(process.env.FIREBASE_APP_HOSTING_URL)
+    }
+
+    if (process.env.NEXT_PUBLIC_BASE_URL) {
+        return normalizeOrigin(process.env.NEXT_PUBLIC_BASE_URL)
+    }
+
+    if (process.env.VERCEL_URL) {
+        return normalizeOrigin(process.env.VERCEL_URL)
+    }
+
+    const h = await headers()
+    const headerOrigin = h.get('origin')
+    if (headerOrigin) {
+        return normalizeOrigin(headerOrigin)
+    }
+
+    const host = h.get('x-forwarded-host') || h.get('host')
+    if (host) {
+        const proto = h.get('x-forwarded-proto') || 'https'
+        return normalizeOrigin(`${proto}://${host}`)
+    }
+
+    return 'http://localhost:3000'
+}
 
 export async function createCheckoutSession(priceId: string, userId: string) {
     if (!priceId || !userId) {
         console.error('Missing priceId or userId')
-        return
+        throw new Error('Missing checkout parameters')
     }
 
-    // Determine domain for success/cancel URLs
-    let origin = 'http://localhost:3000'
-
-    // Production: Firebase App Hosting
-    if (process.env.FIREBASE_APP_HOSTING_URL) {
-        origin = process.env.FIREBASE_APP_HOSTING_URL
-    }
-    // Fallback: Next.js on Vercel
-    else if (process.env.VERCEL_URL) {
-        origin = `https://${process.env.VERCEL_URL}`
-    }
-    // Manual override (set in Secret Manager or GitHub Secrets)
-    else if (process.env.NEXT_PUBLIC_BASE_URL) {
-        origin = process.env.NEXT_PUBLIC_BASE_URL
-    }
-
-    const mode = getCheckoutMode(priceId)
+    const origin = await resolveOrigin()
 
     console.log('[Stripe] Creating checkout session:', {
         origin,
         success_url: `${origin}/account?success=true`,
         cancel_url: `${origin}/pricing?canceled=true`,
-        mode,
         priceId
     })
 
     try {
         const stripe = await getStripe()
+        const stripePrice = await stripe.prices.retrieve(priceId)
+
+        if (!stripePrice || 'deleted' in stripePrice) {
+            throw new Error(`Unknown Stripe price: ${priceId}`)
+        }
+
+        if (!stripePrice.active) {
+            throw new Error(`Inactive Stripe price: ${priceId}`)
+        }
+
+        const mode: 'payment' | 'subscription' = stripePrice.type === 'one_time' ? 'payment' : 'subscription'
+
         const session = await stripe.checkout.sessions.create({
-            mode: mode,
-            payment_method_types: ['card', 'ideal'],
+            mode,
+            payment_method_types: mode === 'payment' ? ['card', 'ideal'] : ['card'],
             line_items: [
                 {
                     price: priceId,
@@ -49,8 +80,12 @@ export async function createCheckoutSession(priceId: string, userId: string) {
             ],
             metadata: {
                 userId,
+                priceId,
             },
-            customer_email: undefined,
+            client_reference_id: userId,
+            allow_promotion_codes: true,
+            billing_address_collection: 'auto',
+            ...(mode === 'subscription' ? { subscription_data: { metadata: { userId, priceId } } } : {}),
             success_url: `${origin}/account?success=true`,
             cancel_url: `${origin}/pricing?canceled=true`,
         })
@@ -59,17 +94,17 @@ export async function createCheckoutSession(priceId: string, userId: string) {
         trackServerEventAsync({
             userId,
             event: 'checkout_started',
-            properties: { price_id: priceId, mode }
+            properties: { price_id: priceId, mode, plan: resolvePlanFromPriceId(priceId) }
         })
-        // Don't await - fire-and-forget!
 
-        if (session.url) {
-            redirect(session.url)
+        if (!session.url) {
+            throw new Error('Stripe did not return a checkout URL')
         }
+
+        redirect(session.url)
     } catch (err: any) {
         console.error('Stripe Checkout Error:', err)
-        // Check if it's a redirect error (NEXT_REDIRECT)
-        if (err.message === 'NEXT_REDIRECT') throw err;
+        if (err?.message === 'NEXT_REDIRECT' || (typeof err?.digest === 'string' && err.digest.startsWith('NEXT_REDIRECT'))) throw err
         throw new Error('Checkout failed: ' + err.message)
     }
 }

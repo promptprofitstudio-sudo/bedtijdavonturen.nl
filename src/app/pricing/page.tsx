@@ -5,7 +5,7 @@ import { SectionTitle, Card } from '@/components/ui'
 import { PlanCard, type Plan } from '@/components/PlanCard'
 import { PricingFAQ } from '@/components/PricingFAQ'
 import { useAuth } from '@/context/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createCheckoutSession } from '@/app/actions/stripe'
 import { STRIPE_CONFIG } from '@/lib/stripe-config'
 import { usePostHog } from 'posthog-js/react'
@@ -15,6 +15,7 @@ export const dynamic = 'force-dynamic'
 export default function PricingPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const posthog = usePostHog()
   const [isPending, startTransition] = React.useTransition()
   const [toast, setToast] = React.useState<string | null>(null)
@@ -26,6 +27,12 @@ export default function PricingPage() {
       device_type: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
     })
   }, [posthog])
+
+  React.useEffect(() => {
+    if (searchParams.get('canceled') === 'true') {
+      setToast('Betaling geannuleerd. Je kunt een plan opnieuw kiezen.')
+    }
+  }, [searchParams])
 
   /* Refined Packages (v2.2) with AU-004 badges */
   const plans: Plan[] = [
@@ -50,7 +57,7 @@ export default function PricingPage() {
       highlighted: true,
       buttonText: 'Try Free for 7 Days',
       priceId: STRIPE_CONFIG.prices.monthly,
-      badge: { text: 'Aanbevolen', color: 'orange' }, // AU-004
+      badge: { text: 'Aanbevolen', color: 'orange' },
     },
     {
       name: 'Family',
@@ -61,12 +68,11 @@ export default function PricingPage() {
       variant: 'default',
       highlighted: false,
       buttonText: 'Unlock Family Plan',
-      priceId: STRIPE_CONFIG.prices.annual,
-      badge: { text: 'Beste Waarde', color: 'green' }, // AU-004
+      priceId: STRIPE_CONFIG.prices.family,
+      badge: { text: 'Beste Waarde', color: 'green' },
     },
   ]
 
-  /* New State for Waiver Checkbox */
   const [agreedToTerms, setAgreedToTerms] = React.useState(false)
 
   const getDeviceType = () => {
@@ -75,31 +81,16 @@ export default function PricingPage() {
   }
 
   const handleSelect = (plan: Plan) => {
+    if (isPending) return
+
     if (!user) {
       setToast('Log eerst in om te abonneren.')
-      setTimeout(() => router.push('/account'), 1500)
+      router.push('/account?next=%2Fpricing')
       return
     }
 
     const deviceType = getDeviceType()
 
-    // AU-004: Fire analytics events
-    posthog?.capture('plan_selected', {
-      plan_name: plan.name,
-      plan_price_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
-      device_type: deviceType,
-      from_faq_context: false,
-    })
-
-    posthog?.capture('payment_initiated', {
-      plan_name: plan.name,
-      plan_price_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
-      payment_method: 'card', // Default
-      device_type: deviceType,
-      total_amount_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
-    })
-
-    /* Checkbox Validation */
     if (!agreedToTerms) {
       setToast('Ga eerst akkoord met de voorwaarden.')
       return
@@ -110,11 +101,31 @@ export default function PricingPage() {
       return
     }
 
+    if (!plan.priceId.startsWith('price_')) {
+      setToast('Deze bundel heeft een ongeldige Stripe prijs-ID.')
+      return
+    }
+
+    posthog?.capture('plan_selected', {
+      plan_name: plan.name,
+      plan_price_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
+      device_type: deviceType,
+      from_faq_context: false,
+    })
+
+    posthog?.capture('payment_initiated', {
+      plan_name: plan.name,
+      plan_price_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
+      payment_method: 'card',
+      device_type: deviceType,
+      total_amount_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
+    })
+
     setToast('Bezig met doorsturen naar Stripe...')
 
     startTransition(async () => {
       try {
-        await createCheckoutSession(plan.priceId!, user.uid)
+        await createCheckoutSession(plan.priceId, user.uid)
       } catch (err: any) {
         console.error(err)
         setToast('Er ging iets mis: ' + err.message)
@@ -128,7 +139,6 @@ export default function PricingPage() {
         <SectionTitle title="Kies je plan" subtitle="Stop fighting bedtime. Start enjoying it." />
       </header>
 
-      {/* [NEW] Trial Status Banner */}
       {user?.subscriptionStatus === 'trial' && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-2">
           <p className="text-green-800 font-bold">✨ Je geniet van 7 dagen gratis Premium!</p>
@@ -140,7 +150,6 @@ export default function PricingPage() {
       )}
 
       <div className="space-y-3">
-        {/* Compliance Checkbox */}
         <div className="bg-moon-50 p-3 rounded-xl border border-moon-100 flex gap-3 items-start">
           <input
             type="checkbox"
@@ -169,7 +178,6 @@ export default function PricingPage() {
         <p className="text-xs text-ink-800/70">Abonnementen zijn op elk moment met 1 klik te stoppen in je account.</p>
       </Card>
 
-      {/* AU-004: Pricing FAQ Section */}
       <div className="mt-8">
         <PricingFAQ deviceType={getDeviceType()} />
       </div>
