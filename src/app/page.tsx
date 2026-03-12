@@ -222,7 +222,7 @@ export default function HomePage() {
       <section className="px-4 py-12 text-center">
         <p className="text-sm text-gray-500 font-medium mb-3">Flexibiliteit staat voorop</p>
         <Link href="/pricing" className="inline-block text-primary font-bold hover:underline">
-          Kies voor een abonnement of een losse Weekend Bundel (€1,99) &rarr;
+          Kies voor een abonnement of een losse Weekend Bundel (€2,99) &rarr;
         </Link>
       </section>
 

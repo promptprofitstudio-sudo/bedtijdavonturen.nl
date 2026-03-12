@@ -86,17 +86,17 @@ export default function PricingPage() {
     // AU-004: Fire analytics events
     posthog?.capture('plan_selected', {
       plan_name: plan.name,
-      plan_price_eur: parseFloat(plan.price.replace('€', '')),
+      plan_price_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
       device_type: deviceType,
       from_faq_context: false,
     })
 
     posthog?.capture('payment_initiated', {
       plan_name: plan.name,
-      plan_price_eur: parseFloat(plan.price.replace('€', '')),
+      plan_price_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
       payment_method: 'card', // Default
       device_type: deviceType,
-      total_amount_eur: parseFloat(plan.price.replace('€', '')),
+      total_amount_eur: parseFloat(plan.price.replace('€', '').replace(',', '.')),
     })
 
     /* Checkbox Validation */
