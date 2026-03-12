@@ -5,8 +5,12 @@ import { getSecret } from '@/lib/secrets'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-function getPriceMapping(priceId: string | undefined, config: { prices: Record<string, string> }) {
-  if (!priceId) return { creditsToAdd: 0, statusUpdate: null as string | null }
+function getPriceMapping(
+  priceId: string | undefined,
+  price: Stripe.Price | Stripe.DeletedPrice | null | undefined,
+  config: { prices: Record<string, string> },
+) {
+  if (!priceId && !price) return { creditsToAdd: 0, statusUpdate: null as string | null }
 
   if (priceId === config.prices.weekend) {
     return { creditsToAdd: 3, statusUpdate: null as string | null }
@@ -14,6 +18,20 @@ function getPriceMapping(priceId: string | undefined, config: { prices: Record<s
 
   if (priceId === config.prices.monthly || priceId === config.prices.family || priceId === config.prices.annual) {
     return { creditsToAdd: priceId === config.prices.monthly ? 10 : 20, statusUpdate: 'premium' }
+  }
+
+  if (price && !('deleted' in price)) {
+    if (price.type === 'one_time') {
+      return { creditsToAdd: 3, statusUpdate: null as string | null }
+    }
+
+    if (price.recurring) {
+      // Fallback by amount when IDs are not configured consistently at runtime.
+      if (price.unit_amount === 999) {
+        return { creditsToAdd: 20, statusUpdate: 'premium' }
+      }
+      return { creditsToAdd: 10, statusUpdate: 'premium' }
+    }
   }
 
   return { creditsToAdd: 0, statusUpdate: null as string | null }
@@ -52,8 +70,9 @@ export async function POST(req: Request) {
         const stripe = await getStripe()
 
         const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 5 })
-        const priceId = lineItems.data[0]?.price?.id
-        const { creditsToAdd, statusUpdate } = getPriceMapping(priceId, STRIPE_CONFIG)
+        const firstPrice = lineItems.data[0]?.price
+        const priceId = typeof firstPrice === 'string' ? firstPrice : firstPrice?.id
+        const { creditsToAdd, statusUpdate } = getPriceMapping(priceId, firstPrice, STRIPE_CONFIG)
 
         const updateData: Record<string, unknown> = {
           stripeCustomerId: typeof session.customer === 'string' ? session.customer : undefined,
