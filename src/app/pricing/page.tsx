@@ -96,12 +96,14 @@ export default function PricingPage() {
       return
     }
 
-    if (!plan.priceId) {
+    const selectedPriceId = plan.priceId
+
+    if (!selectedPriceId) {
       setToast('Deze bundel is nog niet beschikbaar.')
       return
     }
 
-    if (!plan.priceId.startsWith('price_')) {
+    if (!selectedPriceId.startsWith('price_')) {
       setToast('Deze bundel heeft een ongeldige Stripe prijs-ID.')
       return
     }
@@ -125,7 +127,7 @@ export default function PricingPage() {
 
     startTransition(async () => {
       try {
-        await createCheckoutSession(plan.priceId!, user.uid)
+        await createCheckoutSession(selectedPriceId, user.uid)
       } catch (err: any) {
         console.error(err)
         setToast('Er ging iets mis: ' + err.message)

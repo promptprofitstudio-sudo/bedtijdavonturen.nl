@@ -126,9 +126,8 @@ export async function POST(req: Request) {
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object as Stripe.Invoice
-    const subscriptionId = typeof (invoice as any).subscription === 'string' ? (invoice as any).subscription : (invoice as any).subscription?.id
     const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
-    console.log(`[Stripe] Invoice paid for customer ${customerId} (subscription ${subscriptionId || 'unknown'})`)
+    console.log(`[Stripe] Invoice paid for customer ${customerId} (invoice ${invoice.id})`)
   }
 
   if (event.type === 'customer.subscription.deleted') {
