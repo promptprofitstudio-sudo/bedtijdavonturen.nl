@@ -13,7 +13,7 @@ import { usePostHog } from 'posthog-js/react'
 
 export const dynamic = 'force-dynamic'
 
-function PricingPageInner() {
+function PricingPageContent() {
   const { user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -200,8 +200,12 @@ function PricingPageInner() {
 
 export default function PricingPage() {
   return (
-    <Suspense>
-      <PricingPageInner />
+    <Suspense fallback={
+      <main className="px-4 py-6 space-y-6">
+        <p className="text-center text-sm text-ink-500">Laden...</p>
+      </main>
+    }>
+      <PricingPageContent />
     </Suspense>
   )
 }
