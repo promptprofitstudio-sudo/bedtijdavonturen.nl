@@ -20,6 +20,7 @@ jobs:
       # Stripe Price IDs (CRITICAL: These are embedded in the build)
       NEXT_PUBLIC_STRIPE_PRICE_WEEKEND: ${{ secrets.NEXT_PUBLIC_STRIPE_PRICE_WEEKEND }}
       NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: ${{ secrets.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY }}
+      NEXT_PUBLIC_STRIPE_PRICE_FAMILY: ${{ secrets.NEXT_PUBLIC_STRIPE_PRICE_FAMILY }}
       NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: ${{ secrets.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL }}
     steps:
       - uses: actions/checkout@v4

@@ -14,6 +14,13 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === 'development',
   workboxOptions: {
     disableDevLogs: true,
+    // Never let the service worker cache /wizard HTML — prevents stale unstyled pages after deploys.
+    runtimeCaching: [
+      {
+        urlPattern: /^\/wizard/,
+        handler: 'NetworkOnly',
+      },
+    ],
   },
 });
 

@@ -66,6 +66,7 @@ export default {
       boxShadow: {
         soft: '0 12px 30px rgba(5, 10, 30, 0.18)',
         card: '0 10px 24px rgba(5, 10, 30, 0.14)',
+        'teal-glow': '0 10px 24px rgba(25, 148, 115, 0.22)',
       },
       borderRadius: {
         xl: '16px',
