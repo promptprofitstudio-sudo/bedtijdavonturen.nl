@@ -128,7 +128,13 @@ function PricingPageContent() {
 
     startTransition(async () => {
       try {
-        await createCheckoutSession(selectedPriceId, user.uid)
+        const result = await createCheckoutSession(selectedPriceId, user.uid)
+
+        if (!result?.url) {
+          throw new Error('Geen checkout-link ontvangen van Stripe.')
+        }
+
+        window.location.href = result.url
       } catch (err: any) {
         console.error(err)
         setToast('Er ging iets mis: ' + err.message)

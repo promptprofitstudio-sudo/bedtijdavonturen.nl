@@ -2,7 +2,6 @@
 
 import { headers } from 'next/headers'
 import { getStripe } from '@/lib/stripe'
-import { redirect } from 'next/navigation'
 import { resolvePlanFromPriceId } from '@/lib/stripe-config'
 
 function normalizeOrigin(value: string) {
@@ -101,10 +100,9 @@ export async function createCheckoutSession(priceId: string, userId: string) {
             throw new Error('Stripe did not return a checkout URL')
         }
 
-        redirect(session.url)
+        return { ok: true, url: session.url }
     } catch (err: any) {
         console.error('Stripe Checkout Error:', err)
-        if (err?.message === 'NEXT_REDIRECT' || (typeof err?.digest === 'string' && err.digest.startsWith('NEXT_REDIRECT'))) throw err
         throw new Error('Checkout failed: ' + err.message)
     }
 }
