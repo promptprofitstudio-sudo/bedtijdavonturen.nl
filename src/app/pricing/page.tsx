@@ -7,7 +7,6 @@ import { PlanCard, type Plan } from '@/components/PlanCard'
 import { PricingFAQ } from '@/components/PricingFAQ'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createCheckoutSession } from '@/app/actions/stripe'
 import { STRIPE_CONFIG } from '@/lib/stripe-config'
 import { usePostHog } from 'posthog-js/react'
 
@@ -128,7 +127,17 @@ function PricingPageContent() {
 
     startTransition(async () => {
       try {
-        const result = await createCheckoutSession(selectedPriceId, user.uid)
+        const response = await fetch('/api/stripe/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ priceId: selectedPriceId, userId: user.uid }),
+        })
+
+        const result = await response.json()
+
+        if (!response.ok) {
+          throw new Error(result?.error || 'Stripe checkout kon niet worden gestart.')
+        }
 
         if (!result?.url) {
           throw new Error('Geen checkout-link ontvangen van Stripe.')
