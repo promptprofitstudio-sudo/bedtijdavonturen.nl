@@ -41,34 +41,34 @@ function PricingPageContent() {
       name: 'Weekend Pakket',
       price: '€2,99',
       period: 'eenmalig',
-      tagline: '3 bedtime stories — enough to get through sleepover drama',
+      tagline: '3 verhalen voor het slapengaan — genoeg om logeerpartijtjes zonder drama door te komen',
       features: ['3 Verhalen die niet verlopen', 'Perfect voor logeerpartijtjes of oppas', 'Inclusief Audio & Print', 'Geen maandelijkse kosten'],
       variant: 'weekend',
       highlighted: false,
-      buttonText: 'Start Now — 3 Stories for €2.99',
+      buttonText: 'Start Nu — 3 Verhalen voor €2,99',
       priceId: STRIPE_CONFIG.prices.weekend,
     },
     {
       name: 'Rust & Regelmaat',
       price: '€7,99',
       period: '/ maand',
-      tagline: 'A new story every night — never use the same bedtime script twice',
-      features: ['Onbeperkt Audio 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Cancel anytime. No questions. No auto-renewal surprises.'],
+      tagline: 'Elke avond een nieuw verhaal — gebruik nooit meer twee keer hetzelfde script',
+      features: ['Onbeperkt Audio 🎧', 'Voor 1 kind', 'Alle lees- en luisterfuncties', 'Opzeggen kan altijd. Geen vragen. Geen verrassingen.'],
       variant: 'default',
       highlighted: true,
-      buttonText: 'Try Free for 7 Days',
+      buttonText: 'Probeer 7 Dagen Gratis',
       priceId: STRIPE_CONFIG.prices.monthly,
       badge: { text: 'Aanbevolen', color: 'orange' },
     },
     {
-      name: 'Family',
+      name: 'Familie',
       price: '€9,99',
       period: '/ maand',
-      tagline: 'Bedtime peace for your whole house — even Grandma\'s got a story ready',
-      features: ['Onbeperkt Audio 🎧', '5 Kindprofielen', 'Premium Stemmen', 'Grandparents can listen & read along from their own home — bonding made easy'],
+      tagline: 'Avondrust voor het hele gezin — zelfs oma heeft een verhaal klaar',
+      features: ['Onbeperkt Audio 🎧', '5 Kindprofielen', 'Premium Stemmen', 'Opa en oma kunnen meelezen en luisteren vanuit hun eigen huis'],
       variant: 'default',
       highlighted: false,
-      buttonText: 'Unlock Family Plan',
+      buttonText: 'Kies het Familie Plan',
       priceId: STRIPE_CONFIG.prices.family,
       badge: { text: 'Beste Waarde', color: 'green' },
     },
@@ -139,7 +139,7 @@ function PricingPageContent() {
   return (
     <main className="px-4 py-6 space-y-6">
       <header className="space-y-2">
-        <SectionTitle title="Kies je plan" subtitle="Stop fighting bedtime. Start enjoying it." />
+        <SectionTitle title="Kies je plan" subtitle="Stop de strijd rond bedtijd. Begin met genieten." />
       </header>
 
       {user?.subscriptionStatus === 'trial' && (
